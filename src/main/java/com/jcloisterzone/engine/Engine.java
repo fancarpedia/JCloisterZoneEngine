@@ -146,6 +146,7 @@ public class Engine implements  Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"monastery", MonasteriesCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"russian-trap", RussianPromosTrapCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"watchtower", WatchtowerCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"barber-surgeon", BarberSurgeonCapability.class);
 
         capabilities = addCapabilities(capabilities, setupMsg,"robbers-son", RobbersSonCapability.class);
 
