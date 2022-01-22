@@ -7,6 +7,7 @@ import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.TokenPlacedEvent;
 import com.jcloisterzone.feature.*;
 import com.jcloisterzone.figure.Barn;
+import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.Wagon;
 import com.jcloisterzone.game.Capability;
@@ -100,6 +101,8 @@ public class ScoringPhase extends Phase {
         Position pos = lastPlaced.getPosition();
 
         Map<Wagon, FeaturePointer> deployedWagonsBefore = getDeployedWagons(state);
+        
+        Map<Meeple, FeaturePointer> deployedFollowersBefore = getDeployedFollowers(state);
 
         collectCompletedOnTile(state, lastPlaced);
         collectCompletedOnAdjacentEdges(state, pos); // closed by abbey, city gates ... etc
@@ -195,6 +198,27 @@ public class ScoringPhase extends Phase {
             state = state.setCapabilityModel(WagonCapability.class, model);
         }
 
+        System.out.println("Deployed Meeples");
+        System.out.println(deployedFollowersBefore);
+        if (!deployedFollowersBefore.isEmpty()) {
+            Set<Meeple> deployedFollowersAfter = getDeployedFollowers(state).keySet();
+            Set<Meeple> returnedFollowers = deployedFollowersBefore.keySet().diff(deployedFollowersAfter);
+
+            System.out.println("Returned Meeples");
+            System.out.println(returnedFollowers);
+
+            Tuple2<Meeple, FeaturePointer> model = state.getPlayers()
+                .getPlayersBeginWith(state.getTurnPlayer())
+                .flatMap(p -> returnedFollowers.filter(w -> w.getPlayer().equals(p)))
+                .map(w -> new Tuple2<>(w, deployedFollowersBefore.get(w).get()))
+                .getOrNull();
+
+            System.out.println("BS Model");
+            System.out.println(model);
+            
+            state = state.setCapabilityModel(BarberSurgeonCapability.class, model);
+        }
+
         completedMutable.clear();
         return next(state);
     }
@@ -203,6 +227,11 @@ public class ScoringPhase extends Phase {
         return state.getDeployedMeeples()
            .filter((m, fp) -> m instanceof Wagon)
            .mapKeys(m -> (Wagon) m);
+    }
+
+    private Map<Meeple, FeaturePointer> getDeployedFollowers(GameState state) {
+        return state.getDeployedMeeples()
+           .filter((m, fp) -> m instanceof Follower);
     }
 
     private void collectCompleted(GameState state, Completable completable) {
