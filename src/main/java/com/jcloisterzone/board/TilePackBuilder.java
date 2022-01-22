@@ -5,6 +5,7 @@ import com.jcloisterzone.feature.modifier.BooleanAllModifier;
 import com.jcloisterzone.feature.modifier.BooleanAnyModifier;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
+import com.jcloisterzone.feature.modifier.IntegerArrayModifier;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.TunnelCapability;
@@ -116,6 +117,7 @@ public class TilePackBuilder {
                     case "+": cls = IntegerAddModifier.class; break;
                     case "all": cls = BooleanAllModifier.class; break;
                     case "any": cls = BooleanAnyModifier.class; break;
+                    case "intarray": cls = IntegerArrayModifier.class; break;
                 }
                 String selector = modifierEl.getAttribute("selector");
                 SetupQuery enabledBy = null;
