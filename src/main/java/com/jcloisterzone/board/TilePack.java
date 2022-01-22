@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents a stack of tiles that can be drawn. It handles active/unactivated tiles and only draws from active ones.
@@ -258,6 +259,27 @@ public class TilePack implements Serializable {
     public TilePack removeTilesById(String tileId) {
         return setGroups(groups.mapValues(g ->
             g.mapTiles(tiles -> tiles.filter(tile -> !tile.getId().equals(tileId)))
+        ));
+    }
+
+    /**
+     * Removes requested count of the tile with id {@code tileId}.
+     *
+     * @param tileId the tile id
+     * @param count of removed tiles
+     * @return a new instance with the tile removed
+     */
+    public TilePack removeTilesById(String tileId, int count) {
+    	AtomicInteger removed = new AtomicInteger(0);
+        return setGroups(groups.mapValues(g ->
+            g.mapTiles(tiles -> tiles.filter(tile -> {
+            	if (tile.getId().equals(tileId) && removed.get()<count) {
+            		removed.addAndGet(1);
+            		return false;
+            	} else {
+            		return true;
+            	}
+            }))
         ));
     }
 
