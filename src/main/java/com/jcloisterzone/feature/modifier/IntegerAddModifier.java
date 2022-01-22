@@ -1,6 +1,5 @@
 package com.jcloisterzone.feature.modifier;
 
-import com.jcloisterzone.feature.ModifiedFeature;
 import com.jcloisterzone.game.setup.SetupQuery;
 
 public class IntegerAddModifier extends FeatureModifier<Integer> {
