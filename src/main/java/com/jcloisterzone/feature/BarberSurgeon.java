@@ -42,15 +42,9 @@ public class BarberSurgeon extends TileFeature implements TrapFeature, Structure
         return new BarberSurgeon(placeOnBoardPlaces(pos, rot), modifiers);
     }
     
-    public PointsExpression getRansomPoints(GameState state) {
-    	Integer ransom = getModifier(state, VALUE, null);
-
-    	if (ransom != null) {
-            var exprItems = new ArrayList<ExprItem>();
-    		exprItems.add(new ExprItem(1, "ransom", -1 * ransom));
-    		return new PointsExpression("barbersurgeons", List.ofAll(exprItems));
-    	}
-    	return null;
+    public Integer getValue(GameState state) {
+    	Integer value = getModifier(state, VALUE, null);
+    	return value;
     }
 
     public static String name() {

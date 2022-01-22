@@ -52,7 +52,7 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
         if (setup.contains(CountCapability.class)) next = new CocFollowerPhase(randomGenerator, next);
         if (setup.contains(BigTopCapability.class)) next = new BigTopPhase(randomGenerator, next);
         if (setup.contains(WagonCapability.class)) next = new WagonPhase(randomGenerator, next);
-        if (setup.contains(BarberSurgeonCapability.class)) next = new BarberSurgeonPhase(randomGenerator, next);
+        if (setup.contains(BarberSurgeonCapability.class)) next = new BarberSurgeonTrapPhase(randomGenerator, next);
         next = new ScoringPhase(randomGenerator, next);
         if (setup.contains(CountCapability.class)) next = new CocScoringPhase(randomGenerator, next);
         next = new CommitActionPhase(randomGenerator, next);
@@ -70,6 +70,7 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
         if (setup.contains(PhantomCapability.class)) next = new PhantomPhase(randomGenerator, next);
         if (setup.contains(RussianPromosTrapCapability.class)) next = new RussianPromosTrapPhase(randomGenerator, next);
         next = actionPhase = new ActionPhase(randomGenerator, next);
+        if (setup.contains(BarberSurgeonCapability.class)) next = new BarberSurgeonBuyBackPhase(randomGenerator, next);
         if (setup.contains(MageAndWitchCapability.class)) next =  new MageAndWitchPhase(randomGenerator, next);
         if (setup.contains(GoldminesCapability.class)) next =  new GoldPiecePhase(randomGenerator, next);
         next = tilePhase = new TilePhase(randomGenerator, next);

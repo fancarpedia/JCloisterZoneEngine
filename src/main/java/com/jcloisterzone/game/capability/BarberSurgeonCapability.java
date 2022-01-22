@@ -16,12 +16,14 @@ import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
-import com.jcloisterzone.io.message.ReturnMeepleMessage;
+import com.jcloisterzone.game.state.PlacedTile;
+import com.jcloisterzone.reducers.UndeployMeeple;
 
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
-import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
+import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
 import io.vavr.collection.Vector;
 
 /**
@@ -71,24 +73,27 @@ public class BarberSurgeonCapability extends Capability<Tuple2<Meeple, FeaturePo
     }
 
     @Override
-    public GameState onActionPhaseEntered(GameState state) {
-        ActionsState actions = state.getPlayerActions();
-        HashSet places = HashSet.empty();
-        Player active = state.getActivePlayer();
-        Position placeTilePos = state.getLastPlaced().getPosition();
-        for (Tuple2<Meeple, FeaturePointer> t : state.getDeployedMeeples()) {
-            Meeple meeple = t._1;
-            FeaturePointer fp = t._2;
-            Feature feature = state.getFeature(fp);
-            if (meeple.getPlayer().equals(active) && !fp.getPosition().equals(placeTilePos) && (feature instanceof BarberSurgeon)) {
-                places = places.add(new MeeplePointer(fp, meeple.getId()));
-            }
-        }
+    public GameState onTilePlaced(GameState state, PlacedTile placedTile) {
+    	GameState _state = state;
+    	Set<FeaturePointer> occupiedBarberSurgeons = state
+    			.getFeatures(BarberSurgeon.class)
+    			.filter(c -> c.isOccupied(_state))
+    			.map(f -> f.getPlace())
+    			.toSet();
 
-        if (!places.isEmpty()){
-            actions = actions.appendAction(new ReturnMeepleAction(places, ReturnMeepleMessage.ReturnMeepleSource.BARBER_SURGEON));
-            state = state.setPlayerActions(actions);
-        }
+    	for(FeaturePointer fp: occupiedBarberSurgeons) {
+    		Stream<Tuple2<Location, PlacedTile>> surroundingTiles = state.getAdjacentAndDiagonalTiles2(fp.getPosition());
+    		if (surroundingTiles.size()==8 && surroundingTiles.filter(t -> t._2.getPosition().equals(placedTile.getPosition())).size()>0) {
+    			// Fully surrounded and one of tile is current placedTile
+    	        for (Tuple2<Meeple, FeaturePointer> t: state.getDeployedMeeples()) {
+    	            Meeple m = t._1;
+    	            FeaturePointer _fp = t._2;
+    	            if (fp.getPosition().equals(_fp.getPosition())) {
+    	                state = (new UndeployMeeple(m, true)).apply(state);
+    	            }
+    	        }
+    		}
+    	}
         return state;
     }
 }

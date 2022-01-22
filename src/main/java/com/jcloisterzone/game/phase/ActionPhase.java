@@ -144,12 +144,6 @@ public class ActionPhase extends AbstractActionPhase {
                     throw new IllegalArgumentException("Not owner");
                 }
                 break;
-        	case BARBER_SURGEON:
-                if (meeple.getPlayer() != state.getPlayerActions().getPlayer()) {
-                    throw new IllegalArgumentException("Not owner");
-                }
-                payBarberSurgeonRansom = (BarberSurgeon) state.getFeature(ptr.asFeaturePointer());
-        		break;
             default:
                 throw new IllegalArgumentException("Return meeple is not allowed");
         }
@@ -161,19 +155,6 @@ public class ActionPhase extends AbstractActionPhase {
             PointsExpression points = assignAbbotScore.getStructurePoints(state, false);
             ReceivedPoints rp = new ReceivedPoints(points, meeple.getPlayer(), ptr.asFeaturePointer());
             state = (new AddPoints(rp, false)).apply(state);
-        }
-
-        if (payBarberSurgeonRansom != null) {
-        	System.out.println("");
-        	System.out.println("-");
-        	System.out.println("--");
-//        	System.out.println(payBarberSurgeonRansom.get);
-            PointsExpression ransom = payBarberSurgeonRansom.getRansomPoints(state);
-        	System.out.println(ransom);
-            if (ransom != null) {
-              ReceivedPoints rp = new ReceivedPoints(ransom, meeple.getPlayer(), ptr.asFeaturePointer());
-              state = (new AddPoints(rp, false)).apply(state);
-            }
         }
 
         return next(state);

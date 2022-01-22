@@ -30,9 +30,9 @@ import io.vavr.collection.Queue;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 
-public class BarberSurgeonPhase extends Phase {
+public class BarberSurgeonTrapPhase extends Phase {
 
-    public BarberSurgeonPhase(RandomGenerator random, Phase defaultNext) {
+    public BarberSurgeonTrapPhase(RandomGenerator random, Phase defaultNext) {
         super(random, defaultNext);
     }
 
