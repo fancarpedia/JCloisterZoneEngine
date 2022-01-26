@@ -139,7 +139,7 @@ public class Tile implements Serializable {
         if (tuple._2 instanceof Road) return EdgeType.ROAD;
         if (tuple._2 instanceof City) return EdgeType.CITY;
         if (tuple._2 instanceof River) return EdgeType.RIVER;
-        if (tuple._2 instanceof CityGate) return EdgeType.CITY_GATE;
+        if (tuple._2 instanceof CityGate || tuple._2 instanceof LittleHouse) return EdgeType.CITY_GATE;
         if (tuple._2 instanceof AbbeyEdge) return EdgeType.ANY;
 
         throw new IllegalArgumentException();

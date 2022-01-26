@@ -48,7 +48,7 @@ public class PlaceBridge implements Reducer {
             Position adj = bridgePos.add(side);
             Feature f = state.getFeaturePartOf(adj, side.rev());
             if (f != null && !(f instanceof Road)) {
-                // city gate
+                // city gate or little house
                 bridgeRoad = bridgeRoad.closeEdge(new Edge(bridgePos, adj));
             }
         }

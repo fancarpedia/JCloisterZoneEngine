@@ -252,6 +252,14 @@ public class TileBuilder {
                 initFeature(null, new CityGate(List.of(gateFp), fp));
             });
         }
+
+        if (e.hasAttribute("little-house")) {
+            attrAsLocations(e, "little-house").forEach(loc -> {
+                assert loc.isEdge();
+                FeaturePointer gateFp = new FeaturePointer(Position.ZERO, LittleHouse.class, loc);
+                initFeature(null, new LittleHouse(List.of(gateFp)));
+            });
+        }
     }
 
     private void processRiverElement(Element e) {

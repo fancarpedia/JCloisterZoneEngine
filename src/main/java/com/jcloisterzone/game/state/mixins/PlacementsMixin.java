@@ -4,6 +4,7 @@ import com.jcloisterzone.board.*;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.feature.Acrobats;
 import com.jcloisterzone.feature.CityGate;
+import com.jcloisterzone.feature.LittleHouse;
 import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.capability.BridgeCapability;
@@ -137,12 +138,12 @@ public interface PlacementsMixin extends BoardMixin, PlayersMixin, CapabilitiesM
         Location loc = bridgePtr.getLocation();
 
         // for valid placement there must be adjacent place with empty
-        // space or city gate on the other side
+        // space or city gate or little house on the other side
         for (var l: loc.splitToSides()) {
             var p = pos.add(l);
             if (getPlacedTile(p) == null) continue;
             var f = getFeaturePartOf(p, l.rev());
-            if (!(f instanceof CityGate)) {
+            if (!(f instanceof CityGate || f instanceof LittleHouse)) {
                 return false;
             }
         }
