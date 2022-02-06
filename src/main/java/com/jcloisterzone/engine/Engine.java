@@ -148,7 +148,7 @@ public class Engine implements  Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"watchtower", WatchtowerCapability.class);
 
         capabilities = addCapabilities(capabilities, setupMsg,"robbers-son", RobbersSonCapability.class);
-        capabilities = addCapabilities(capabilities, setupMsg,"castleroad", CastleLordsCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"castle-lords", CastleLordsCapability.class);
         
         Map<Rule, Object> rules = HashMap.empty();
         if (setupMsg.getElements().containsKey("farmers")) {

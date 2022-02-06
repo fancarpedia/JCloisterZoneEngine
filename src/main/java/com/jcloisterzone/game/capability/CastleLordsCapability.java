@@ -49,6 +49,7 @@ public class CastleLordsCapability extends Capability<Void> {
     @Override
     public List<ReceivedPoints> appendFiguresBonusPoints(GameState state, List<ReceivedPoints> bonusPoints, Scoreable feature, boolean isFinal) {
         if (isFinal || !(feature instanceof Road)) {
+        	// Skip on final scoring or scored feature is not road
             return bonusPoints;
         }
         Road road = (Road) feature;
@@ -88,11 +89,9 @@ public class CastleLordsCapability extends Capability<Void> {
         // Bonus per player, not per meeple
         for (Player player: feature.getOwners(state)) {
         	FeaturePointer fp = followers.filter(t -> t._1.getPlayer().equals(player)).get()._2;
-            PointsExpression expr = new PointsExpression("castlelords", new ExprItem("castlelords", castleLordsPoints));
+            PointsExpression expr = new PointsExpression("castle-lords", new ExprItem("castle-lords", castleLordsPoints));
             bonusPoints = bonusPoints.append(new ReceivedPoints(expr, player, fp));
         }
-
         return bonusPoints;
-
     }
 }

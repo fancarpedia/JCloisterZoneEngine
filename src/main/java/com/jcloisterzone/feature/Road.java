@@ -31,7 +31,7 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
     public static final BooleanAnyModifier INN = new BooleanAnyModifier("road[inn]", new GameElementQuery("inn"));
     public static final BooleanAnyModifier LABYRINTH = new BooleanAnyModifier("road[labyrinth]", new RuleQuery(Rule.LABYRINTH_VARIANT, "advanced"));
     public static final BooleanAnyModifier ROBBERS_SON = new BooleanAnyModifier("road[robbers-son]", new GameElementQuery("robbers-son"));
-    public static final BooleanAnyModifier CASTLE_LORDS = new BooleanAnyModifier("road[castleroad]", new GameElementQuery("castleroad"));
+    public static final BooleanAnyModifier CASTLE_LORDS = new BooleanAnyModifier("road[castle-lords]", new GameElementQuery("castle-lords"));
 
     private final Map<FeatureModifier<?>, Object> modifiers;
     private final Set<FeaturePointer> openTunnelEnds;
