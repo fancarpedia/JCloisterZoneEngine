@@ -29,6 +29,8 @@ import com.jcloisterzone.game.state.PlacedTile;
 import io.vavr.Predicates;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
@@ -52,45 +54,39 @@ public class CastleLordsCapability extends Capability<Void> {
         	// Skip on final scoring or scored feature is not road
             return bonusPoints;
         }
-        Road road = (Road) feature;
-
-        if (!road.hasModifier(state, Road.CASTLE_LORDS)) {
+        if (!((Road) feature).hasModifier(state, Road.CASTLE_LORDS)) {
             return bonusPoints;
         }
         
-        // Get All Castle Lords Tiles on Road
-        List<Road> castleLords = feature.getPlaces()
-                .map(fp -> {
-                     PlacedTile pt = state.getPlacedTile(fp.getPosition());
-                     return (Road) pt.getInitialFeaturePartOf(fp.getLocation())._2
-                         .placeOnBoard(fp.getPosition(), pt.getRotation());
-                }).filter(f -> ((Road) f).hasModifier(state, Road.CASTLE_LORDS));
+        // Get All Castles on Road
+        Set<FeaturePointer> castles = feature.getPlaces()
+            .map(fp -> {
+                 PlacedTile pt = state.getPlacedTile(fp.getPosition());
+                 return (Road) pt.getInitialFeaturePartOf(fp.getLocation())._2
+                     .placeOnBoard(fp.getPosition(), pt.getRotation());
+            }).filter(f -> ((Road) f).hasModifier(state, Road.CASTLE_LORDS))
+            .map(f -> f.getPlaces().get())
+            .toSet();
 
-        // If more than one Castle Lord Tile, no bonus
-        if (castleLords.size()>1) {
-        	return bonusPoints;
+    	LinkedHashMap<Meeple, FeaturePointer> castleLords = state.getDeployedMeeples()
+            .filter(mt -> mt._1 instanceof  Follower)
+            .filter(mt -> feature.getOwners(state).contains(mt._1.getPlayer()))
+            .filter(mt -> castles.contains(mt._2));
+
+    	// No Castle Lords Meeple
+    	if (castleLords.size()==0) {
+    		return bonusPoints;
     	}
 
-        Position castleLordPosition = castleLords.get().getPlace().getPosition();
-        
-        LinkedHashMap<Meeple, FeaturePointer> followers = state.getDeployedMeeples()
-                .filter(mt -> mt._1 instanceof  Follower)
-                .filter(mt -> mt._1.getPosition(state).equals(castleLordPosition));
-
-        // If meeples are not only on Castle Lord tile, no bonus
-        
-        if (!castleLords.get().getFollowers(state).equals(feature.getFollowers(state))) {
-        	return bonusPoints;
-        }
-        int size = road.getTilePositions().size();
-        
+    	int size = feature.getTilePositions().size();
         int castleLordsPoints = (size)*(size-1)/2;
-
-        // Bonus per player, not per meeple
+        PointsExpression expr = new PointsExpression("castle-lords", new ExprItem("castle-lords", castleLordsPoints));
+        
         for (Player player: feature.getOwners(state)) {
-        	FeaturePointer fp = followers.filter(t -> t._1.getPlayer().equals(player)).get()._2;
-            PointsExpression expr = new PointsExpression("castle-lords", new ExprItem("castle-lords", castleLordsPoints));
-            bonusPoints = bonusPoints.append(new ReceivedPoints(expr, player, fp));
+        	FeaturePointer fp = castleLords.filter(t -> t._1.getPlayer().equals(player)).map(t -> t._2).getOrNull();
+        	if (fp != null) {
+        		bonusPoints = bonusPoints.append(new ReceivedPoints(expr, player, fp));
+        	}
         }
         return bonusPoints;
     }
