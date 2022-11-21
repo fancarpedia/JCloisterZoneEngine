@@ -288,6 +288,14 @@ public class StateGsonBuilder {
             data.add("placement", context.serialize(pos));
             neutral.add("bigtop", data);
         }
+        fp = state.getCourierDeployment();
+        if (fp != null) {
+        	System.out.println("Placement");
+            JsonObject data = new JsonObject();
+            data.add("placement", context.serialize(fp));
+        	System.out.println(data);
+            neutral.add("courier", data);
+        }
         return neutral;
     }
 
