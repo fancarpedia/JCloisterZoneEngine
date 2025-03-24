@@ -134,8 +134,7 @@ public final class ObeliskCapability extends Capability<FeaturePointer> {
         	Position position = obelisk.getPosition(state);
         	Set<PlacedTile> tiles = getObeliskTiles(state,position);
         	if (isFinal || (tiles.length() == tilesRequired)) {
-            	ReceivedPoints rp = new ReceivedPoints(new PointsExpression(isFinal ? "obelisk.incomplete" : "obelisk", new ExprItem(tiles.length(), "tiles", tiles.length())), obelisk.getPlayer() , obelisk.getDeployment(state));
-                state = (new AddPoints(rp, true, true)).apply(state);
+                state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "obelisk.incomplete" : "obelisk", new ExprItem(tiles.length(), "tiles", tiles.length())), obelisk.getPlayer() , obelisk.getDeployment(state)), false)).apply(state);
         		state = (new UndeployMeeple(obelisk, false)).apply(state);
             }
         }
