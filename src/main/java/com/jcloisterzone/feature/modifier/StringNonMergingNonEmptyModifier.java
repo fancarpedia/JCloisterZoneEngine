@@ -2,18 +2,20 @@ package com.jcloisterzone.feature.modifier;
 
 import com.jcloisterzone.game.setup.SetupQuery;
 
-public class StringNonMergingModifier extends FeatureModifier<String> {
+public class StringNonMergingNonEmptyModifier extends FeatureModifier<String> {
 
-    public StringNonMergingModifier(String selector, SetupQuery enabledBy) {
+    public StringNonMergingNonEmptyModifier(String selector, SetupQuery enabledBy) {
         super(selector, enabledBy);
     }
 
     @Override
     public String mergeValues(String a, String b) {
-    	if (a != null) {
-			return (b != null && a.equals(b)) ? a : null;
+    	if (a == null) {
+    		return b;
+    	} else if (b == null) {
+    		return null;
     	} else {
-    		return (b != null) ? b : null;
+    		return (a.equals(b) ? a : "");
     	}
     }
 
