@@ -6,6 +6,7 @@ import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.feature.Structure;
 import com.jcloisterzone.feature.modifier.StringNonMergingNonEmptyModifier;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.reducers.PlaceTile;
@@ -22,15 +23,17 @@ public class FamiliesCapability extends Capability<PlacedTile> {
 
 	@Override
     public Feature initFeature(GameState state, String tileId, Feature feature, Element xml) {
-        if (feature instanceof City) {
-        	if (attributeIntValue(xml, "pennants", 0) > 0 ) {
-        		String family = "blue";
-        		if (xml.hasAttribute("family")) {
-        			family = xml.getAttribute("family");
-        		}
-        		feature = ((City) feature).putModifier(FAMILY, family);
-        	}
-        }
+        if (new GameElementQuery("families").equals(true) != null) {
+            if (feature instanceof City) {
+        	    if (attributeIntValue(xml, "pennants", 0) > 0 ) {
+                    String family = "blue";
+                    if (xml.hasAttribute("family")) {
+                        family = xml.getAttribute("family");
+                    }
+                    feature = ((City) feature).putModifier(FAMILY, family);
+        	    }
+            }
+		}
         return feature;
     }
 
