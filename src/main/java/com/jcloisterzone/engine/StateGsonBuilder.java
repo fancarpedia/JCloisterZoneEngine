@@ -482,6 +482,7 @@ public class StateGsonBuilder {
                     data.addProperty("type", "meeple-returned");
                     data.addProperty("meeple", mev.getMeeple().getClass().getSimpleName());
                     data.addProperty("player", mev.getMeeple().getPlayer().getIndex());
+                    data.addProperty("source", mev.getReturnMeepleSource() == null ? null : mev.getReturnMeepleSource().toString());
                     data.add("from", context.serialize(mev.getFrom()));
                     turnEvents.add(data);
                 }
@@ -791,7 +792,7 @@ public class StateGsonBuilder {
         public JsonElement serialize(ReturnMeepleAction action, Type type, JsonSerializationContext context) {
             JsonObject json = new JsonObject();
             json.addProperty("type", "ReturnMeeple");
-            json.addProperty("source", action.getSource().name());
+            json.addProperty("source", action.getReturnMeepleSource().name());
             JsonArray options = new JsonArray();
             action.getOptions().forEach(ptr -> {
                 options.add(context.serialize(ptr));

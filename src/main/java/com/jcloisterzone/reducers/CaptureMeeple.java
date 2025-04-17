@@ -7,6 +7,7 @@ import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.game.capability.TowerCapability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.GameState;
 import io.vavr.collection.LinkedHashMap;
 
@@ -17,11 +18,11 @@ public class CaptureMeeple extends UndeployMeeple {
     }
 
     @Override
-    protected GameState primaryUndeploy(GameState state, PlayEventMeta meta, Meeple meeple, FeaturePointer source) {
+    protected GameState primaryUndeploy(GameState state, PlayEventMeta meta, Meeple meeple, FeaturePointer source, ReturnMeepleSource returnMeepleSource) {
         Follower follower = (Follower) meeple;
         Player p = state.getPlayers().getPlayer(meta.getTriggeringPlayerIndex());
         if (p.equals(follower.getPlayer())) {
-            return super.primaryUndeploy(state, meta, follower, source);
+            return super.primaryUndeploy(state, meta, follower, source, returnMeepleSource);
         } else {
             LinkedHashMap<Meeple, FeaturePointer> deployedMeeples = state.getDeployedMeeples();
             state = state.setDeployedMeeples(deployedMeeples.remove(follower));

@@ -15,9 +15,9 @@ import com.jcloisterzone.feature.*;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
-import com.jcloisterzone.io.message.ReturnMeepleMessage;
 import com.jcloisterzone.reducers.AddPoints;
 import com.jcloisterzone.reducers.DeployMeeple;
 import io.vavr.Tuple2;
@@ -62,7 +62,7 @@ public class RussianPromosTrapCapability extends Capability<Void> {
         }
 
         if (!places.isEmpty()){
-            actions = actions.appendAction(new ReturnMeepleAction(places, ReturnMeepleMessage.ReturnMeepleSource.TRAP));
+            actions = actions.appendAction(new ReturnMeepleAction(places, ReturnMeepleSource.TRAP));
             state = state.setPlayerActions(actions);
         }
         return state;
