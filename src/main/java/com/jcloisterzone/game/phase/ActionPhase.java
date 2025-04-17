@@ -26,6 +26,7 @@ import com.jcloisterzone.game.capability.AcrobatsCapability;
 import com.jcloisterzone.game.capability.FestivalCapability;
 import com.jcloisterzone.game.capability.LittleBuildingsCapability.LittleBuilding;
 import com.jcloisterzone.game.capability.PrincessCapability;
+import com.jcloisterzone.game.capability.RobbersSonCapability;
 import com.jcloisterzone.game.capability.TowerCapability.TowerToken;
 import com.jcloisterzone.game.capability.TunnelCapability.Tunnel;
 import com.jcloisterzone.game.state.ActionsState;
@@ -76,6 +77,16 @@ public class ActionPhase extends AbstractActionPhase {
                     find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getSource() == ReturnMeepleSource.PRINCESS).getOrNull();
             if (princessAction != null) {
                 actions = Vector.of(princessAction);
+                state = state.setPlayerActions(new ActionsState(player, actions, false));
+            }
+        }
+
+        if (state.getCapabilities().contains(RobbersSonCapability.class) &&
+                "must".equals(state.getStringRule(Rule.ROBBERS_SON_ACTION))) {
+            ReturnMeepleAction robbersSonAction = (ReturnMeepleAction) state.getPlayerActions().getActions().
+                    find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getSource() == ReturnMeepleSource.ROBBERS_SON).getOrNull();
+            if (robbersSonAction  != null) {
+                actions = Vector.of(robbersSonAction);
                 state = state.setPlayerActions(new ActionsState(player, actions, false));
             }
         }
