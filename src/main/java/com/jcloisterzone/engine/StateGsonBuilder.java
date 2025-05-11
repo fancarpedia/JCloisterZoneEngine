@@ -483,6 +483,7 @@ public class StateGsonBuilder {
                     data.addProperty("meeple", mev.getMeeple().getClass().getSimpleName());
                     data.addProperty("player", mev.getMeeple().getPlayer().getIndex());
                     data.addProperty("source", mev.getReturnMeepleSource() == null ? null : mev.getReturnMeepleSource().toString());
+                    data.addProperty("forced", mev.isForced());
                     data.add("from", context.serialize(mev.getFrom()));
                     turnEvents.add(data);
                 }
