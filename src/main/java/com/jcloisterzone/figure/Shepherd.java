@@ -15,6 +15,11 @@ public class Shepherd extends Special {
     }
 
     @Override
+    public boolean interactingWithOtherMeeples() {
+    	return false;
+    }
+    
+    @Override
     public DeploymentCheckResult isDeploymentAllowed(GameState state, FeaturePointer fp, Structure feature) {
         if (!(feature instanceof Field)) {
             return new DeploymentCheckResult("Shepherd must be placed on a field only.");
