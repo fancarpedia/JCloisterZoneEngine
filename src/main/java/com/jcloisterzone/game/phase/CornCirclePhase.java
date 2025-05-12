@@ -10,12 +10,12 @@ import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.figure.*;
 import com.jcloisterzone.game.capability.CornCircleCapability;
 import com.jcloisterzone.game.capability.CornCircleCapability.CornCircleModifier;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.io.message.*;
 import com.jcloisterzone.io.message.CornCircleRemoveOrDeployMessage.CornCircleOption;
-import com.jcloisterzone.io.message.ReturnMeepleMessage.ReturnMeepleSource;
 import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.DeployMeeple;
 import com.jcloisterzone.reducers.UndeployMeeple;
@@ -150,14 +150,14 @@ public class CornCirclePhase extends Phase {
         }
 
         MeeplePointer ptr = msg.getPointer();
-        if (msg.getSource() != ReturnMeepleSource.CORN_CIRCLE) {
+        if (msg.getReturnMeepleSource() != ReturnMeepleSource.CORN_CIRCLE) {
             throw new IllegalStateException();
         }
 
         Player player = state.getActivePlayer();
         Meeple meeple = state.getDeployedMeeples().find(m -> ptr.match(m._1)).map(t -> t._1)
             .getOrElseThrow(() -> new IllegalArgumentException("Pointer doesn't match any meeple"));
-        state = (new UndeployMeeple(meeple, true)).apply(state);
+        state = (new UndeployMeeple(meeple, true, ReturnMeepleSource.CORN_CIRCLE)).apply(state);
 
         return promote(state.setPlayerActions(new ActionsState(player, new ConfirmAction(), false)));
     }

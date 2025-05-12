@@ -8,9 +8,9 @@ import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.figure.Abbot;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
-import com.jcloisterzone.io.message.ReturnMeepleMessage.ReturnMeepleSource;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
 

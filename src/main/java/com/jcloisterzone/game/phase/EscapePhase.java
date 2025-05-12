@@ -11,11 +11,11 @@ import com.jcloisterzone.feature.Monastery;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.SiegeCapability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.io.message.ReturnMeepleMessage;
-import com.jcloisterzone.io.message.ReturnMeepleMessage.ReturnMeepleSource;
 import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.UndeployMeeple;
 import io.vavr.collection.Set;
@@ -89,17 +89,17 @@ public class EscapePhase extends Phase {
         Meeple meeple = state.getDeployedMeeples().find(m -> ptr.match(m._1)).map(t -> t._1)
             .getOrElseThrow(() -> new IllegalArgumentException("Pointer doesn't match any meeple"));
 
-        if (msg.getSource() != ReturnMeepleSource.SIEGE_ESCAPE) {
+        if (msg.getReturnMeepleSource() != ReturnMeepleSource.SIEGE_ESCAPE) {
             throw new IllegalArgumentException("Return meeple is not allowed");
         }
 
         ReturnMeepleAction escapeAction = (ReturnMeepleAction) state.getAction();
-        assert escapeAction.getSource() == ReturnMeepleSource.SIEGE_ESCAPE;
+        assert escapeAction.getReturnMeepleSource() == ReturnMeepleSource.SIEGE_ESCAPE;
         if (!escapeAction.getOptions().contains(ptr)) {
             throw new IllegalArgumentException("Pointer doesn't match action");
         }
 
-        state = (new UndeployMeeple(meeple, true)).apply(state);
+        state = (new UndeployMeeple(meeple, true, ReturnMeepleSource.SIEGE_ESCAPE)).apply(state);
         state = clearActions(state);
         return next(state);
     }

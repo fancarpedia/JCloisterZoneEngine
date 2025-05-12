@@ -5,10 +5,10 @@ import com.jcloisterzone.board.pointer.MeeplePointer;
 import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.feature.Scoreable;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
-import com.jcloisterzone.io.message.ReturnMeepleMessage.ReturnMeepleSource;
 import io.vavr.collection.Set;
 
 public class RobbersSonCapability extends Capability<Void> {

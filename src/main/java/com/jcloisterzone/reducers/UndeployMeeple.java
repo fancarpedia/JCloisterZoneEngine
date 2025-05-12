@@ -8,6 +8,7 @@ import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.Shepherd;
 import com.jcloisterzone.game.capability.SheepCapability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.NeutralFiguresState;
 
@@ -16,10 +17,18 @@ public class UndeployMeeple extends AbstractUndeploy {
     private final Meeple meeple;
     /** true if meeple is returned different way than scoring feature */
     private final boolean forced;
+    private final ReturnMeepleSource returnMeepleSource;
 
     public UndeployMeeple(Meeple meeple, boolean forced) {
         this.meeple = meeple;
         this.forced = forced;
+        this.returnMeepleSource = null;
+    }
+
+    public UndeployMeeple(Meeple meeple, boolean forced, ReturnMeepleSource returnMeepleSource) {
+        this.meeple = meeple;
+        this.forced = forced;
+        this.returnMeepleSource = returnMeepleSource;
     }
 
     @Override
@@ -28,7 +37,7 @@ public class UndeployMeeple extends AbstractUndeploy {
         assert source != null;
 
         PlayEventMeta metaWithPlayer = PlayEventMeta.createWithActivePlayer(state);
-        state = primaryUndeploy(state, metaWithPlayer, meeple, source);
+        state = primaryUndeploy(state, metaWithPlayer, meeple, source, returnMeepleSource);
 
         if (meeple instanceof Follower) {
             // Undeploy lonely Builders and Pigs
@@ -52,8 +61,8 @@ public class UndeployMeeple extends AbstractUndeploy {
         return state;
     }
 
-    protected GameState primaryUndeploy(GameState state, PlayEventMeta meta, Meeple meeple, FeaturePointer source) {
-        return undeploy(state, meta, meeple, source, forced);
+    protected GameState primaryUndeploy(GameState state, PlayEventMeta meta, Meeple meeple, FeaturePointer source, ReturnMeepleSource returnMeepleSource) {
+        return undeploy(state, meta, meeple, source, forced, returnMeepleSource);
     }
 
     public boolean isForced() {
