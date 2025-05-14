@@ -1,14 +1,11 @@
 package com.jcloisterzone.io.message;
 
 import com.jcloisterzone.board.pointer.MeeplePointer;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.io.MessageCommand;
 
 @MessageCommand("RETURN_MEEPLE")
 public class ReturnMeepleMessage extends AbstractMessage implements ReplayableMessage {
-
-    public enum ReturnMeepleSource {
-        PRINCESS, SIEGE_ESCAPE, FESTIVAL, CORN_CIRCLE, ABBOT_RETURN, TRAP, ROBBERS_SON
-    }
 
     private MeeplePointer pointer;
     private ReturnMeepleSource source;
@@ -29,7 +26,7 @@ public class ReturnMeepleMessage extends AbstractMessage implements ReplayableMe
         this.pointer = pointer;
     }
 
-    public ReturnMeepleSource getSource() {
+    public ReturnMeepleSource getReturnMeepleSource() {
         return source;
     }
 
