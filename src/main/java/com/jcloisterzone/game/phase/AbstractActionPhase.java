@@ -110,11 +110,6 @@ public abstract class AbstractActionPhase extends Phase {
                     // no meeples interaction with other meeples are on feature
                     return true;
                 }
-                // Obelisk is not interacting with other meeples
-                if (meeples.find(m -> !(m instanceof Obelisk)).isEmpty()) {
-                    // no meeples except Obelisk is on feature
-                    return true;
-                }
                 if (struct instanceof Road) {
                     Road road = (Road) struct;
                     if (road.isLabyrinth(state)) {
