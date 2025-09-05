@@ -202,7 +202,7 @@ public abstract class AbstractActionPhase extends Phase {
 
         MeepleAction action = (MeepleAction) state.getPlayerActions().getActions().find(a -> a instanceof MeepleAction && ((MeepleAction) a).getMeepleType().equals(meeple.getClass())).get();
         if (action.getOptions().find(p -> fp.equals(p)).isEmpty()) {
-            throw new IllegalArgumentException("Invalid placement");
+            throw new IllegalArgumentException("Invalid placement of meeple "+fp.toString());
         }
 
         if (!fp.getFeature().equals(Tower.class)
