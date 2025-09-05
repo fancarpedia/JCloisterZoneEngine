@@ -84,7 +84,7 @@ public class ActionPhase extends AbstractActionPhase {
         if (state.getCapabilities().contains(RobbersSonCapability.class) &&
                 "must".equals(state.getStringRule(Rule.ROBBERS_SON_ACTION))) {
             ReturnMeepleAction robbersSonAction = (ReturnMeepleAction) state.getPlayerActions().getActions().
-                    find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getSource() == ReturnMeepleSource.ROBBERS_SON).getOrNull();
+                    find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getReturnMeepleSource() == ReturnMeepleSource.ROBBERS_SON).getOrNull();
             if (robbersSonAction  != null) {
                 actions = Vector.of(robbersSonAction);
                 state = state.setPlayerActions(new ActionsState(player, actions, false));
