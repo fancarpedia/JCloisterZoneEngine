@@ -173,7 +173,7 @@ public class WagonPhase extends Phase {
 
         MeepleAction action = (MeepleAction) state.getPlayerActions().getActions().find(a -> a instanceof MeepleAction && ((MeepleAction) a).getMeepleType().equals(Wagon.class)).get();
         if (action.getOptions().find(p -> fp.equals(p)).isEmpty()) {
-            throw new IllegalArgumentException("Invalid placement");
+            throw new IllegalArgumentException("Invalid placement of wagon");
         }
 
         state = (new DeployMeeple(m, fp)).apply(state);
