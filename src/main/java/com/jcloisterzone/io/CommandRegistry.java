@@ -15,6 +15,7 @@ public class CommandRegistry {
             .put(t(UndoMessage.class))
             .put(t(CommitMessage.class))
             .put(t(PassMessage.class))
+            .put(t(AiMessage.class))
             .put(t(PlaceTileMessage.class))
             .put(t(DeployMeepleMessage.class))
             .put(t(ReturnMeepleMessage.class))
