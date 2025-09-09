@@ -3,16 +3,21 @@ package com.jcloisterzone.engine;
 import com.github.zafarkhaja.semver.Version;
 import com.google.gson.Gson;
 import com.jcloisterzone.Player;
+import com.jcloisterzone.action.PlayerAction;
+import com.jcloisterzone.ai.AiPlayer;
+import com.jcloisterzone.ai.player.DummyAiPlayer;
 import com.jcloisterzone.figure.*;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.GameSetup;
 import com.jcloisterzone.game.GameStatePhaseReducer;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.*;
+import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.phase.GameOverPhase;
 import com.jcloisterzone.game.phase.Phase;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.GameStateBuilder;
+import com.jcloisterzone.io.MessageCommand;
 import com.jcloisterzone.io.MessageParser;
 import com.jcloisterzone.io.message.*;
 import com.sampullara.cli.Args;
@@ -21,6 +26,7 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
+import io.vavr.collection.Vector;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -29,6 +35,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 public class Engine implements Runnable {
 
@@ -228,6 +235,7 @@ public class Engine implements Runnable {
 
         GameStatePhaseReducer phaseReducer = new GameStatePhaseReducer(gameSetup, initialRandom);
         GameStateBuilder builder = new GameStateBuilder(tileDefinitions, gameSetup, setupMsg.getPlayers());
+        AiPlayer aiPlayer = new DummyAiPlayer();
 
         if (setupMsg.getGameAnnotations() != null) {
             builder.setGameAnnotations(setupMsg.getGameAnnotations());
@@ -266,7 +274,25 @@ public class Engine implements Runnable {
             Message msg = parser.fromJson(line);
             Player oldActivePlayer = state.getActivePlayer();
 
-            if (msg instanceof ReplayableMessage) {
+            if (msg instanceof AiMessage) {
+            	// Client request to finish current phase by AI
+            	Vector<ReplayableMessage> messages = aiPlayer.getPossibleActions(state);
+
+            	String bestSoFar = "0";
+//            	String chainStr = messages.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
+            	
+                Random random = new Random();
+
+            	ReplayableMessage message = messages.get(random.nextInt(messages.length()));
+            	
+            	Gson gson = new Gson();
+            	System.out.println(this.gson.toJson(message).toString());
+            	System.out.println(this.gson.toJson(message));
+            	String messageCommand = message.getClass().getAnnotation(MessageCommand.class).value();
+            	String aiResponse = String.format("{ \"type\": \"AI_MESSAGE\", \"payload\": { \"type\": \"%s\", \"payload\": %s }}",messageCommand,this.gson.toJson(message));
+            	System.out.println(aiResponse);
+            	out.println(aiResponse);
+            } else if (msg instanceof ReplayableMessage) {
                 if (msg instanceof RandomChangingMessage) {
                     RandomChangingMessage rndChangeMsg = (RandomChangingMessage) msg;
                     if (rndChangeMsg.getRandom() != null) {

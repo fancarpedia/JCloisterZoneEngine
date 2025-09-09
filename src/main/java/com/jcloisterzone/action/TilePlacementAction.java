@@ -4,6 +4,8 @@ import com.jcloisterzone.board.PlacementOption;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.Rotation;
 import com.jcloisterzone.board.Tile;
+import com.jcloisterzone.io.message.PlaceTileMessage;
+
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 
@@ -22,6 +24,11 @@ public class TilePlacementAction extends AbstractPlayerAction<PlacementOption> {
         return tile;
     }
 
+    @Override
+    public PlaceTileMessage select(PlacementOption tp) {
+        return new PlaceTileMessage(tile.getId(), tp.getRotation(), tp.getPosition());
+    }
+    
     @Deprecated
     public Set<Rotation> getRotations(Position pos) {
         return Stream.ofAll(getOptions())

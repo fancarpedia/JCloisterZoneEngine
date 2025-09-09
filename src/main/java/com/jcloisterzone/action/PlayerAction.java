@@ -1,6 +1,7 @@
 package com.jcloisterzone.action;
 
 import com.jcloisterzone.io.message.CornCircleRemoveOrDeployMessage;
+import com.jcloisterzone.io.message.ReplayableMessage;
 import io.vavr.collection.Iterator;
 import io.vavr.collection.Set;
 
@@ -40,4 +41,15 @@ public interface PlayerAction<T> extends Iterable<T>, Serializable {
     default boolean isEmpty() {
         return getOptions().isEmpty();
     }
+    
+    /**
+     * Generates a Client style message that informs the receiver that the player chose the given {@code option}.
+     *
+     * @param option the option chosen
+     * @return the WebSocket message
+     */
+    default public ReplayableMessage select(T option) {
+    	return null;
+    }
+
 }
