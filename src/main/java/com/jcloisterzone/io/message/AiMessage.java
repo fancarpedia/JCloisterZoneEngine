@@ -6,6 +6,10 @@ import com.jcloisterzone.io.MessageCommand;
 public class AiMessage extends AbstractMessage implements ReplayableMessage, RandomChangingMessage {
 
     private Double random;
+    
+    private Integer player;
+
+    private Integer seq;
 
     public AiMessage() {
     }
@@ -18,5 +22,21 @@ public class AiMessage extends AbstractMessage implements ReplayableMessage, Ran
     @Override
     public void setRandom(Double random) {
         this.random = random;
+    }
+
+    public Integer getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Integer player) {
+        this.player = player;
+    }
+
+    public Integer getSeq() {
+        return seq;
+    }
+
+    public void setSeq(Integer seq) {
+        this.seq = seq;
     }
 }

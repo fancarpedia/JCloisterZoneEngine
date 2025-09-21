@@ -18,21 +18,21 @@ public interface AiPlayer extends Function1<GameState, ReplayableMessage> {
     default Vector<ReplayableMessage> getPossibleActions(GameState state) {
         ActionsState as = state.getPlayerActions();
 
-   	 	System.out.println("DEBUG actions = " + as.getActions());
+//   	 	System.out.println("DEBUG actions = " + as.getActions());
         
         Vector<ReplayableMessage> messages = as.getActions().flatMap(action -> {
           if (action instanceof ConfirmAction) {
             return Vector.of(new CommitMessage());
           } else {
 	        return action.getOptions().map(o -> {
-	       	  System.out.println("DEBUG action = " + action);
-	          System.out.println("DEBUG option = " + o);
+//	       	  System.out.println("DEBUG action = " + action);
+//	          System.out.println("DEBUG option = " + o);
 	          return Helpers.createMessage(action, o);
 	        }).toVector();
           }
         });
 
-        if (as.isPassAllowed()) {
+        if (as.isPassAllowed()) {// && messages.size() == 0) {
             messages = messages.append(new PassMessage());
         }
 
@@ -42,8 +42,8 @@ public interface AiPlayer extends Function1<GameState, ReplayableMessage> {
     static class Helpers {
         @SuppressWarnings({ "rawtypes", "unchecked" })
         public static ReplayableMessage createMessage(PlayerAction action, Object option) {
-       	 	System.out.println("DEBUG2 action = " + action);
-       	 	System.out.println("DEBUG2 option = " + option);
+//       	 	System.out.println("DEBUG2 action = " + action);
+//       	 	System.out.println("DEBUG2 option = " + option);
             return action.select(option);
         }
     }
