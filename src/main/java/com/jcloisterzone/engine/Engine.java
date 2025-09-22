@@ -99,6 +99,8 @@ public class Engine implements Runnable {
         meeples = addMeeples(meeples, setupMsg, "ringmaster", Ringmaster.class);
 
         meeples = addMeeples(meeples, setupMsg, "obelisk", Obelisk.class);
+        meeples = addMeeples(meeples, setupMsg, "windmill", Windmill.class);
+        meeples = addMeeples(meeples, setupMsg, "decinsky-sneznik", DecinskySneznik.class);
 
         Set<Class<? extends Capability<?>>> capabilities = HashSet.empty();
         capabilities = addCapabilities(capabilities, setupMsg,"abbot", AbbotCapability.class);
@@ -152,6 +154,8 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"robbers-son", RobbersSonCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"obelisk", ObeliskCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"families", FamiliesCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"windmill", WindmillCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"decinsky-sneznik", DecinskySneznikCapability.class);
 
         Map<Rule, Object> rules = HashMap.empty();
         if (setupMsg.getElements().containsKey("farmers")) {
