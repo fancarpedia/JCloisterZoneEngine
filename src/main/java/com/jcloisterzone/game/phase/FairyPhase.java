@@ -35,7 +35,7 @@ public class FairyPhase extends Phase {
 
         boolean onTileRule = ptr instanceof Position;
         FeaturePointer fairyFp = ptr.asFeaturePointer();
-        boolean fairyOnAcrobats = fairyFp.getFeature().equals(Acrobats.class);
+        boolean fairyOnAcrobats = !onTileRule && fairyFp.getFeature().equals(Acrobats.class);
 
         var points = 0;
 
