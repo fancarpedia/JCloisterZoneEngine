@@ -29,7 +29,17 @@ public class WindmillCapability extends Capability<Void> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final int PLUS = 4;
+    public static final Set<Position> WINDMILL_RANGE_POSITIONS = HashSet.of(
+            new Position(-2, 0),
+            new Position(-1, 0),
+            new Position(0,  0),
+            new Position(1, 0),
+            new Position(2, 0),
+            new Position(0, -2),
+            new Position(0, -1),
+            new Position(0, 1),
+            new Position(0, 2)
+    	).toSet();
 
     @Override
     public GameState onActionPhaseEntered(GameState state) {
@@ -71,13 +81,13 @@ public class WindmillCapability extends Capability<Void> {
     	           .mapKeys(m -> (Windmill) m).
     				keySet();
     	
-        int tilesRequired = PLUS;
+        int tilesRequired = WINDMILL_RANGE_POSITIONS.size();
         
         for(Windmill windmill : deployed) {
-        	Position position = windmill.getPosition(state);
-        	Set<PlacedTile> t = state.getAdjacentTiles2(position).map(Tuple2::_2).toSet();
+        	Position pos = windmill.getPosition(state);
+        	Set<PlacedTile> t = getWindmillTiles(state, pos);
         	if (isFinal || (t.length() == tilesRequired)) {
-        		Integer tiles = t.length() + 1;
+        		Integer tiles = t.length();
         		Integer points = tiles;
                 state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "windmill.incomplete" : "windmill", new ExprItem(tiles, "tiles", points)), windmill.getPlayer() , windmill.getDeployment(state)), false)).apply(state);
                 if (!isFinal) {
@@ -87,5 +97,14 @@ public class WindmillCapability extends Capability<Void> {
         }
         return state;
     	
-    }    
+    }  
+    
+    private Set<PlacedTile> getWindmillTiles(GameState state, Position pos) {
+        return WINDMILL_RANGE_POSITIONS
+            .map(
+                offset -> state.getPlacedTile(pos.add(offset))
+            )
+            .filter(locTile -> locTile != null);
+    }
+
 }

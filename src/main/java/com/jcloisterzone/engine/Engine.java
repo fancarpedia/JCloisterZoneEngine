@@ -156,6 +156,7 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"families", FamiliesCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"windmill", WindmillCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"decinsky-sneznik", DecinskySneznikCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"donkey", DonkeyCapability.class);
 
         Map<Rule, Object> rules = HashMap.empty();
         if (setupMsg.getElements().containsKey("farmers")) {

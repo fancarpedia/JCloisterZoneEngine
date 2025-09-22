@@ -72,6 +72,7 @@ public class StateGsonBuilder {
         builder.registerTypeAdapter(RemoveMageOrWitchAction.class, new ActionSerializer("RemoveMageOrWitch"));
         builder.registerTypeAdapter(LittleBuildingAction.class, new LittleBuildingActionSerializer());
         builder.registerTypeAdapter(ScoreAcrobatsAction.class, new SelectFeatureActionSerializer());
+        builder.registerTypeAdapter(DonkeyAction.class, new DonkeyActionSerializer());
         return builder.create();
     }
 
@@ -289,6 +290,12 @@ public class StateGsonBuilder {
             JsonObject data = new JsonObject();
             data.add("placement", context.serialize(pos));
             neutral.add("bigtop", data);
+        }
+        pos = state.getDonkeyDeployment();
+        if (pos != null) {
+            JsonObject data = new JsonObject();
+            data.add("placement", context.serialize(pos));
+            neutral.add("donkey", data);
         }
         return neutral;
     }
@@ -778,6 +785,21 @@ public class StateGsonBuilder {
         public JsonElement serialize(FairyOnTileAction action, Type type, JsonSerializationContext context) {
             JsonObject json = new JsonObject();
             json.addProperty("type", "MoveFairyOnTile");
+            json.addProperty("figureId", action.getFigureId());
+            JsonArray options = new JsonArray();
+            action.getOptions().forEach(pos -> {
+                options.add(context.serialize(pos));
+            });
+            json.add("options", options);
+            return json;
+        }
+    }
+
+    private class DonkeyActionSerializer implements JsonSerializer<DonkeyAction> {
+        @Override
+        public JsonElement serialize(DonkeyAction action, Type type, JsonSerializationContext context) {
+            JsonObject json = new JsonObject();
+            json.addProperty("type", "MoveDonkeyOnTile");
             json.addProperty("figureId", action.getFigureId());
             JsonArray options = new JsonArray();
             action.getOptions().forEach(pos -> {
