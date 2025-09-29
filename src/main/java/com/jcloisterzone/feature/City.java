@@ -11,6 +11,7 @@ import com.jcloisterzone.feature.modifier.BooleanAnyModifier;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
 import com.jcloisterzone.feature.modifier.IntegerNonMergingModifier;
+import com.jcloisterzone.feature.modifier.MultisetAddModifier;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
@@ -29,6 +30,7 @@ public class City extends CompletableFeature<City> implements ModifiedFeature<Ci
     public static final BooleanAnyModifier CATHEDRAL = new BooleanAnyModifier("city[cathedral]", new GameElementQuery("cathedral"));
     public static final BooleanAnyModifier PRINCESS = new BooleanAnyModifier("city[princess]", new GameElementQuery("princess"));
     public static final IntegerNonMergingModifier POINTS_MODIFIER = new IntegerNonMergingModifier("city[points]", null);
+    public static final MultisetAddModifier FLOWERS = new MultisetAddModifier("city[flowers]", new GameElementQuery("flowers"));
 
     private final Set<Tuple2<ShortEdge, FeaturePointer>> multiEdges; // HS.CC!.v abstraction, multiple cities can connect to same edge
     private final Map<FeatureModifier<?>, Object> modifiers;
