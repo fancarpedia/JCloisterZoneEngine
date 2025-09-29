@@ -3,6 +3,7 @@ package com.jcloisterzone.game.capability;
 import com.jcloisterzone.action.MeepleAction;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.pointer.FeaturePointer;
+import com.jcloisterzone.board.pointer.ScoreMeeplePositionsPointer;
 import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
@@ -17,8 +18,8 @@ import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.figure.DecinskySneznik;
 import com.jcloisterzone.reducers.AddPoints;
 import com.jcloisterzone.reducers.UndeployMeeple;
-import io.vavr.collection.HashSet;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
@@ -29,7 +30,7 @@ public class DecinskySneznikCapability extends Capability<Void> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final int PLUS = 4;
+	private static final int TILES_REQUIRED = 4;
 
     @Override
     public GameState onActionPhaseEntered(GameState state) {
@@ -71,15 +72,14 @@ public class DecinskySneznikCapability extends Capability<Void> {
     	           .mapKeys(m -> (DecinskySneznik) m).
     				keySet();
     	
-        int tilesRequired = PLUS;
-        
         for(DecinskySneznik decinskySneznik : deployed) {
         	Position position = decinskySneznik.getPosition(state);
-        	Set<PlacedTile> t = state.getAdjacentTiles2(position).map(Tuple2::_2).toSet();
-        	if (isFinal || (t.length() == tilesRequired)) {
-        		Integer tiles = t.length() + 1;
+        	Set<PlacedTile> places = state.getAdjacentTiles2(position).map(Tuple2::_2).toSet();
+        	if (isFinal || (places.length() == TILES_REQUIRED)) {
+            	Set<Position> positions = places.map(t -> t.getPosition()).add(position);
+            	Integer tiles = places.length() + 1;
         		Integer points = isFinal ? 0 : tiles;
-                state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "decinsky-sneznik.incomplete" : "decinsky-sneznik", new ExprItem(tiles, "tiles", points)), decinskySneznik.getPlayer() , decinskySneznik.getDeployment(state)), false)).apply(state);
+                state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "decinsky-sneznik.incomplete" : "decinsky-sneznik", new ExprItem(tiles, "tiles", points)), decinskySneznik.getPlayer() , new ScoreMeeplePositionsPointer(decinskySneznik.getDeployment(state), decinskySneznik.getId(), positions)), false)).apply(state);
                 if (!isFinal) {
                 	state = (new UndeployMeeple(decinskySneznik, false)).apply(state);
                 }

@@ -47,6 +47,7 @@ public class StateGsonBuilder {
         builder.registerTypeAdapter(Location.class, new MessageParser.LocationSerializer());
         builder.registerTypeAdapter(FeaturePointer.class, new MessageParser.FeaturePointerSerializer());
         builder.registerTypeAdapter(BoardPointer.class, new MessageParser.BoardPointerSerializer());
+        builder.registerTypeAdapter(new com.google.gson.reflect.TypeToken<Set<Position>>() {}.getType(), new MessageParser.PositionSetSerializer());
         // actions
         builder.registerTypeAdapter(TilePlacementAction.class, new TilePlacementActionSerializer());
         builder.registerTypeAdapter(MeepleAction.class, new MeepleActionSerializer());

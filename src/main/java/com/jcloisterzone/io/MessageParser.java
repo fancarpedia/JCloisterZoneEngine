@@ -11,6 +11,7 @@ import com.jcloisterzone.io.message.Message;
 import com.jcloisterzone.io.message.ReplayableMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.vavr.collection.Set;
 
 import java.lang.reflect.Type;
 
@@ -174,4 +175,16 @@ public final class MessageParser {
             return context.serialize(src);
         }
     }
+    
+    public static class PositionSetSerializer implements JsonSerializer<Set<Position>> {
+        @Override
+        public JsonElement serialize(Set<Position> src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonArray array = new JsonArray();
+            for (Position pos : src) {
+            	array.add(context.serialize(pos));
+            }
+            return array;
+        }
+    }
+    
 }

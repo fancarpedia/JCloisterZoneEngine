@@ -3,6 +3,7 @@ package com.jcloisterzone.game.capability;
 import com.jcloisterzone.action.MeepleAction;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.pointer.FeaturePointer;
+import com.jcloisterzone.board.pointer.ScoreMeeplePositionsPointer;
 import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
@@ -89,7 +90,8 @@ public class WindmillCapability extends Capability<Void> {
         	if (isFinal || (t.length() == tilesRequired)) {
         		Integer tiles = t.length();
         		Integer points = tiles;
-                state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "windmill.incomplete" : "windmill", new ExprItem(tiles, "tiles", points)), windmill.getPlayer() , windmill.getDeployment(state)), false)).apply(state);
+            	Set<Position> positions = t.map(tile -> tile.getPosition());
+                state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "windmill.incomplete" : "windmill", new ExprItem(tiles, "tiles", points)), windmill.getPlayer() , new ScoreMeeplePositionsPointer(windmill.getDeployment(state), windmill.getId(), positions)), false)).apply(state);
                 if (!isFinal) {
                 	state = (new UndeployMeeple(windmill, false)).apply(state);
                 }

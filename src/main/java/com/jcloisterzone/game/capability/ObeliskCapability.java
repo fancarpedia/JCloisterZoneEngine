@@ -6,6 +6,7 @@ import com.jcloisterzone.board.Corner;
 import com.jcloisterzone.board.Location;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.pointer.FeaturePointer;
+import com.jcloisterzone.board.pointer.ScoreMeeplePositionsPointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.ScoreEvent;
@@ -134,12 +135,14 @@ public final class ObeliskCapability extends Capability<FeaturePointer> {
         	Position position = obelisk.getPosition(state);
         	Set<PlacedTile> tiles = getObeliskTiles(state,position);
         	if (isFinal || (tiles.length() == tilesRequired)) {
-                state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "obelisk.incomplete" : "obelisk", new ExprItem(tiles.length(), "tiles", tiles.length())), obelisk.getPlayer() , obelisk.getDeployment(state)), false)).apply(state);
-        		state = (new UndeployMeeple(obelisk, false)).apply(state);
+               	Set<Position> positions = tiles.map(tile -> tile.getPosition());
+                state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "obelisk.incomplete" : "obelisk", new ExprItem(tiles.length(), "tiles", tiles.length())), obelisk.getPlayer() , new ScoreMeeplePositionsPointer(obelisk.getDeployment(state), obelisk.getId(), positions)), false)).apply(state);
+                if (!isFinal) {
+                	state = (new UndeployMeeple(obelisk, false)).apply(state);
+                }
             }
         }
         return state;
-    	
     }
 
     private Map<Obelisk, FeaturePointer> getDeployedObelisks(GameState state) {
