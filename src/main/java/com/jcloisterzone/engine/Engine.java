@@ -157,6 +157,7 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"windmill", WindmillCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"decinsky-sneznik", DecinskySneznikCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"donkey", DonkeyCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"flowers", FlowersCapability.class);
 
         Map<Rule, Object> rules = HashMap.empty();
         if (setupMsg.getElements().containsKey("farmers")) {
@@ -232,7 +233,7 @@ public class Engine implements Runnable {
         game = new Game(gameSetup);
 
         GameStatePhaseReducer phaseReducer = new GameStatePhaseReducer(gameSetup, initialRandom);
-        GameStateBuilder builder = new GameStateBuilder(tileDefinitions, gameSetup, setupMsg.getPlayers());
+        GameStateBuilder builder = new GameStateBuilder(tileDefinitions, gameSetup, setupMsg.getPlayers(), initialRandom);
 
         if (setupMsg.getGameAnnotations() != null) {
             builder.setGameAnnotations(setupMsg.getGameAnnotations());
