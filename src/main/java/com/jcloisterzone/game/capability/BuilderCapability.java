@@ -2,13 +2,14 @@ package com.jcloisterzone.game.capability;
 
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 
 public class BuilderCapability extends Capability<BuilderState> {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return setModel(state, BuilderState.UNUSED);
     }
 

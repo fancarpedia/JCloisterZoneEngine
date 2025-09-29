@@ -11,6 +11,7 @@ import com.jcloisterzone.game.capability.LittleBuildingsCapability.LittleBuildin
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlayersState;
 import com.jcloisterzone.game.state.mixins.RulesMixin;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.*;
 
 import java.util.Arrays;
@@ -27,7 +28,7 @@ public class LittleBuildingsCapability extends Capability<Map<Position, LittleBu
     }
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         int playersCount = state.getPlayers().getPlayers().length();
         int tokensCount = 6 / playersCount;
         state = state.mapPlayers(ps -> {

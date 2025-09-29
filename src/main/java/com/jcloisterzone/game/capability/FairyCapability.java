@@ -17,6 +17,7 @@ import com.jcloisterzone.figure.neutral.Fairy;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.Tuple2;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
@@ -32,7 +33,7 @@ public class FairyCapability extends Capability<Void> {
     public static final int FAIRY_POINTS_FINISHED_OBJECT = 3;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return state.mapNeutralFigures(nf -> nf.setFairy(new Fairy("fairy.1")));
     }
 

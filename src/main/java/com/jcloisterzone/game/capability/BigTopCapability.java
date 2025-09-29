@@ -10,6 +10,7 @@ import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.neutral.BigTop;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.AddPoints;
 import io.vavr.collection.*;
 
@@ -23,7 +24,7 @@ public class BigTopCapability extends Capability<Integer> {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-    public GameState onStartGame(GameState state) {
+	public GameState onStartGame(GameState state, RandomGenerator random) {
 		state = state.mapNeutralFigures(nf -> nf.setBigTop(new BigTop("bigtop.1")));
         int circusCount = state.getTilePack().getGroups().toStream().flatMap(t -> t._2.getTiles()).filter(tile -> tile.getInitialFeatures().exists(t -> t._2 instanceof Circus)).size();
         int tokensPerSet = 0;

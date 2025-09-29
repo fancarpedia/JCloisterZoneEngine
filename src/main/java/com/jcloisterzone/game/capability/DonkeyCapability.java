@@ -13,6 +13,7 @@ import com.jcloisterzone.figure.neutral.Witch;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.MoveNeutralFigure;
 import com.jcloisterzone.reducers.PlaceTile;
 import io.vavr.collection.List;
@@ -25,7 +26,7 @@ public class DonkeyCapability extends Capability<Void> {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         state = state.setNeutralFigures(
             state.getNeutralFigures()
                 .setDonkey(new Donkey("donkey.1"))

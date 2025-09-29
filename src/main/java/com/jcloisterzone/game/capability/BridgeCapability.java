@@ -10,9 +10,9 @@ import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
-
 
 /**
  * @model Set<FeaturePointer> : placed bridges
@@ -26,7 +26,7 @@ public class BridgeCapability extends Capability<Set<FeaturePointer>> {
 	private static final long serialVersionUID = 1L;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         int tokens = state.getPlayers().length() < 5 ? 3 : 2;
         state = state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(BridgeToken.BRIDGE, tokens));
         state = setModel(state, HashSet.empty());

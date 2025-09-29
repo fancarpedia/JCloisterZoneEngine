@@ -10,6 +10,7 @@ import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
@@ -44,7 +45,7 @@ public class AbbeyCapability extends Capability<Integer> {
     }
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(AbbeyToken.ABBEY_TILE, 1));
     }
 
