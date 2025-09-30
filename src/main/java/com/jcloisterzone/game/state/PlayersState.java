@@ -7,8 +7,10 @@ import com.jcloisterzone.figure.Special;
 import com.jcloisterzone.game.Token;
 import io.vavr.collection.Array;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
+import io.vavr.collection.Set;
 import io.vavr.control.Option;
 
 import java.io.Serializable;
@@ -274,6 +276,13 @@ public class PlayersState implements Serializable {
             }
         }
         return null;
+    }
+
+    public Set<Player> getPlayersWithToken(Token token) {
+	    return players.zip(tokens)
+	        .filter(tuple -> tuple._2.get(token).getOrElse(0) > 0)
+	        .map(tuple -> tuple._1)
+	        .toSet();
     }
 
     /**
