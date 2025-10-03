@@ -8,6 +8,7 @@ import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.ScoreEvent;
+import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
 import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Scoreable;
 import com.jcloisterzone.feature.Structure;
@@ -20,6 +21,7 @@ import com.jcloisterzone.reducers.AddPoints;
 import com.jcloisterzone.reducers.UndeployMeeple;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
@@ -30,18 +32,6 @@ public class WindmillCapability extends Capability<Void> {
 
 	private static final long serialVersionUID = 1L;
 	
-    public static final Set<Position> WINDMILL_RANGE_POSITIONS = HashSet.of(
-            new Position(-2, 0),
-            new Position(-1, 0),
-            new Position(0,  0),
-            new Position(1, 0),
-            new Position(2, 0),
-            new Position(0, -2),
-            new Position(0, -1),
-            new Position(0, 1),
-            new Position(0, 2)
-    	).toSet();
-
     @Override
     public GameState onActionPhaseEntered(GameState state) {
         ActionsState actions = state.getPlayerActions();
@@ -82,31 +72,29 @@ public class WindmillCapability extends Capability<Void> {
     	           .mapKeys(m -> (Windmill) m).
     				keySet();
     	
-        int tilesRequired = WINDMILL_RANGE_POSITIONS.size();
+        int tilesRequired = 9;
         
         for(Windmill windmill : deployed) {
-        	Position pos = windmill.getPosition(state);
-        	Set<PlacedTile> t = getWindmillTiles(state, pos);
+        	Set<PlacedTile> t = windmill.getRangeTiles(state).toSet();
         	if (isFinal || (t.length() == tilesRequired)) {
         		Integer tiles = t.length();
         		Integer points = tiles;
             	Set<Position> positions = t.map(tile -> tile.getPosition());
                 state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "windmill.incomplete" : "windmill", new ExprItem(tiles, "tiles", points)), windmill.getPlayer() , new ScoreMeeplePositionsPointer(windmill.getDeployment(state), windmill.getId(), positions)), false)).apply(state);
+
+                List<ReceivedPoints> bonusPoints = List.empty();
+                for (Capability<?> cap : state.getCapabilities().toSeq()) {
+                    bonusPoints = cap.appendSpecialFiguresBonusPoints(state, bonusPoints, windmill, isFinal);
+                }
+                state = (new AddPoints(bonusPoints, true, isFinal)).apply(state);
+                
                 if (!isFinal) {
                 	state = (new UndeployMeeple(windmill, false)).apply(state);
                 }
+
             }
         }
         return state;
     	
-    }  
-    
-    private Set<PlacedTile> getWindmillTiles(GameState state, Position pos) {
-        return WINDMILL_RANGE_POSITIONS
-            .map(
-                offset -> state.getPlacedTile(pos.add(offset))
-            )
-            .filter(locTile -> locTile != null);
     }
-
 }

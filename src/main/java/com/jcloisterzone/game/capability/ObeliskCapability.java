@@ -25,6 +25,7 @@ import com.jcloisterzone.reducers.UndeployMeeple;
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import io.vavr.collection.HashSet;
@@ -36,25 +37,6 @@ import io.vavr.collection.Stream;
 public final class ObeliskCapability extends Capability<FeaturePointer> {
 
 	private static final long serialVersionUID = 1L;
-
-    public static final Set<Position> TILES_ARROUND_OBELISK = HashSet.of(
-        new Position(-2, -2),
-        new Position(-2, -1),
-        new Position(-2,  0),
-        new Position(-2,  1),
-        new Position(-1, -2),
-        new Position(-1, -1),
-        new Position(-1,  0),
-        new Position(-1,  1),
-        new Position( 0, -2),
-        new Position( 0, -1),
-        new Position( 0,  0),
-        new Position( 0,  1),
-        new Position( 1, -2),
-        new Position( 1, -1),
-        new Position( 1,  0),
-        new Position( 1,  1)
-	).toSet();
 
 	@Override
     public GameState onActionPhaseEntered(GameState state) {
@@ -129,14 +111,20 @@ public final class ObeliskCapability extends Capability<FeaturePointer> {
     public GameState scoreObelisks(GameState state, Boolean isFinal) {
         Set<Obelisk> deployedObelisks = getDeployedObelisks(state).keySet();
         
-        int tilesRequired = TILES_ARROUND_OBELISK.length();
+        int tilesRequired = 16;
         
         for(Obelisk obelisk : deployedObelisks) {
-        	Position position = obelisk.getPosition(state);
-        	Set<PlacedTile> tiles = getObeliskTiles(state,position);
+        	Set<PlacedTile> tiles = obelisk.getRangeTiles(state).toSet();
         	if (isFinal || (tiles.length() == tilesRequired)) {
                	Set<Position> positions = tiles.map(tile -> tile.getPosition());
                 state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "obelisk.incomplete" : "obelisk", new ExprItem(tiles.length(), "tiles", tiles.length())), obelisk.getPlayer() , new ScoreMeeplePositionsPointer(obelisk.getDeployment(state), obelisk.getId(), positions)), false)).apply(state);
+                
+                List<ReceivedPoints> bonusPoints = List.empty();
+                for (Capability<?> cap : state.getCapabilities().toSeq()) {
+                    bonusPoints = cap.appendSpecialFiguresBonusPoints(state, bonusPoints, obelisk, isFinal);
+                }
+                state = (new AddPoints(bonusPoints, true, isFinal)).apply(state);
+
                 if (!isFinal) {
                 	state = (new UndeployMeeple(obelisk, false)).apply(state);
                 }
@@ -149,13 +137,5 @@ public final class ObeliskCapability extends Capability<FeaturePointer> {
         return state.getDeployedMeeples()
            .filter((m, fp) -> m instanceof Obelisk)
            .mapKeys(m -> (Obelisk) m);
-    }
-    
-    private Set<PlacedTile> getObeliskTiles(GameState state, Position pos) {
-        return TILES_ARROUND_OBELISK
-            .map(
-                offset -> state.getPlacedTile(pos.add(offset))
-            )
-            .filter(locTile -> locTile != null);
     }
 }
