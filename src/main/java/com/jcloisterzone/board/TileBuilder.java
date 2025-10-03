@@ -224,6 +224,15 @@ public class TileBuilder {
             road = road.setOpenTunnelEnds(HashSet.of(fp));
         }
         initFeature(e, road);
+        
+        if (e.hasAttribute("bush")) {
+            attrAsLocations(e, "bush").forEach(loc -> {
+                assert loc.isEdge();
+                FeaturePointer bushFp = new FeaturePointer(Position.ZERO, Bush.class, loc);
+                initFeature(null, new Bush(List.of(bushFp), fp));
+            });
+        }
+
     }
 
     private void processCityElement(Element e) {
