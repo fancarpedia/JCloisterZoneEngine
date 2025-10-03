@@ -152,7 +152,25 @@ public class Monastery extends TileFeature implements Monastic, ModifiedFeature<
         String baseName = isShrine(state) ? "shrine" : "monastery";
 
         scoreScriptedModifiers(state, exprItems, java.util.Map.of("tiles", adjacent + 1, "completed", completed));
+        
         return new PointsExpression(completed ? baseName : baseName + ".incomplete",  List.ofAll(exprItems));
+    }
+    
+    public Stream<PlacedTile> getRangeTilesMonastery(GameState state) {
+        return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2);
+    }
+
+    public Stream<PlacedTile> getRangeTilesSpecialMonastery(GameState state) {
+        Position monasteryPosition = getPosition();
+        List<PlacedTile> tiles = List.empty();
+        for(Location direction: Location.SIDES) {
+        	Position pos = monasteryPosition.add(direction);
+        	while (state.getPlacedTiles().containsKey(pos)) {
+        		tiles = tiles.append(state.getPlacedTiles().get(pos).get());
+        		pos = pos.add(direction);
+        	}
+        }
+        return tiles.toStream();
     }
 
     public static String name() {
