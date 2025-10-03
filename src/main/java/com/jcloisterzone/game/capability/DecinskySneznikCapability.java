@@ -8,6 +8,7 @@ import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.ScoreEvent;
+import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
 import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Scoreable;
 import com.jcloisterzone.feature.Structure;
@@ -20,6 +21,7 @@ import com.jcloisterzone.reducers.AddPoints;
 import com.jcloisterzone.reducers.UndeployMeeple;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
@@ -30,7 +32,7 @@ public class DecinskySneznikCapability extends Capability<Void> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final int TILES_REQUIRED = 4;
+	private static final int TILES_REQUIRED = 5;
 
     @Override
     public GameState onActionPhaseEntered(GameState state) {
@@ -74,18 +76,24 @@ public class DecinskySneznikCapability extends Capability<Void> {
     	
         for(DecinskySneznik decinskySneznik : deployed) {
         	Position position = decinskySneznik.getPosition(state);
-        	Set<PlacedTile> places = state.getAdjacentTiles2(position).map(Tuple2::_2).toSet();
+        	Set<PlacedTile> places = decinskySneznik.getRangeTiles(state).toSet();
         	if (isFinal || (places.length() == TILES_REQUIRED)) {
-            	Set<Position> positions = places.map(t -> t.getPosition()).add(position);
-            	Integer tiles = places.length() + 1;
+            	Set<Position> positions = places.map(t -> t.getPosition());
+            	Integer tiles = places.length();
         		Integer points = isFinal ? 0 : tiles;
                 state = (new AddPoints(new ScoreEvent.ReceivedPoints(new PointsExpression(isFinal ? "decinsky-sneznik.incomplete" : "decinsky-sneznik", new ExprItem(tiles, "tiles", points)), decinskySneznik.getPlayer() , new ScoreMeeplePositionsPointer(decinskySneznik.getDeployment(state), decinskySneznik.getId(), positions)), false)).apply(state);
+
+                List<ReceivedPoints> bonusPoints = List.empty();
+                for (Capability<?> cap : state.getCapabilities().toSeq()) {
+                    bonusPoints = cap.appendSpecialFiguresBonusPoints(state, bonusPoints, decinskySneznik, isFinal);
+                }
+                state = (new AddPoints(bonusPoints, true, isFinal)).apply(state);
+
                 if (!isFinal) {
                 	state = (new UndeployMeeple(decinskySneznik, false)).apply(state);
                 }
             }
         }
         return state;
-    	
     }    
 }
