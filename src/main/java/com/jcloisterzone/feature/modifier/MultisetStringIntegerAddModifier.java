@@ -4,9 +4,9 @@ import com.jcloisterzone.game.setup.SetupQuery;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 
-public class MultisetAddModifier extends FeatureModifier<Map<String, Integer>> {
+public class MultisetStringIntegerAddModifier extends FeatureModifier<Map<String, Integer>> {
 
-    public MultisetAddModifier(String selector, SetupQuery enabledBy) {
+    public MultisetStringIntegerAddModifier(String selector, SetupQuery enabledBy) {
         super(selector, enabledBy);
     }
 
