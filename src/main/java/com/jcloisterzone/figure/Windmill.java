@@ -6,13 +6,14 @@ import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Structure;
 import com.jcloisterzone.figure.RangeFigure;
+import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 
-public class Windmill extends Special implements RangeFigure {
+public class Windmill extends Special implements FlowersBonusAffected, RangeFigure {
 
     private static final long serialVersionUID = 1L;
 

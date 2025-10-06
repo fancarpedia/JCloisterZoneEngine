@@ -156,7 +156,7 @@ public class Monastery extends TileFeature implements Monastic, ModifiedFeature<
         return new PointsExpression(completed ? baseName : baseName + ".incomplete",  List.ofAll(exprItems));
     }
     
-    public Stream<PlacedTile> getRangeTilesMonastery(GameState state) {
+    public Stream<PlacedTile> getRangeTiles(GameState state) {
         return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2);
     }
 

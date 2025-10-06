@@ -7,7 +7,12 @@ import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.game.state.GameState;
-import io.vavr.collection.*;
+import com.jcloisterzone.game.state.PlacedTile;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
+import io.vavr.Tuple2;
 
 public class Garden extends TileFeature implements Monastic {
 
@@ -47,6 +52,10 @@ public class Garden extends TileFeature implements Monastic {
         int adjacent = state.getAdjacentAndDiagonalTiles2(p).size();
         int tiles = adjacent + 1;
         return new PointsExpression(adjacent == 8 ? "garden" : "garden.incomplete", new ExprItem(tiles, "tiles", tiles));
+    }
+
+    public Stream<PlacedTile> getRangeTiles(GameState state) {
+        return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2);
     }
 
     public static String name() {

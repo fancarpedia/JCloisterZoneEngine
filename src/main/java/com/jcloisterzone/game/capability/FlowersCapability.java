@@ -9,6 +9,7 @@ import com.jcloisterzone.event.ScoreEvent;
 import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
 import com.jcloisterzone.feature.City;
 import com.jcloisterzone.feature.Field;
+import com.jcloisterzone.feature.RangeFeature;
 import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.feature.Monastery;
@@ -17,6 +18,7 @@ import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.RangeFigure;
 import com.jcloisterzone.figure.Special;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.state.GameState;
@@ -67,7 +69,7 @@ public class FlowersCapability extends Capability<Void> {
             featureFlowers = ((Field) feature).getModifier(state, Field.FLOWERS, HashMap.empty() );
         } else if (feature instanceof Road && !isFinal) {
             featureFlowers = ((Road) feature).getModifier(state, Road.FLOWERS, HashMap.empty() );
-        } else {
+        } else if (feature instanceof FlowersBonusAffected) {
         	Stream<PlacedTile> tiles = Stream.empty();
        		if (feature instanceof Monastery) {
        			if (((Monastery) feature).isSpecialMonastery(state)) {
@@ -75,8 +77,12 @@ public class FlowersCapability extends Capability<Void> {
        					tiles = ((Monastery) feature).getRangeTilesSpecialMonastery(state);
        				}
        			} else {
-   					tiles = ((Monastery) feature).getRangeTilesMonastery(state);
+   					tiles = ((Monastery) feature).getRangeTiles(state);
        			}
+            } else if (feature instanceof RangeFeature) {
+				tiles = ((RangeFeature) feature).getRangeTiles(state);
+	        } else {
+	            throw new IllegalArgumentException("Unknown feature type for FlowersBonus " + feature);
 	        }
 
        		featureFlowers = getFlowersOnTiles(state, tiles);
@@ -91,29 +97,6 @@ public class FlowersCapability extends Capability<Void> {
         	}
         	
         	bonusPoints = appendBonusPoints(state, bonusPoints, featureFlowers, featurePlayers);
-/*            if (featurePlayers.size()==0) {
-                return bonusPoints;
-            }
-
-            HashMap<Token,Set<Player>> players = HashMap.empty();
-            for(Token token: FlowersToken.values()) {
-                players = players.put(token, ps.getPlayersWithToken(token));
-            }
-
-            for(Tuple2<String, Integer> flowers : featureFlowers) {
-                Token token = FlowersToken.fromValue(flowers._1);
-                for (Tuple2<Token,Set<Player>> p: players) {
-                    ArrayList<ExprItem> exprItems = new ArrayList<ExprItem>();
-                    if (token.equals(p._1)) {
-                        ExprItem expr = new ExprItem(flowers._2, "flowers." + token.name(), 3 * flowers._2);
-                        for (Player player: p._2) {
-                            if (featurePlayers.contains(player)) {
-                                bonusPoints = bonusPoints.append(new ScoreEvent.ReceivedPoints(new PointsExpression("flowers", expr), player, null)); // Positions or Feature pointer
-                            }
-                        }
-                    }
-                }
-            }*/
         }
         return bonusPoints;
     }
@@ -121,7 +104,7 @@ public class FlowersCapability extends Capability<Void> {
     @Override
     public List<ReceivedPoints> appendSpecialFiguresBonusPoints(GameState state, List<ReceivedPoints> bonusPoints, Special figure, boolean isFinal) {
     	Stream<PlacedTile> tiles = Stream.empty();
-   		if (figure instanceof RangeFigure) {
+   		if (figure instanceof FlowersBonusAffected) {
    			tiles = ((RangeFigure) figure).getRangeTiles(state);
         }
    		Map<String,Integer> flowersInRange = getFlowersOnTiles(state, tiles);

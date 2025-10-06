@@ -5,13 +5,21 @@ import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.game.capability.LittleBuildingsCapability;
 import com.jcloisterzone.game.capability.LittleBuildingsCapability.LittleBuilding;
+import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.state.GameState;
-import io.vavr.collection.*;
+import com.jcloisterzone.game.state.PlacedTile;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.Seq;
+import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
+import io.vavr.Tuple2;
 
 /**
  * Any feature completed when it is surrounded by eight land tiles.
  */
-public interface Monastic extends Completable, Scoreable {
+public interface Monastic extends Completable, FlowersBonusAffected, RangeFeature, Scoreable {
 
     @Override
     default boolean isOpen(GameState state) {
@@ -44,6 +52,10 @@ public interface Monastic extends Completable, Scoreable {
         ).values();
 
         return LittleBuildingsCapability.getBuildingsPoints(state, buildingsSeq);
+    }
+
+    default Stream<PlacedTile> getRangeTiles(GameState state) {
+        return state.getAdjacentAndDiagonalTiles2(getPosition()).map(Tuple2::_2);
     }
 
 }
