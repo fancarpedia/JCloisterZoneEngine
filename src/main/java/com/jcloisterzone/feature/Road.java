@@ -6,6 +6,7 @@ import com.jcloisterzone.board.Rotation;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
+import com.jcloisterzone.feature.Completable;
 import com.jcloisterzone.feature.modifier.BooleanAnyModifier;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
@@ -38,9 +39,10 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
 
     private final Map<FeatureModifier<?>, Object> modifiers;
     private final Set<FeaturePointer> openTunnelEnds;
+    private final Set<FeaturePointer> marketplaces;
 
     public Road(List<FeaturePointer> places, Set<Edge> openEdges, Map<FeatureModifier<?>, Object> modifiers) {
-        this(places, openEdges, HashSet.empty(), modifiers, HashSet.empty());
+        this(places, openEdges, HashSet.empty(), modifiers, HashSet.empty(), HashSet.empty());
     }
 
     public Road(
@@ -48,16 +50,39 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
             Set<Edge> openEdges,
             Set<FeaturePointer> neighboring,
             Map<FeatureModifier<?>, Object> modifiers,
-            Set<FeaturePointer> openTunnelEnds
+            Set<FeaturePointer> openTunnelEnds,
+            Set<FeaturePointer> marketplaces
         ) {
         super(places, openEdges, neighboring);
         this.modifiers = modifiers;
         this.openTunnelEnds = openTunnelEnds;
+        this.marketplaces = marketplaces;
     }
 
     @Override
     public boolean isOpen(GameState state) {
         return super.isOpen(state) || !openTunnelEnds.isEmpty();
+    }
+
+    @Override
+    public boolean isCompleted(GameState state) {
+        if (isOpen(state)) {
+        	return false;
+        }
+        if (!marketplaces.isEmpty()) {
+    		for (FeaturePointer fp: marketplaces) {
+    			Feature feature = state.getFeatureMap()
+    			    .get(fp.getPosition())
+    			    .flatMap(m -> m.get(fp))
+    			    .get();
+    			if (feature instanceof Completable) {
+    				if (((Completable) feature).isOpen(state)) {
+    					return false;
+    				}
+    			}
+    		}
+        }
+    	return true;
     }
 
     public boolean isLabyrinth(GameState state) {
@@ -72,7 +97,7 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
     @Override
     public Road setModifiers(Map<FeatureModifier<?>, Object> modifiers) {
         if (this.modifiers == modifiers) return this;
-        return new Road(places, openEdges, neighboring, modifiers, openTunnelEnds);
+        return new Road(places, openEdges, neighboring, modifiers, openTunnelEnds, marketplaces);
     }
 
     @Override
@@ -88,7 +113,8 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
             mergeEdges(road),
             mergeNeighboring(road),
             mergeModifiers(road),
-            mergeTunnelEnds(road)
+            mergeTunnelEnds(road),
+            mergeMarketplaces(road)
         );
     }
 
@@ -99,7 +125,8 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
             openEdges.remove(edge),
             neighboring,
             modifiers,
-            openTunnelEnds
+            openTunnelEnds,
+            marketplaces
         );
     }
 
@@ -110,7 +137,8 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
             openEdges,
             neighboring,
             modifiers,
-            openTunnelEnds
+            openTunnelEnds,
+            marketplaces
         );
     }
 
@@ -135,7 +163,8 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
             placeOnBoardEdges(pos, rot),
             placeOnBoardNeighboring(pos, rot),
             modifiers,
-            placeOnBoardTunnelEnds(pos, rot)
+            placeOnBoardTunnelEnds(pos, rot),
+            marketplaces
         );
     }
 
@@ -145,13 +174,22 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
 
     public Road setOpenTunnelEnds(Set<FeaturePointer> openTunnelEnds) {
         if (this.openTunnelEnds == openTunnelEnds) return this;
-        return new Road(places, openEdges, neighboring, modifiers, openTunnelEnds);
+        return new Road(places, openEdges, neighboring, modifiers, openTunnelEnds, marketplaces);
+    }
+
+    public Set<FeaturePointer> getMarketplaces() {
+        return marketplaces;
+    }
+
+    public Road setMarketplaces(Set<FeaturePointer> marketplaces) {
+        if (this.marketplaces == marketplaces) return this;
+        return new Road(places, openEdges, neighboring, modifiers, openTunnelEnds, marketplaces);
     }
 
     @Override
     public Road setNeighboring(Set<FeaturePointer> neighboring) {
         if (this.neighboring == neighboring) return this;
-        return new Road(places, openEdges, neighboring, modifiers, openTunnelEnds);
+        return new Road(places, openEdges, neighboring, modifiers, openTunnelEnds, marketplaces);
     }
 
     @Override
@@ -295,5 +333,9 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
 
     protected Set<FeaturePointer> placeOnBoardTunnelEnds(Position pos, Rotation rot) {
         return openTunnelEnds.map(fp -> fp.rotateCW(rot).translate(pos));
+    }
+
+    protected Set<FeaturePointer> mergeMarketplaces(Road road) {
+        return marketplaces.union(road.marketplaces);
     }
 }
