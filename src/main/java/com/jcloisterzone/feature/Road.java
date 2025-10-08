@@ -75,8 +75,8 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
     			    .get(fp.getPosition())
     			    .flatMap(m -> m.get(fp))
     			    .get();
-    			if (feature instanceof Completable) {
-    				if (((Completable) feature).isOpen(state)) {
+    			if (feature instanceof Marketplace) {
+    				if (((Marketplace) feature).isOpen(state)) {
     					return false;
     				}
     			}
@@ -164,7 +164,7 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
             placeOnBoardNeighboring(pos, rot),
             modifiers,
             placeOnBoardTunnelEnds(pos, rot),
-            marketplaces
+            placeOnBoardMarketplaces(pos, rot)
         );
     }
 
@@ -338,4 +338,9 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
     protected Set<FeaturePointer> mergeMarketplaces(Road road) {
         return marketplaces.union(road.marketplaces);
     }
+    
+    public Set<FeaturePointer> placeOnBoardMarketplaces(Position pos, Rotation rot) {
+        return getMarketplaces().map(fp -> fp.rotateCW(rot).translate(pos));
+    }
+
 }
