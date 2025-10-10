@@ -2,12 +2,14 @@ package com.jcloisterzone.game.capability;
 
 import com.jcloisterzone.Player;
 import com.jcloisterzone.board.Location;
+import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.ScoreEvent;
 import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
 import com.jcloisterzone.feature.City;
+import com.jcloisterzone.feature.CompletableFeature;
 import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.RangeFeature;
 import com.jcloisterzone.feature.Road;
@@ -63,12 +65,8 @@ public class FlowersCapability extends Capability<Void> {
     public List<ReceivedPoints> appendFiguresBonusPoints(GameState state, List<ReceivedPoints> bonusPoints, Scoreable feature, boolean isFinal) {
         Map<String,Integer> featureFlowers = HashMap.empty();
 
-   		if (feature instanceof City && !isFinal) {
-            featureFlowers = ((City) feature).getModifier(state, City.FLOWERS, HashMap.empty() );
-        } else if (feature instanceof Field && isFinal) {
+        if (feature instanceof Field && isFinal) {
             featureFlowers = ((Field) feature).getModifier(state, Field.FLOWERS, HashMap.empty() );
-        } else if (feature instanceof Road && !isFinal) {
-            featureFlowers = ((Road) feature).getModifier(state, Road.FLOWERS, HashMap.empty() );
         } else if (feature instanceof FlowersBonusAffected) {
         	Stream<PlacedTile> tiles = Stream.empty();
        		if (feature instanceof Monastery) {
@@ -81,6 +79,11 @@ public class FlowersCapability extends Capability<Void> {
        			}
             } else if (feature instanceof RangeFeature) {
 				tiles = ((RangeFeature) feature).getRangeTiles(state);
+            } else if (feature instanceof CompletableFeature){
+            	Set<Position> positions = ((CompletableFeature) feature).getTilePositions();
+            	for(Position pos: positions) {
+            		tiles = tiles.append(state.getPlacedTiles().get(pos).get());
+                }
 	        } else {
 	            throw new IllegalArgumentException("Unknown feature type for FlowersBonus " + feature);
 	        }

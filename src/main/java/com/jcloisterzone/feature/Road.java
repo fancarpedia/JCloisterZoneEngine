@@ -10,11 +10,11 @@ import com.jcloisterzone.feature.Completable;
 import com.jcloisterzone.feature.modifier.BooleanAnyModifier;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
-import com.jcloisterzone.feature.modifier.MultisetStringIntegerAddModifier;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.FerriesCapability;
 import com.jcloisterzone.game.capability.FerriesCapabilityModel;
 import com.jcloisterzone.game.capability.TunnelCapability;
+import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.setup.RuleQuery;
 import com.jcloisterzone.game.state.GameState;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.function.Function;
 
-public class Road extends CompletableFeature<Road> implements ModifiedFeature<Road> {
+public class Road extends CompletableFeature<Road> implements FlowersBonusAffected, ModifiedFeature<Road> {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,7 +35,6 @@ public class Road extends CompletableFeature<Road> implements ModifiedFeature<Ro
     public static final BooleanAnyModifier LABYRINTH = new BooleanAnyModifier("road[labyrinth]", new RuleQuery(Rule.LABYRINTH_VARIANT, "advanced"));
     public static final BooleanAnyModifier ROBBERS_SON = new BooleanAnyModifier("road[robbers-son]", new GameElementQuery("robbers-son"));
     public static final IntegerAddModifier WELL = new IntegerAddModifier("road[wells]", new GameElementQuery("well"));
-    public static final MultisetStringIntegerAddModifier FLOWERS = new MultisetStringIntegerAddModifier("road[flowers]", new GameElementQuery("flowers"));
 
     private final Map<FeatureModifier<?>, Object> modifiers;
     private final Set<FeaturePointer> openTunnelEnds;
