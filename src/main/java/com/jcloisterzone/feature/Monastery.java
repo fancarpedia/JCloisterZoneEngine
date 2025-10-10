@@ -157,7 +157,7 @@ public class Monastery extends TileFeature implements Monastic, ModifiedFeature<
     }
     
     public Stream<PlacedTile> getRangeTiles(GameState state) {
-        return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2);
+        return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2).append(state.getPlacedTile(getPlace().getPosition()));
     }
 
     public Stream<PlacedTile> getRangeTilesSpecialMonastery(GameState state) {

@@ -55,7 +55,7 @@ public class Garden extends TileFeature implements Monastic {
     }
 
     public Stream<PlacedTile> getRangeTiles(GameState state) {
-        return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2);
+        return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2).append(state.getPlacedTile(getPlace().getPosition()));
     }
 
     public static String name() {
