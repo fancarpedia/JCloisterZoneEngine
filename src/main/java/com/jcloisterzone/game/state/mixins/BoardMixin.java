@@ -113,12 +113,18 @@ public interface BoardMixin {
     default Stream<Tuple2<FeaturePointer, Feature>> getTileFeatures2(Position pos) {
         return getFeatureMap().get(pos).getOrElse(HashMap.empty()).toStream();
     }
-
+    
     @SuppressWarnings("unchecked")
     default <T extends Feature> Stream<Tuple2<FeaturePointer, T>> getTileFeatures2(Position pos, Class<T> cls) {
         return getTileFeatures2(pos)
            .filter(t -> cls.isInstance(t._2))
            .map(t -> (Tuple2<FeaturePointer, T>) t);
+    }
+    
+    @SuppressWarnings("unchecked")
+    default <T extends Feature> Stream<Tuple2<FeaturePointer, T>> getTileFeatures2ForPositions(Iterable<Position> positions, Class<T> cls) {
+        return Stream.ofAll(positions)
+            .flatMap(pos -> getTileFeatures2(pos, cls));
     }
 
     default Feature getFeature(FeaturePointer fp) {
