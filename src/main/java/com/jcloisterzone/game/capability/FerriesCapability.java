@@ -6,6 +6,7 @@ import com.jcloisterzone.board.TileModifier;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Vector;
 import org.w3c.dom.Element;
@@ -28,7 +29,7 @@ public class FerriesCapability extends Capability<FerriesCapabilityModel> {
     }
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return setModel(state, new FerriesCapabilityModel());
     }
 

@@ -66,6 +66,11 @@ public class FinalScoring implements Reducer {
             if (!receivedPoints.isEmpty()) {
                 state = (new AddPoints(receivedPoints, true, true)).apply(state);
             }
+            List<ReceivedPoints> bonusPoints = List.empty();
+            for (Capability<?> cap : state.getCapabilities().toSeq()) {
+                bonusPoints = cap.appendFiguresBonusPoints(state, bonusPoints, monastery, true);
+            }
+            state = (new AddPoints(bonusPoints, true, true)).apply(state);
         }
 
         for (Field field : getOccupiedScoreables(state, Field.class)) {

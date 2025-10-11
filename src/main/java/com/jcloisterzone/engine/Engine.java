@@ -99,6 +99,8 @@ public class Engine implements Runnable {
         meeples = addMeeples(meeples, setupMsg, "ringmaster", Ringmaster.class);
 
         meeples = addMeeples(meeples, setupMsg, "obelisk", Obelisk.class);
+        meeples = addMeeples(meeples, setupMsg, "windmill", Windmill.class);
+        meeples = addMeeples(meeples, setupMsg, "decinsky-sneznik", DecinskySneznik.class);
 
         Set<Class<? extends Capability<?>>> capabilities = HashSet.empty();
         capabilities = addCapabilities(capabilities, setupMsg,"abbot", AbbotCapability.class);
@@ -152,6 +154,11 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"robbers-son", RobbersSonCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"obelisk", ObeliskCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"families", FamiliesCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"windmill", WindmillCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"decinsky-sneznik", DecinskySneznikCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"donkey", DonkeyCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"flowers", FlowersCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"marketplace", MarketplaceCapability.class);
 
         Map<Rule, Object> rules = HashMap.empty();
         if (setupMsg.getElements().containsKey("farmers")) {
@@ -227,7 +234,7 @@ public class Engine implements Runnable {
         game = new Game(gameSetup);
 
         GameStatePhaseReducer phaseReducer = new GameStatePhaseReducer(gameSetup, initialRandom);
-        GameStateBuilder builder = new GameStateBuilder(tileDefinitions, gameSetup, setupMsg.getPlayers());
+        GameStateBuilder builder = new GameStateBuilder(tileDefinitions, gameSetup, setupMsg.getPlayers(), initialRandom);
 
         if (setupMsg.getGameAnnotations() != null) {
             builder.setGameAnnotations(setupMsg.getGameAnnotations());

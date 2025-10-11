@@ -13,30 +13,23 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 
-public class Obelisk extends Special implements FlowersBonusAffected, RangeFigure {
+public class Windmill extends Special implements FlowersBonusAffected, RangeFigure {
 
     private static final long serialVersionUID = 1L;
 
     public static final Set<Position> RANGE_POSITIONS = HashSet.of(
-            new Position(-2, -2),
-            new Position(-2, -1),
-            new Position(-2,  0),
-            new Position(-2,  1),
-            new Position(-1, -2),
-            new Position(-1, -1),
-            new Position(-1,  0),
-            new Position(-1,  1),
-            new Position( 0, -2),
-            new Position( 0, -1),
-            new Position( 0,  0),
-            new Position( 0,  1),
-            new Position( 1, -2),
-            new Position( 1, -1),
-            new Position( 1,  0),
-            new Position( 1,  1)
+            new Position(-2, 0),
+            new Position(-1, 0),
+            new Position(0,  0),
+            new Position(1, 0),
+            new Position(2, 0),
+            new Position(0, -2),
+            new Position(0, -1),
+            new Position(0, 1),
+            new Position(0, 2)
     	).toSet();
 
-    public Obelisk(String id, Player player) {
+    public Windmill(String id, Player player) {
         super(id, player);
     }
 
@@ -53,17 +46,18 @@ public class Obelisk extends Special implements FlowersBonusAffected, RangeFigur
     @Override
     public DeploymentCheckResult isDeploymentAllowed(GameState state, FeaturePointer fp, Structure feature) {
         if (!(feature instanceof Field)) {
-            return new DeploymentCheckResult("The obelisk must be placed only on a field.");
+            return new DeploymentCheckResult("The windmill must be placed only on a field.");
         }
         return super.isDeploymentAllowed(state, fp, feature);
     }
     
     public Stream<PlacedTile> getRangeTiles(GameState state) {
         return RANGE_POSITIONS
-                .map(
-                    offset -> state.getPlacedTile(getPosition(state).add(offset))
-                )
-                .filter(locTile -> locTile != null)
-                .toStream();
+            .map(
+                offset -> state.getPlacedTile(getPosition(state).add(offset))
+            )
+            .filter(locTile -> locTile != null)
+            .toStream();
     }
+
 }

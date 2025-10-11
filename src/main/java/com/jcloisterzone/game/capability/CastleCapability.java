@@ -11,6 +11,7 @@ import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.ScoreCastle;
 import com.jcloisterzone.reducers.UndeployMeeples;
 import io.vavr.Tuple2;
@@ -28,7 +29,7 @@ public class CastleCapability extends Capability<Void> {
 	public static BooleanAllModifier CASTLE_BASE = new BooleanAllModifier("city[castle-base]", new GameElementQuery("castle"));
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         int tokens = state.getPlayers().length() < 5 ? 3 : 2;
         return state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(CastleToken.CASTLE, tokens));
     }

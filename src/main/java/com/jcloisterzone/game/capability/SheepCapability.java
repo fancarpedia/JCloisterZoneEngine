@@ -2,6 +2,7 @@ package com.jcloisterzone.game.capability;
 
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.*;
 
 import java.util.function.Function;
@@ -25,7 +26,7 @@ public class SheepCapability extends Capability<SheepCapabilityModel> {
 
 
 	@Override
-    public GameState onStartGame(GameState state) {
+	public GameState onStartGame(GameState state, RandomGenerator random) {
 		return setModel(state, new SheepCapabilityModel(HashMap.empty(), List.empty()));
     }
 

@@ -10,12 +10,14 @@ import com.jcloisterzone.figure.MeepleIdProvider;
 import com.jcloisterzone.figure.Special;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.GameSetup;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.PlaceTile;
 import com.jcloisterzone.io.message.GameSetupMessage.PlacedTileItem;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.Seq;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-
 
 public class GameStateBuilder {
 
@@ -37,15 +38,17 @@ public class GameStateBuilder {
 
     private GameState state;
     java.util.List<String> definitions;
+    
+    private double initialRandom;
 
-
-    public GameStateBuilder(java.util.List<String> definitions, GameSetup setup, int playersCount) {
+    public GameStateBuilder(java.util.List<String> definitions, GameSetup setup, int playersCount, double initialRandom) {
         if (playersCount < 1) {
             throw new IllegalArgumentException("No player in game");
         }
         this.definitions = definitions;
         this.setup = setup;
         this.playersCount = playersCount;
+        this.initialRandom = initialRandom;
     }
 
     public GameState createInitialState() {
@@ -73,8 +76,10 @@ public class GameStateBuilder {
             state = (new PlaceTile(draw._1, new Position(pt.getX(), pt.getY()), rot)).apply(state);
         }
 
+        RandomGenerator randomGenerator = new RandomGenerator(initialRandom);
+
         for (Capability<?> cap : state.getCapabilities().toSeq()) {
-            state = cap.onStartGame(state);
+            state = cap.onStartGame(state, randomGenerator);
         }
 
         //prepareAiPlayers(muteAi);
