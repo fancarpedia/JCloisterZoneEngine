@@ -1,19 +1,19 @@
 package com.jcloisterzone.action;
 
 import com.jcloisterzone.board.pointer.MeeplePointer;
-import com.jcloisterzone.io.message.ReturnMeepleMessage.ReturnMeepleSource;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import io.vavr.collection.Set;
 
 public class ReturnMeepleAction extends AbstractPlayerAction<MeeplePointer> {
 
-    private final ReturnMeepleSource source;
+    private final ReturnMeepleSource returnMeepleSource;
 
-    public ReturnMeepleAction(Set<MeeplePointer> options, ReturnMeepleSource source) {
+    public ReturnMeepleAction(Set<MeeplePointer> options, ReturnMeepleSource returnMeepleSource) {
         super(options);
-        this.source = source;
+        this.returnMeepleSource = returnMeepleSource;
     }
 
-    public ReturnMeepleSource getSource() {
-        return source;
+    public ReturnMeepleSource getReturnMeepleSource() {
+        return returnMeepleSource;
     }
 }

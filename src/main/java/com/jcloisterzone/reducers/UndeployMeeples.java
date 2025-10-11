@@ -9,7 +9,9 @@ import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.figure.Barn;
 import com.jcloisterzone.figure.Meeple;
+import com.jcloisterzone.figure.Obelisk;
 import com.jcloisterzone.figure.Shepherd;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.NeutralFiguresState;
 import io.vavr.Tuple2;
@@ -27,10 +29,18 @@ public class UndeployMeeples implements Reducer {
     private final Feature feature;
     /** true if meeple is returned different way than scoring feature */
     private final boolean forced;
+    private final ReturnMeepleSource returnMeepleSource;
 
     public UndeployMeeples(Feature feature, boolean forced) {
         this.feature = feature;
         this.forced = forced;
+        this.returnMeepleSource = null;
+    }
+
+    public UndeployMeeples(Feature feature, boolean forced, ReturnMeepleSource returnMeepleSource) {
+        this.feature = feature;
+        this.forced = forced;
+        this.returnMeepleSource = returnMeepleSource;
     }
 
     @Override
@@ -43,11 +53,11 @@ public class UndeployMeeples implements Reducer {
         for (Tuple2<Meeple, FeaturePointer> t : state
                 .getDeployedMeeples()
                 .filter(t -> fps.contains(t._2))
-                .filter(t -> !(t._1 instanceof Barn) &&  !(t._1 instanceof Shepherd))
+                .filter(t -> !(t._1 instanceof Barn) &&  !(t._1 instanceof Shepherd) && !(t._1 instanceof Obelisk))
             ) {
             meeples.add(t._1);
             events.add(
-                new MeepleReturned(eventMeta, t._1, t._2, forced)
+                new MeepleReturned(eventMeta, t._1, t._2, forced, returnMeepleSource)
             );
         }
         state = state.setDeployedMeeples(
@@ -76,6 +86,10 @@ public class UndeployMeeples implements Reducer {
 
     public boolean isForced() {
         return forced;
+    }
+
+    public ReturnMeepleSource getReturnMeepleSource() {
+        return returnMeepleSource;
     }
 
 }

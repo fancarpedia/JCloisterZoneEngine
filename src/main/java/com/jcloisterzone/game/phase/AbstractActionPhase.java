@@ -13,6 +13,7 @@ import com.jcloisterzone.figure.*;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.BarnCapability;
+import com.jcloisterzone.game.capability.ObeliskCapability;
 import com.jcloisterzone.game.capability.MonasteriesCapability;
 import com.jcloisterzone.game.capability.PortalCapability;
 import com.jcloisterzone.game.state.ActionsState;
@@ -104,9 +105,9 @@ public abstract class AbstractActionPhase extends Phase {
                     meeples = struct.getMeeples(state);
                 }
 
-                // Shepherd is not interacting with other meeples
-                if (meeples.find(m -> !(m instanceof Shepherd)).isEmpty()) {
-                    // no meeples except Shepherd is on feature
+                // Meeples not interacting with other meeples
+                if (meeples.find(m -> m.interactingWithOtherMeeples()).isEmpty()) {
+                    // no meeples interaction with other meeples are on feature
                     return true;
                 }
                 if (struct instanceof Road) {
@@ -201,7 +202,7 @@ public abstract class AbstractActionPhase extends Phase {
 
         MeepleAction action = (MeepleAction) state.getPlayerActions().getActions().find(a -> a instanceof MeepleAction && ((MeepleAction) a).getMeepleType().equals(meeple.getClass())).get();
         if (action.getOptions().find(p -> fp.equals(p)).isEmpty()) {
-            throw new IllegalArgumentException("Invalid placement");
+            throw new IllegalArgumentException("Invalid placement of meeple "+fp.toString());
         }
 
         if (!fp.getFeature().equals(Tower.class)
@@ -214,6 +215,9 @@ public abstract class AbstractActionPhase extends Phase {
         state = (new DeployMeeple(meeple, fp)).apply(state);
         if (meeple instanceof Barn) {
             state = state.setCapabilityModel(BarnCapability.class, fp);
+        }
+        if (meeple instanceof Obelisk) {
+            state = state.setCapabilityModel(ObeliskCapability.class, fp);
         }
 
         state = clearActions(state);

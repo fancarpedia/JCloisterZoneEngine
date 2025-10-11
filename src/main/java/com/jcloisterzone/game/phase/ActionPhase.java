@@ -26,8 +26,10 @@ import com.jcloisterzone.game.capability.AcrobatsCapability;
 import com.jcloisterzone.game.capability.FestivalCapability;
 import com.jcloisterzone.game.capability.LittleBuildingsCapability.LittleBuilding;
 import com.jcloisterzone.game.capability.PrincessCapability;
+import com.jcloisterzone.game.capability.RobbersSonCapability;
 import com.jcloisterzone.game.capability.TowerCapability.TowerToken;
 import com.jcloisterzone.game.capability.TunnelCapability.Tunnel;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
@@ -35,7 +37,6 @@ import com.jcloisterzone.io.message.ScoreAcrobatsMessage;
 import com.jcloisterzone.io.message.MoveNeutralFigureMessage;
 import com.jcloisterzone.io.message.PlaceTokenMessage;
 import com.jcloisterzone.io.message.ReturnMeepleMessage;
-import com.jcloisterzone.io.message.ReturnMeepleMessage.ReturnMeepleSource;
 import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.*;
 import io.vavr.collection.Vector;
@@ -73,12 +74,24 @@ public class ActionPhase extends AbstractActionPhase {
         if (state.getCapabilities().contains(PrincessCapability.class) &&
                 "must".equals(state.getStringRule(Rule.PRINCESS_ACTION))) {
             ReturnMeepleAction princessAction = (ReturnMeepleAction) state.getPlayerActions().getActions().
-                    find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getSource() == ReturnMeepleSource.PRINCESS).getOrNull();
+                    find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getReturnMeepleSource() == ReturnMeepleSource.PRINCESS).getOrNull();
             if (princessAction != null) {
                 actions = Vector.of(princessAction);
                 state = state.setPlayerActions(new ActionsState(player, actions, false));
             }
         }
+        
+        if (state.getCapabilities().contains(RobbersSonCapability.class) &&
+                "must".equals(state.getStringRule(Rule.ROBBERS_SON_ACTION))) {
+            ReturnMeepleAction robbersSonAction = (ReturnMeepleAction) state.getPlayerActions().getActions().
+                    find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getReturnMeepleSource() == ReturnMeepleSource.ROBBERS_SON).getOrNull();
+            if (robbersSonAction  != null) {
+                actions = Vector.of(robbersSonAction);
+                state = state.setPlayerActions(new ActionsState(player, actions, false));
+            }
+        }
+
+        state = state.setPlayerActions(state.getPlayerActions().reorderActions());
 
         if (state.getPlayerActions().getActions().isEmpty()) {
             state = clearActions(state);
@@ -114,11 +127,11 @@ public class ActionPhase extends AbstractActionPhase {
 
         Monastic assignAbbotScore = null;
 
-        switch (msg.getSource()) {
+        switch (msg.getReturnMeepleSource()) {
             case PRINCESS:
             case ROBBERS_SON:
                 ReturnMeepleAction princessAction = (ReturnMeepleAction) state.getPlayerActions()
-                    .getActions().find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getSource() == msg.getSource())
+                    .getActions().find(a -> a instanceof ReturnMeepleAction && ((ReturnMeepleAction) a).getReturnMeepleSource() == msg.getReturnMeepleSource())
                     .getOrElseThrow(() -> new IllegalArgumentException("Return meeple is not allowed"));
                 if (princessAction.getOptions().contains(ptr)) {
                     state = state.addFlag(Flag.NO_PHANTOM);
@@ -146,7 +159,7 @@ public class ActionPhase extends AbstractActionPhase {
                 throw new IllegalArgumentException("Return meeple is not allowed");
         }
 
-        state = (new UndeployMeeple(meeple, true)).apply(state);
+        state = (new UndeployMeeple(meeple, true, msg.getReturnMeepleSource())).apply(state);
         state = clearActions(state);
 
         if (assignAbbotScore != null) {
