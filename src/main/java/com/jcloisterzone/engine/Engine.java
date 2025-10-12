@@ -159,6 +159,7 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"donkey", DonkeyCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"flowers", FlowersCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"marketplace", MarketplaceCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"meteorite", MeteoriteCapability.class);
 
         Map<Rule, Object> rules = HashMap.empty();
         if (setupMsg.getElements().containsKey("farmers")) {
@@ -283,11 +284,14 @@ public class Engine implements Runnable {
                 state = phaseReducer.apply(state, msg);
 
                 Player newActivePlayer = state.getActivePlayer();
-                boolean undoAllowed = (!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
+                boolean undoAllowed = (
+                		(!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
                         && newActivePlayer != null
                         && newActivePlayer.equals(oldActivePlayer)
                         && !(msg instanceof DeployMeepleMessage && ((DeployMeepleMessage)msg).getMeepleId().contains("shepherd"))
-                        && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"));
+                        && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"))
+                        && !(msg instanceof PlaceTileMessage && state.getLastPlaced().getTile().hasModifier(MeteoriteCapability.CRATER))
+                );
 
                 if (undoAllowed) {
                     game.markUndo();

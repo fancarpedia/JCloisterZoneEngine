@@ -29,7 +29,8 @@ public enum Rule {
     COC_FINAL_SCORING("coc-final-scoring", String.class, new Object[] { "market-only", "any-district"}),
     COUNT_MOVE("count-move", String.class, new Object[] { "by-player", "clockwise", "follow-meeple"}),
 
-    ROBBERS_SON_ACTION("robbers-son-action", String.class, new Object[] { "may", "must" });
+    ROBBERS_SON_ACTION("robbers-son-action", String.class, new Object[] { "may", "must" }),
+    METEORITE_IMPACT("meteorite-impact", String.class, new Object[] { "standard", "extended", "combination" });
 
     String key;
     Class<?> type;
