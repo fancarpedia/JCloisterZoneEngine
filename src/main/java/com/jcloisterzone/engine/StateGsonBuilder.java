@@ -497,6 +497,19 @@ public class StateGsonBuilder {
                 }
                 continue;
             }
+            if (ev instanceof NeutralFigureReturned nfev) {
+//                if (mev.isForced()) {
+                    JsonObject data = new JsonObject();
+                    data.addProperty("type", "neutral-returned");
+                    data.addProperty("figure", nfev.getNeutralFigure().getClass().getSimpleName());
+//                    data.addProperty("player", mev.getMeeple().getPlayer().getIndex());
+                    data.addProperty("source", nfev.getFrom().toString());
+//                    data.addProperty("forced", mev.isForced());
+                    data.add("from", context.serialize(nfev.getFrom()));
+                    turnEvents.add(data);
+//                }
+                continue;
+            }
             if (ev instanceof FollowerCaptured) {
                 FollowerCaptured mev = (FollowerCaptured) ev;
                 JsonObject data = new JsonObject();
