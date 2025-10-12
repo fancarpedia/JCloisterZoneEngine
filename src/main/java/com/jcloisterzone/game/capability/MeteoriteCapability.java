@@ -3,16 +3,20 @@ package com.jcloisterzone.game.capability;
 import com.jcloisterzone.XMLUtils;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.Tile;
+import com.jcloisterzone.board.pointer.BoardPointer;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.board.TileModifier;
 import com.jcloisterzone.event.DiceSixRollEvent;
 import com.jcloisterzone.event.FlierDiceRollEvent;
 import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.figure.Meeple;
+import com.jcloisterzone.figure.neutral.NeutralFigure;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.capability.trait.MeteoriteProtected;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
+import com.jcloisterzone.reducers.ReturnNeutralFigure;
 import com.jcloisterzone.reducers.UndeployMeeple;
 
 import io.vavr.collection.LinkedHashMap;
@@ -175,16 +179,22 @@ public class MeteoriteCapability extends Capability<Void> {
 	                PlayEventMeta.createWithActivePlayer(state), positions, impactValue, String.format("%s.%s", "meteorite-impact", state.getStringRule(Rule.METEORITE_IMPACT))));
     		}
 
-	        LinkedHashMap<Meeple, FeaturePointer> meeples = state.getDeployedMeeples().filter((m, fp) -> {
-                Position mpos = fp.getPosition();
-                return positions.contains(mpos);
-            });
-
-	        for (Tuple2<Meeple, FeaturePointer> t: state.getDeployedMeeples()) {
+	        for (Tuple2<Meeple, FeaturePointer> t: state.getDeployedMeeples()
+	        		.filter(dm -> !(dm._1 instanceof MeteoriteProtected))) {
 	            Meeple m = t._1;
 	            FeaturePointer fp = t._2;
 	            if (positions.contains(fp.getPosition())) {
 	                state = (new UndeployMeeple(m, true)).apply(state);
+	            }
+	        }
+
+	        for (Tuple2<NeutralFigure<?>, BoardPointer> t: state.getNeutralFigures()
+	        		.getDeployedNeutralFigures()
+	        		.filter(dnf -> !(dnf._1 instanceof MeteoriteProtected))) {
+	            NeutralFigure<?> f = t._1;
+	            BoardPointer bp = t._2;
+	            if (positions.contains(bp.getPosition())) {
+	                state = (new ReturnNeutralFigure(f)).apply(state);
 	            }
 	        }
 
