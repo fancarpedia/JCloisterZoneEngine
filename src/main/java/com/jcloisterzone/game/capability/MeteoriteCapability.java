@@ -112,8 +112,8 @@ public class MeteoriteCapability extends Capability<Void> {
         return tile;
     }
     
-    @Override
-    public GameState onTilePlaced(GameState state, PlacedTile pt) {
+    public GameState confirmedTilePlacement(GameState state) {
+    	PlacedTile pt = state.getLastPlaced();
         if (pt.getTile().hasModifier(CRATER)) {
 
         	int diceValue = state.getPhase().getRandom().getNextInt(6)+1;

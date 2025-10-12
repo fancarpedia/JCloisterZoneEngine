@@ -290,7 +290,6 @@ public class Engine implements Runnable {
                         && newActivePlayer.equals(oldActivePlayer)
                         && !(msg instanceof DeployMeepleMessage && ((DeployMeepleMessage)msg).getMeepleId().contains("shepherd"))
                         && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"))
-                        && !(msg instanceof PlaceTileMessage && state.getLastPlaced().getTile().hasModifier(MeteoriteCapability.CRATER))
                 );
 
                 if (undoAllowed) {
