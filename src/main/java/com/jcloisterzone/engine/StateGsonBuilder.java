@@ -625,6 +625,36 @@ public class StateGsonBuilder {
                 turnEvents.add(data);
                 continue;
             }
+            if (ev instanceof FlierDiceRollEvent fdrev) {
+                JsonObject data = new JsonObject();
+                data.addProperty("type", "flierdice-roll");
+                data.addProperty("value", fdrev.getValue());
+                data.addProperty("action", fdrev.getType());
+                if (fdrev.getPositions() != null) {
+                	JsonArray arr = new JsonArray();
+                	fdrev.getPositions().forEach(pos -> {
+                        arr.add(context.serialize(pos));
+                    });
+                    data.add("positions", arr);
+                }
+                turnEvents.add(data);
+                continue;
+            }
+            if (ev instanceof DiceSixRollEvent dsixrev) {
+                JsonObject data = new JsonObject();
+                data.addProperty("type", "dicesix-roll");
+                data.addProperty("value", dsixrev.getValue());
+                data.addProperty("action", dsixrev.getType());
+                if (dsixrev.getPositions() != null) {
+                	JsonArray arr = new JsonArray();
+                	dsixrev.getPositions().forEach(pos -> {
+                		arr.add(context.serialize(pos));
+                    });
+                    data.add("positions", arr);
+                }
+                turnEvents.add(data);
+                continue;
+            }
         }
         return events;
     }
