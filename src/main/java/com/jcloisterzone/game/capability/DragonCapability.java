@@ -9,6 +9,7 @@ import com.jcloisterzone.figure.neutral.Dragon;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.MoveNeutralFigure;
 import io.vavr.collection.Vector;
 import org.w3c.dom.Element;
@@ -45,7 +46,7 @@ public class DragonCapability extends Capability<Vector<Position>> {
 
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         state = state.mapNeutralFigures(nf -> nf.setDragon(new Dragon("dragon.1")));
         state = state.mapTilePack(pack -> pack.deactivateGroup(TILE_GROUP_DRAGON));
         state = setModel(state, Vector.empty());

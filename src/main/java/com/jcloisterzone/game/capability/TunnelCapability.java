@@ -10,6 +10,7 @@ import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTunnelToken;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
@@ -34,7 +35,7 @@ public final class TunnelCapability extends Capability<Map<FeaturePointer, Place
 	private static final long serialVersionUID = 1L;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         int playersCount = state.getPlayers().getPlayers().length();
         String moreTokens = state.getStringRule(Rule.MORE_TUNNEL_TOKENS);
         state = state.mapPlayers(ps -> {

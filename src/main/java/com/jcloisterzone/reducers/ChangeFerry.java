@@ -81,7 +81,10 @@ public class ChangeFerry implements Reducer {
            Set<FeaturePointer> neighbouring = merged.getNeighboring().intersect(
                initialFeatures.flatMap(f -> f.getNeighboring()).toSet()
            );
-           return new Road(places, openEdges, neighbouring, modifiers, openTunnelEnds);
+           Set<FeaturePointer> marketplaces = merged.getMarketplaces().intersect(
+                   initialFeatures.flatMap(f -> f.getMarketplaces()).toSet()
+               );
+           return new Road(places, openEdges, neighbouring, modifiers, openTunnelEnds, marketplaces);
         });
 
         // handle special case, ferry connected two ends of same road (after disconnect)

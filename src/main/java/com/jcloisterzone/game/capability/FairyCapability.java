@@ -11,17 +11,20 @@ import com.jcloisterzone.board.pointer.MeeplePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
+import com.jcloisterzone.feature.Monastery;
 import com.jcloisterzone.feature.Scoreable;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.neutral.Fairy;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.Tuple2;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
 
 @Immutable
 public class FairyCapability extends Capability<Void> {
@@ -32,7 +35,7 @@ public class FairyCapability extends Capability<Void> {
     public static final int FAIRY_POINTS_FINISHED_OBJECT = 3;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return state.mapNeutralFigures(nf -> nf.setFairy(new Fairy("fairy.1")));
     }
 
@@ -80,7 +83,14 @@ public class FairyCapability extends Capability<Void> {
         if (ptr != null) {
             boolean onTileRule = ptr instanceof Position;
 
-            for (Tuple2<Follower, FeaturePointer> t : feature.getFollowers2(state)) {
+            Stream<Tuple2<Follower, FeaturePointer>> followers = Stream.empty();
+            if (feature instanceof Monastery && ((Monastery) feature).isSpecialMonastery(state)) {
+            	followers = ((Monastery) feature).getMonasteryFollowers2(state);
+            } else {
+            	followers = feature.getFollowers2(state);
+            }
+
+            for (Tuple2<Follower, FeaturePointer> t : followers) {
                 Follower m = t._1;
 
                 if (onTileRule && !ptr.getPosition().equals(t._2.getPosition())) continue;

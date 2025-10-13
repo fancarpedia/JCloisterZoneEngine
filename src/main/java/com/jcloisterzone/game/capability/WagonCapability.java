@@ -10,6 +10,7 @@ import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.figure.Wagon;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.Map;
@@ -29,7 +30,7 @@ public class WagonCapability extends Capability<Queue<Tuple2<Wagon, FeaturePoint
 	private static final long serialVersionUID = 1L;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return setModel(state, Queue.empty());
     }
 

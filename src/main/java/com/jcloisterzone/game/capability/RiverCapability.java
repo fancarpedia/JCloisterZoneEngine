@@ -5,17 +5,17 @@ import com.jcloisterzone.feature.River;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
-
 
 public class RiverCapability extends Capability<Void> {
 
 	private static final long serialVersionUID = 1L;
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         state = state.mapTilePack(pack -> {
             pack = pack.deactivateGroup("default");
             pack = pack.deactivateGroup("river-lake");

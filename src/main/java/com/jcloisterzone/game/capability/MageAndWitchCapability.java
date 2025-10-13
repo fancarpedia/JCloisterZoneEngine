@@ -7,6 +7,7 @@ import com.jcloisterzone.figure.neutral.Mage;
 import com.jcloisterzone.figure.neutral.Witch;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.Vector;
 import org.w3c.dom.Element;
 
@@ -17,7 +18,7 @@ public class MageAndWitchCapability extends Capability<Void> {
 	public static final TileModifier MAGE_TRIGGER = new TileModifier("MageTrigger");
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return state.setNeutralFigures(
             state.getNeutralFigures()
                 .setMage(new Mage("mage.1"))

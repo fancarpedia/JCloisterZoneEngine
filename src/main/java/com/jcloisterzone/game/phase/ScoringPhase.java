@@ -122,6 +122,28 @@ public class ScoringPhase extends Phase {
             }
         }
 
+        if (state.getCapabilities().contains(MarketplaceCapability.class)) {
+        	Set<Position> lastPlacedAndAdjacentPositions = state.getAdjacentTiles(pos)
+        			.map(PlacedTile::getPosition)
+        			.toSet()
+        			.add(lastPlaced.getPosition());
+            for (Tuple2<FeaturePointer, Road> t : state.getTileFeatures2ForPositions(lastPlacedAndAdjacentPositions, Road.class)) {
+            	Set<FeaturePointer> fps = t._2.getMarketplaces();
+        		if (fps.size()>0) {
+        			for(FeaturePointer fp : fps) {
+        				Marketplace marketplace = (Marketplace) state.getFeatureMap()
+        			        .get(fp.getPosition())
+        			        .flatMap(m -> m.get(fp))
+        			        .get();
+                		List<Road> marketplaceRoads = marketplace.getMarketplaceRoads(state);
+        				for(Road marketplaceRoad: marketplaceRoads) {
+        	                collectCompleted(state, (Completable) marketplaceRoad);
+        				}
+        			}
+        		}
+        	}
+        }
+
         Set<Position> neighbourPositions = state.getAdjacentAndDiagonalTiles2(pos)
             .map(pt -> pt._2.getPosition()).toSet();
 

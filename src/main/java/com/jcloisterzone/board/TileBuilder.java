@@ -29,6 +29,7 @@ public class TileBuilder {
     private static final FeatureModifier[] MONASTERY_MODIFIERS = new FeatureModifier[] { Monastery.SPECIAL_MONASTERY, Monastery.SHRINE, Monastery.CHURCH };
     private static final FeatureModifier[] CITY_MODIFIERS = new FeatureModifier[] { City.PENNANTS, City.CATHEDRAL, City.PRINCESS, City.BESIEGED, City.DARMSTADTIUM, City.POINTS_MODIFIER };
     private static final FeatureModifier[] ROAD_MODIFIERS = new FeatureModifier[] { Road.INN, Road.LABYRINTH, Road.ROBBERS_SON, Road.WELL };
+    private static final FeatureModifier[] FIELD_MODIFIERS = new FeatureModifier[] { Field.FLOWERS };
 
     private java.util.List<FeatureModifier> externalModifiers;
     private java.util.Map<String, java.util.List<FeatureModifier>> modifiersByType;
@@ -36,6 +37,7 @@ public class TileBuilder {
     private java.util.Map<FeaturePointer, Feature> features;
     private java.util.List<Tuple3<ShortEdge, Location, FeaturePointer>> multiEdges; //Edge, edge location, target feature (which is declared without edge)
     private java.util.Map<String, java.util.List<FeaturePointer>> neighbouring;
+    private java.util.Map<String, java.util.List<FeaturePointer>> marketplaces;
     private String tileId;
 
     private GameState state;
@@ -54,6 +56,7 @@ public class TileBuilder {
         modifiersByType.put("road", new ArrayList<>(Arrays.asList(ROAD_MODIFIERS)));
         modifiersByType.put("city", new ArrayList<>(Arrays.asList(CITY_MODIFIERS)));
         modifiersByType.put("monastery", new ArrayList<>(Arrays.asList(MONASTERY_MODIFIERS)));
+        modifiersByType.put("field", new ArrayList<>(Arrays.asList(FIELD_MODIFIERS)));
         for (FeatureModifier mod : externalModifiers) {
             String key = mod.getSelector().split("\\[")[0];
             var list = modifiersByType.get(key);
@@ -74,6 +77,7 @@ public class TileBuilder {
         features = new java.util.HashMap<>();
         multiEdges = new java.util.ArrayList<>();
         neighbouring = new java.util.HashMap<>();
+        marketplaces = new java.util.HashMap<>();
         Set<TileModifier> tileModifiers = HashSet.empty();
         this.tileId = tileId;
 
@@ -117,6 +121,9 @@ public class TileBuilder {
                     // init feature even if capability is not enabled, because of ringmaster scoring
                     initFeature(el, new Acrobats());
                     break;
+                case "marketplace":
+                    initFeature(el, new Marketplace());
+                    break;
             }
         }
 
@@ -149,6 +156,21 @@ public class TileBuilder {
             }
         }
 
+        for (var _fps : marketplaces.values()) {
+            var fps = List.ofAll(_fps);
+            for (FeaturePointer fp : fps) {
+            	if (fp.getFeature().equals(Road.class)) {
+                  Road feature = (Road) features.get(fp);
+                  feature = feature.setMarketplaces(feature.getMarketplaces().addAll(fps.remove(fp)));
+                  features.put(fp, feature);
+            	} else if (fp.getFeature().equals(Marketplace.class)) {
+                  Marketplace feature = (Marketplace) features.get(fp);
+                  feature = feature.setAdjoiningRoads(feature.getAdjoiningRoads().addAll(fps.remove(fp)));
+                  features.put(fp, feature);
+            	}
+            }
+        }
+
         io.vavr.collection.HashMap<FeaturePointer, Feature> _features = io.vavr.collection.HashMap.ofAll(features);
         Tile tileDef = new Tile(tileId, _features, tileModifiers);
 
@@ -170,7 +192,7 @@ public class TileBuilder {
         FeaturePointer fp = feature.getPlaces().get();
         features.put(fp, feature);
 
-        if (feature instanceof  NeighbouringFeature) {
+        if (feature instanceof NeighbouringFeature) {
             String[] wagonMoves = xml.getAttribute("wagon-move").split("\\s");
             for (String wagonMove : wagonMoves) {
                 if (wagonMove.length() > 0) {
@@ -178,6 +200,19 @@ public class TileBuilder {
                     if (connectedFeatures == null) {
                         connectedFeatures = new ArrayList<>();
                         neighbouring.put(wagonMove, connectedFeatures);
+                    }
+                    connectedFeatures.add(fp);
+                }
+            }
+        }
+        if (feature instanceof Road || feature instanceof Marketplace) {
+            String[] markeplaceConnections = xml.getAttribute("marketplace").split("\\s");
+            for (String markeplaceConnection : markeplaceConnections) {
+                if (markeplaceConnection.length() > 0) {
+                    var connectedFeatures = marketplaces.get(markeplaceConnection);
+                    if (connectedFeatures == null) {
+                        connectedFeatures = new ArrayList<>();
+                        marketplaces.put(markeplaceConnection, connectedFeatures);
                     }
                     connectedFeatures.add(fp);
                 }
@@ -224,6 +259,15 @@ public class TileBuilder {
             road = road.setOpenTunnelEnds(HashSet.of(fp));
         }
         initFeature(e, road);
+        
+        if (e.hasAttribute("bush")) {
+            attrAsLocations(e, "bush").forEach(loc -> {
+                assert loc.isEdge();
+                FeaturePointer bushFp = new FeaturePointer(Position.ZERO, Bush.class, loc);
+                initFeature(null, new Bush(List.of(bushFp), fp));
+            });
+        }
+
     }
 
     private void processCityElement(Element e) {
@@ -262,6 +306,7 @@ public class TileBuilder {
 
     private void processFieldElement(Element e) {
         Stream<Location> sides = contentAsLocations(e);
+        
         FeaturePointer fp = initFeaturePointer(sides, Field.class);
         Set<FeaturePointer> adjoiningCities;
 
@@ -295,7 +340,7 @@ public class TileBuilder {
         AtomicReference<Location> locRef = new AtomicReference<>();
         sides.forEach(l -> {
             assert l.isInner() || clazz.equals(Field.class) == l.isFieldEdge() : String.format("Invalid location %s kind for tile %s", l, tileId);
-            assert l.intersect(locRef.get()) == null;
+            assert l.intersect(locRef.get()) == null : String.format("Unknown error %s : %s : %s", locRef.get(), l, tileId);
             locRef.set(locRef.get() == null ? l : locRef.get().union(l));
         });
         //logger.debug(tile.getId() + "/" + piece.getClass().getSimpleName() + "/"  + loc);

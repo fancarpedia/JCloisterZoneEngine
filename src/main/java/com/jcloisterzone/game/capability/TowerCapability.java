@@ -11,6 +11,7 @@ import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
@@ -44,7 +45,7 @@ public final class TowerCapability extends Capability<Array<List<Follower>>> {
     }
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         int pieces = getInitialPiecesCount(state);
         state = state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(TowerToken.TOWER_PIECE, pieces));
         state = setModel(state, Array.fill(state.getPlayers().length(), List::empty));

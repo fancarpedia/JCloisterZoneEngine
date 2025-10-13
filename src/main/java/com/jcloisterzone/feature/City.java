@@ -12,6 +12,7 @@ import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
 import com.jcloisterzone.feature.modifier.IntegerNonMergingModifier;
 import com.jcloisterzone.game.Rule;
+import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
 import io.vavr.Tuple2;
@@ -19,7 +20,7 @@ import io.vavr.collection.*;
 
 import java.util.ArrayList;
 
-public class City extends CompletableFeature<City> implements ModifiedFeature<City> {
+public class City extends CompletableFeature<City> implements FlowersBonusAffected, ModifiedFeature<City> {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +30,7 @@ public class City extends CompletableFeature<City> implements ModifiedFeature<Ci
     public static final BooleanAnyModifier CATHEDRAL = new BooleanAnyModifier("city[cathedral]", new GameElementQuery("cathedral"));
     public static final BooleanAnyModifier PRINCESS = new BooleanAnyModifier("city[princess]", new GameElementQuery("princess"));
     public static final IntegerNonMergingModifier POINTS_MODIFIER = new IntegerNonMergingModifier("city[points]", null);
-
+    
     private final Set<Tuple2<ShortEdge, FeaturePointer>> multiEdges; // HS.CC!.v abstraction, multiple cities can connect to same edge
     private final Map<FeatureModifier<?>, Object> modifiers;
 
