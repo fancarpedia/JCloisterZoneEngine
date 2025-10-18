@@ -41,6 +41,6 @@ public class ScorePositionsFeaturePointer implements BoardPointer {
 
     @Override
     public String toString() {
-        return "[x=" + featurePointer.getPosition().x + ",y=" + featurePointer.getPosition().y + "," + featurePointer.getLocation() + "," + "positions=" + positions.mkString(",") + "]";
+        return "[x=" + featurePointer.getPosition().x + ",y=" + featurePointer.getPosition().y + "," + featurePointer.getFeature() + "," + featurePointer.getLocation() + "," + "positions=" + positions.mkString(",") + "]";
     }
 }
