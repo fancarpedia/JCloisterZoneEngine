@@ -68,6 +68,12 @@ public class ScoreEvent extends PlayEvent  {
         public BoardPointer getSource() {
             return source;
         }
+        
+        @Override
+        public String toString() {
+            return String.format("{%s,%s,%s}", expression, player, source);
+        }
+
     }
 
 }
