@@ -1,11 +1,11 @@
 package com.jcloisterzone.game.capability;
 
-
 import com.jcloisterzone.XMLUtils;
 import com.jcloisterzone.board.Tile;
 import com.jcloisterzone.board.TileModifier;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.Queue;
 import io.vavr.collection.Vector;
 import org.w3c.dom.Element;
@@ -25,8 +25,8 @@ public class BazaarCapability extends Capability<BazaarCapabilityModel> {
     }
 
     @Override
-    public GameState onStartGame(GameState state) {
-        return setModel(state, new BazaarCapabilityModel());
+    public GameState onStartGame(GameState state, RandomGenerator random) {
+    	return setModel(state, new BazaarCapabilityModel());
     }
 
 

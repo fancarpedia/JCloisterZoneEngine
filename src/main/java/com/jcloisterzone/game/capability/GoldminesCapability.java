@@ -19,6 +19,7 @@ import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.game.state.PlayersState;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.AddPoints;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
@@ -53,7 +54,7 @@ public class GoldminesCapability  extends Capability<Map<Position, Integer>> {
     }
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return setModel(state, HashMap.empty());
     }
 

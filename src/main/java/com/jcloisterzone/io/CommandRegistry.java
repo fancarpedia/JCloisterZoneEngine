@@ -13,7 +13,6 @@ public class CommandRegistry {
         TYPES = HashMap.<String, Class<? extends Message>>empty()
             .put(t(GameSetupMessage.class))
             .put(t(UndoMessage.class))
-            .put(t(CommitMessage.class))
             .put(t(PassMessage.class))
             .put(t(AiMessage.class))
             .put(t(PlaceTileMessage.class))
@@ -28,7 +27,9 @@ public class CommandRegistry {
             .put(t(BazaarBuyOrSellMessage.class))
             .put(t(CornCircleRemoveOrDeployMessage.class))
             .put(t(FlockMessage.class))
-            .put(t(ScoreAcrobatsMessage.class));
+            .put(t(ScoreAcrobatsMessage.class))
+            .put(t(TilePlacementConfirmMessage.class))
+            .put(t(CommitMessage.class));
 
     }
 

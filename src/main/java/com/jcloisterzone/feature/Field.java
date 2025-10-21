@@ -10,6 +10,7 @@ import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
+import com.jcloisterzone.feature.modifier.MultisetStringIntegerAddModifier;
 import com.jcloisterzone.figure.Pig;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 public class Field extends TileFeature implements Scoreable, MultiTileFeature<Field>, ModifiedFeature<Field> {
 
     public static final IntegerAddModifier PIG_HERD = new IntegerAddModifier("field[pig-herd]", new GameElementQuery("pig-herd"));
+    public static final MultisetStringIntegerAddModifier FLOWERS = new MultisetStringIntegerAddModifier("field[flowers]", new GameElementQuery("flowers"));
 
     // for unplaced features, references is to (0, 0)
     protected final Set<FeaturePointer> adjoiningCities; //or castles

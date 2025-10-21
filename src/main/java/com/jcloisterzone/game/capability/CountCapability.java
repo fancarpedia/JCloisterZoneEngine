@@ -11,6 +11,7 @@ import com.jcloisterzone.figure.neutral.Count;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.MoveNeutralFigure;
 import io.vavr.Tuple2;
 import io.vavr.collection.Map;
@@ -25,7 +26,7 @@ public class CountCapability extends Capability<CountCapabilityModel> {
     private static final String[] FORBIDDEN_TILES = new String[] { "CO/6", "CO/7" };
 
     @Override
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         Count count = new Count("count.1");
         state =  state.mapNeutralFigures(nf -> nf.setCount(count));
 

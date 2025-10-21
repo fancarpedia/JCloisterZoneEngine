@@ -47,6 +47,7 @@ public class StateGsonBuilder {
         builder.registerTypeAdapter(Location.class, new MessageParser.LocationSerializer());
         builder.registerTypeAdapter(FeaturePointer.class, new MessageParser.FeaturePointerSerializer());
         builder.registerTypeAdapter(BoardPointer.class, new MessageParser.BoardPointerSerializer());
+        builder.registerTypeAdapter(new com.google.gson.reflect.TypeToken<Set<Position>>() {}.getType(), new MessageParser.PositionSetSerializer());
         // actions
         builder.registerTypeAdapter(TilePlacementAction.class, new TilePlacementActionSerializer());
         builder.registerTypeAdapter(MeepleAction.class, new MeepleActionSerializer());
@@ -72,6 +73,7 @@ public class StateGsonBuilder {
         builder.registerTypeAdapter(RemoveMageOrWitchAction.class, new ActionSerializer("RemoveMageOrWitch"));
         builder.registerTypeAdapter(LittleBuildingAction.class, new LittleBuildingActionSerializer());
         builder.registerTypeAdapter(ScoreAcrobatsAction.class, new SelectFeatureActionSerializer());
+        builder.registerTypeAdapter(DonkeyAction.class, new DonkeyActionSerializer());
         return builder.create();
     }
 
@@ -290,6 +292,12 @@ public class StateGsonBuilder {
             data.add("placement", context.serialize(pos));
             neutral.add("bigtop", data);
         }
+        pos = state.getDonkeyDeployment();
+        if (pos != null) {
+            JsonObject data = new JsonObject();
+            data.add("placement", context.serialize(pos));
+            neutral.add("donkey", data);
+        }
         return neutral;
     }
 
@@ -489,6 +497,19 @@ public class StateGsonBuilder {
                 }
                 continue;
             }
+            if (ev instanceof NeutralFigureReturned nfev) {
+//                if (mev.isForced()) {
+                    JsonObject data = new JsonObject();
+                    data.addProperty("type", "neutral-returned");
+                    data.addProperty("figure", nfev.getNeutralFigure().getClass().getSimpleName());
+//                    data.addProperty("player", mev.getMeeple().getPlayer().getIndex());
+                    data.addProperty("source", nfev.getFrom().toString());
+//                    data.addProperty("forced", mev.isForced());
+                    data.add("from", context.serialize(nfev.getFrom()));
+                    turnEvents.add(data);
+//                }
+                continue;
+            }
             if (ev instanceof FollowerCaptured) {
                 FollowerCaptured mev = (FollowerCaptured) ev;
                 JsonObject data = new JsonObject();
@@ -614,6 +635,36 @@ public class StateGsonBuilder {
                 data.addProperty("type", "flier-roll");
                 data.addProperty("distance", frev.getDistance());
                 data.add("flierPosition", context.serialize(frev.getPosition()));
+                turnEvents.add(data);
+                continue;
+            }
+            if (ev instanceof FlierDiceRollEvent fdrev) {
+                JsonObject data = new JsonObject();
+                data.addProperty("type", "flierdice-roll");
+                data.addProperty("value", fdrev.getValue());
+                data.addProperty("action", fdrev.getType());
+                if (fdrev.getPositions() != null) {
+                	JsonArray arr = new JsonArray();
+                	fdrev.getPositions().forEach(pos -> {
+                        arr.add(context.serialize(pos));
+                    });
+                    data.add("positions", arr);
+                }
+                turnEvents.add(data);
+                continue;
+            }
+            if (ev instanceof DiceSixRollEvent dsixrev) {
+                JsonObject data = new JsonObject();
+                data.addProperty("type", "dicesix-roll");
+                data.addProperty("value", dsixrev.getValue());
+                data.addProperty("action", dsixrev.getType());
+                if (dsixrev.getPositions() != null) {
+                	JsonArray arr = new JsonArray();
+                	dsixrev.getPositions().forEach(pos -> {
+                		arr.add(context.serialize(pos));
+                    });
+                    data.add("positions", arr);
+                }
                 turnEvents.add(data);
                 continue;
             }
@@ -778,6 +829,21 @@ public class StateGsonBuilder {
         public JsonElement serialize(FairyOnTileAction action, Type type, JsonSerializationContext context) {
             JsonObject json = new JsonObject();
             json.addProperty("type", "MoveFairyOnTile");
+            json.addProperty("figureId", action.getFigureId());
+            JsonArray options = new JsonArray();
+            action.getOptions().forEach(pos -> {
+                options.add(context.serialize(pos));
+            });
+            json.add("options", options);
+            return json;
+        }
+    }
+
+    private class DonkeyActionSerializer implements JsonSerializer<DonkeyAction> {
+        @Override
+        public JsonElement serialize(DonkeyAction action, Type type, JsonSerializationContext context) {
+            JsonObject json = new JsonObject();
+            json.addProperty("type", "MoveDonkeyOnTile");
             json.addProperty("figureId", action.getFigureId());
             JsonArray options = new JsonArray();
             action.getOptions().forEach(pos -> {

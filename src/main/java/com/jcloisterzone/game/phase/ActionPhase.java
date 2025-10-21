@@ -16,6 +16,7 @@ import com.jcloisterzone.feature.Acrobats;
 import com.jcloisterzone.feature.Monastic;
 import com.jcloisterzone.feature.Tower;
 import com.jcloisterzone.figure.*;
+import com.jcloisterzone.figure.neutral.Donkey;
 import com.jcloisterzone.figure.neutral.Fairy;
 import com.jcloisterzone.figure.neutral.NeutralFigure;
 import com.jcloisterzone.game.Capability;
@@ -114,7 +115,15 @@ public class ActionPhase extends AbstractActionPhase {
             state = (new MoveNeutralFigure<BoardPointer>(fairy, ptr, state.getActivePlayer())).apply(state);
             state = clearActions(state);
             return next(state);
+        } else if (fig instanceof Donkey) {
+            // TODO validation against ActionState
+
+            Donkey donkey = (Donkey) fig;
+            state = (new MoveNeutralFigure<BoardPointer>(donkey, ptr, state.getActivePlayer())).apply(state);
+            state = clearActions(state);
+            return next(state);
         }
+
         throw new IllegalArgumentException("Illegal neutral figure move");
     }
 

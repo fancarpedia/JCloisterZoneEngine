@@ -3,6 +3,7 @@ package com.jcloisterzone.game.state.mixins;
 import com.jcloisterzone.board.*;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.feature.Acrobats;
+import com.jcloisterzone.feature.Bush;
 import com.jcloisterzone.feature.CityGate;
 import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.game.Capability;
@@ -142,7 +143,7 @@ public interface PlacementsMixin extends BoardMixin, PlayersMixin, CapabilitiesM
             var p = pos.add(l);
             if (getPlacedTile(p) == null) continue;
             var f = getFeaturePartOf(p, l.rev());
-            if (!(f instanceof CityGate)) {
+            if (!(f instanceof CityGate || f instanceof Bush)) {
                 return false;
             }
         }

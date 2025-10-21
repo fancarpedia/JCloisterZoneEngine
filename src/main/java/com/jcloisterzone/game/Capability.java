@@ -5,18 +5,24 @@ import com.jcloisterzone.board.PlacementOption;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.RemoveTileException;
 import com.jcloisterzone.board.Tile;
+import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
 import com.jcloisterzone.feature.Completable;
 import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.feature.Scoreable;
+import com.jcloisterzone.figure.Special;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
+import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Vector;
+import io.vavr.collection.Stream;
+
 import org.w3c.dom.Element;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Function;
 
@@ -60,7 +66,7 @@ public abstract class Capability<T> implements Serializable {
         return null;
     }
 
-    public GameState onStartGame(GameState state) {
+    public GameState onStartGame(GameState state, RandomGenerator random) {
         return state;
     }
 
@@ -73,6 +79,10 @@ public abstract class Capability<T> implements Serializable {
     }
 
     public List<ReceivedPoints> appendFiguresBonusPoints(GameState state, List<ReceivedPoints> bonusPoints, Scoreable feature, boolean isFinal) {
+        return bonusPoints;
+    }
+
+    public List<ReceivedPoints> appendSpecialFiguresBonusPoints(GameState state, List<ReceivedPoints> bonusPoints, Special figure, boolean isFinal) {
         return bonusPoints;
     }
 
