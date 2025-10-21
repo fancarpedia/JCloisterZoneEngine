@@ -331,7 +331,7 @@ public class Engine implements Runnable {
 	                    e.printStackTrace();
 	                }*/
                 }
-                state = phaseReducer.apply(state, msg);
+//                state = phaseReducer.apply(state, msg);
 
                 Player newActivePlayer = state.getActivePlayer();
                 boolean undoAllowed = (
