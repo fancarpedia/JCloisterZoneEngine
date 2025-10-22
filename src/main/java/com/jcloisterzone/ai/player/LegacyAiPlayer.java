@@ -7,12 +7,17 @@ import com.jcloisterzone.Player;
 import com.jcloisterzone.ai.GameStateRanking;
 import com.jcloisterzone.ai.player.RankingAiPlayer;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.GameStatePhaseReducer;
 //import com.jcloisterzone.game.SupportedSetup;
 import com.jcloisterzone.game.capability.*;
 
 import io.vavr.collection.HashSet;
 
 public class LegacyAiPlayer extends RankingAiPlayer {
+
+    public LegacyAiPlayer(GameStatePhaseReducer phaseReducer, Player me) {
+    	super(phaseReducer, me);
+    }
 
     @Override
     protected GameStateRanking createStateRanking(Player me) {

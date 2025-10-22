@@ -27,6 +27,16 @@ public abstract class RankingAiPlayer implements AiPlayer {
     private Player me;
     private Vector<ReplayableMessage> messages = Vector.empty();
 
+    /**
+     * Instantiates a new {@code PlayerAction}.
+     *
+     * @param options the options the player can choose from
+     */
+    public RankingAiPlayer(GameStatePhaseReducer phaseReducer, Player me) {
+       this.phaseReducer = phaseReducer;
+       this.me = me;
+       this.stateRanking = this.createStateRanking(me);
+    }
     protected abstract GameStateRanking createStateRanking(Player me);
 
     @Override

@@ -6,8 +6,8 @@ import com.google.gson.GsonBuilder;
 import com.jcloisterzone.Player;
 import com.jcloisterzone.action.PlayerAction;
 import com.jcloisterzone.ai.AiPlayer;
-import com.jcloisterzone.ai.player.DummyAiPlayer;
-//import com.jcloisterzone.ai.player.RankingAiPlayer;
+//import com.jcloisterzone.ai.player.DummyAiPlayer;
+import com.jcloisterzone.ai.player.LegacyAiPlayer;
 import com.jcloisterzone.figure.*;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.GameSetup;
@@ -245,7 +245,6 @@ public class Engine implements Runnable {
 
         GameStatePhaseReducer phaseReducer = new GameStatePhaseReducer(gameSetup, initialRandom);
         GameStateBuilder builder = new GameStateBuilder(tileDefinitions, gameSetup, setupMsg.getPlayers(), initialRandom);
-        AiPlayer aiPlayer = new DummyAiPlayer();
 
         if (setupMsg.getGameAnnotations() != null) {
             builder.setGameAnnotations(setupMsg.getGameAnnotations());
@@ -296,7 +295,8 @@ public class Engine implements Runnable {
                 Integer seq = aiMessage.getSeq();
             	log.println("Message "+playerRequestIdx+' '+oldActivePlayer.getIndex());
                 if (playerRequestIdx == oldActivePlayer.getIndex()) { //Integer.parseInt(playerRequestIdx.toString().split("\\.")[0]) == oldActivePlayer.getIndex()) {
-	
+                    AiPlayer aiPlayer = new LegacyAiPlayer(phaseReducer, oldActivePlayer);
+
                 	ReplayableMessage message = aiPlayer.apply(state);
 //	            	// Client request to finish current phase by AI
 //	            	Vector<ReplayableMessage> messages = aiPlayer.getPossibleActions(state);
