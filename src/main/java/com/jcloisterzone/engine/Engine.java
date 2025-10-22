@@ -7,6 +7,7 @@ import com.jcloisterzone.Player;
 import com.jcloisterzone.action.PlayerAction;
 import com.jcloisterzone.ai.AiPlayer;
 import com.jcloisterzone.ai.player.DummyAiPlayer;
+//import com.jcloisterzone.ai.player.RankingAiPlayer;
 import com.jcloisterzone.figure.*;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.GameSetup;
@@ -296,15 +297,16 @@ public class Engine implements Runnable {
             	log.println("Message "+playerRequestIdx+' '+oldActivePlayer.getIndex());
                 if (playerRequestIdx == oldActivePlayer.getIndex()) { //Integer.parseInt(playerRequestIdx.toString().split("\\.")[0]) == oldActivePlayer.getIndex()) {
 	
-	            	// Client request to finish current phase by AI
-	            	Vector<ReplayableMessage> messages = aiPlayer.getPossibleActions(state);
-	
-	            	String bestSoFar = "0";
-	//            	String chainStr = messages.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
-	            	
-	                Random random = new Random();
-	
-	            	ReplayableMessage message = messages.get(random.nextInt(messages.length()));
+                	ReplayableMessage message = aiPlayer.apply(state);
+//	            	// Client request to finish current phase by AI
+//	            	Vector<ReplayableMessage> messages = aiPlayer.getPossibleActions(state);
+//	
+//	            	String bestSoFar = "0";
+//	//            	String chainStr = messages.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
+//	            	
+//	                Random random = new Random();
+//	
+//	            	ReplayableMessage message = messages.get(random.nextInt(messages.length()));
 	            	
 	            	Gson gson = new Gson();
 	            	String messageCommand = message.getClass().getAnnotation(MessageCommand.class).value();

@@ -1,10 +1,12 @@
-package com.jcloisterzone.ai;
+package com.jcloisterzone.ai.player;
 
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import com.jcloisterzone.ai.AiPlayer;
+import com.jcloisterzone.ai.GameStateRanking;
 import com.jcloisterzone.Player;
 import com.jcloisterzone.game.GameSetup;
 import com.jcloisterzone.game.GameStatePhaseReducer;

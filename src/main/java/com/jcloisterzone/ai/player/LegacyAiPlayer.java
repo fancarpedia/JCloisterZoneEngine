@@ -5,7 +5,7 @@ import java.util.Set;
 //import com.jcloisterzone.Expansion;
 import com.jcloisterzone.Player;
 import com.jcloisterzone.ai.GameStateRanking;
-import com.jcloisterzone.ai.RankingAiPlayer;
+import com.jcloisterzone.ai.player.RankingAiPlayer;
 import com.jcloisterzone.game.Capability;
 //import com.jcloisterzone.game.SupportedSetup;
 import com.jcloisterzone.game.capability.*;
