@@ -295,7 +295,7 @@ public class Engine implements Runnable {
                 Integer seq = aiMessage.getSeq();
             	log.println("Message "+playerRequestIdx+' '+oldActivePlayer.getIndex());
                 if (playerRequestIdx == oldActivePlayer.getIndex()) { //Integer.parseInt(playerRequestIdx.toString().split("\\.")[0]) == oldActivePlayer.getIndex()) {
-                    AiPlayer aiPlayer = new LegacyAiPlayer(phaseReducer, oldActivePlayer);
+                    AiPlayer aiPlayer = new LegacyAiPlayer(phaseReducer, new Player(playerRequestIdx));
 
                 	ReplayableMessage message = aiPlayer.apply(state);
 //	            	// Client request to finish current phase by AI

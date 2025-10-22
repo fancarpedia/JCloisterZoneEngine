@@ -54,7 +54,7 @@ public abstract class RankingAiPlayer implements AiPlayer {
                 for (ReplayableMessage msg : getPossibleActions(itemState)) {
                     Vector<ReplayableMessage> chain = item._2.append(msg);
                     GameState newState = phaseReducer.apply(itemState, msg);
-                    boolean end = newState.getActivePlayer() != me || newState.getTurnPlayer() != state.getTurnPlayer();
+                    boolean end = newState.getActivePlayer() == null || newState.getActivePlayer().getIndex() != me.getIndex() || newState.getTurnPlayer().getIndex() != state.getTurnPlayer().getIndex();
 
                     if (!end && msg instanceof PlaceTileMessage &&
                         newState.getLastPlaced().getTile().hasModifier(PortalCapability.MAGIC_PORTAL)) {
@@ -68,7 +68,7 @@ public abstract class RankingAiPlayer implements AiPlayer {
                         Double ranking = stateRanking.apply(newState);
 
 //                      String chainStr = chain.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
-//                      System.err.println(String.format(">>> %f\n%s", ranking, chainStr));
+//                      System.out.println(String.format(">>> %f\n%s", ranking, chainStr));
 
                         if (ranking > bestSoFar) {
                             bestSoFar = ranking;
@@ -80,8 +80,8 @@ public abstract class RankingAiPlayer implements AiPlayer {
                 }
             }
 
-            String chainStr = messages.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
-            System.out.println(String.format("Best ranking %s, %s", bestSoFar, chainStr));
+//            String chainStr = messages.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
+//            System.out.println(String.format("Best ranking %s, %s", bestSoFar, chainStr));
         }
 
         ReplayableMessage msg = messages.get();

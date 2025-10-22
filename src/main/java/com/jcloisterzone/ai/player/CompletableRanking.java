@@ -22,8 +22,8 @@ public class CompletableRanking {
 
     public CompletableRanking(GameState state, Completable feature) {
         this.feature = feature;
-        incompletePoints = 0; //feature.getStructurePoints(state, false);
-        completePoints = 0;// feature.getStructurePoints(state, true);
+        incompletePoints = feature.getStructurePoints(state, false).getPoints();
+        completePoints = feature.getStructurePoints(state, true).getPoints();
         powers = feature.getPowers(state).mapValues(Tuple2::_1);
 
         // copy from Scoreable interface

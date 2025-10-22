@@ -39,7 +39,7 @@ import io.vavr.collection.Stream;
 
 class LegacyRanking implements GameStateRanking {
 
-    protected final transient Logger logger = LoggerFactory.getLogger("AI Ranking");
+    protected final transient Logger logger = LoggerFactory.getLogger("AIRanking");
 
     public static final double[]  OPEN_ROAD_PENALTY =
         { 0.0, 1.0, 2.5, 4.5, 7.5, 10.5, 14.5, 19.0, 29.0 };
@@ -124,7 +124,7 @@ class LegacyRanking implements GameStateRanking {
     }
 
     private double ptsforPlayer(Player p, double pts) {
-        return p == me ? pts : -pts;
+        return p.getIndex() == me.getIndex() ? pts : -pts;
     }
 
     private Map<Position, Double> getPositionProbability() {
@@ -150,7 +150,7 @@ class LegacyRanking implements GameStateRanking {
         double r = 0.0;
         PlayersState ps = state.getPlayers();
         for (Player player : ps.getPlayers()) {
-//            r += ptsforPlayer(player, ps.getScore().get(player.getIndex()).getPoints());
+            r += ptsforPlayer(player, ps.getScore().get(player.getIndex()));
         }
         return r;
     }
@@ -213,7 +213,7 @@ class LegacyRanking implements GameStateRanking {
             for (CompletableRanking cr : occupiedCompletables) {
                 Set<Player> owners  = cr.getOwners();
                 if (owners.size() != 1) continue;
-                if (owners.get() != player) continue;
+                if (owners.get().getIndex() != player.getIndex()) continue;
 
                 /*if (cr.getFeature() instanceof CloisterLike) {
                     cloisters += 1;
@@ -272,7 +272,7 @@ class LegacyRanking implements GameStateRanking {
             if (remainingTurns > 7) {
                 if (penalty != null) {
                     for (Follower follower : completable.getFollowers(state)) {
-                        if (follower.getPlayer() == me) {
+                        if (follower.getPlayer().getIndex() == me.getIndex()) {
                             fr -= penalty._1;
                         } else {
                             fr += penalty._2;
@@ -319,7 +319,7 @@ class LegacyRanking implements GameStateRanking {
     private double rateMeeples() {
         double r = 0.0;
         for (Player player : state.getPlayers().getPlayers()) {
-            double q = player == me ? 1.0 : -1.0;
+            double q = (player.getIndex() == me.getIndex()) ? 1.0 : -1.0;
             int inSupply = 0;
             for (Follower f : player.getFollowers(state).filter(f -> f.isInSupply(state))) {
                 //instanceof cannot be used because of Phantom
@@ -383,7 +383,6 @@ class LegacyRanking implements GameStateRanking {
         HashMap<Player, Integer> combinedPowers = getCombinedPowers(r1, r2);
         int combinedMaxPower = combinedPowers.values().max().getOrElse(0);
         Set<Player> combinedOwners = combinedPowers.keySet().filter(p -> combinedPowers.get(p).get() == combinedMaxPower);
-
 
         Set<Player> loss1 = r1.getOwners().diff(combinedOwners);
         Set<Player> loss2 = r2.getOwners().diff(combinedOwners);
