@@ -17,7 +17,7 @@ import com.jcloisterzone.feature.City;
 //import com.jcloisterzone.feature.CloisterLike;
 import com.jcloisterzone.feature.Completable;
 import com.jcloisterzone.feature.CompletableFeature;
-//import com.jcloisterzone.feature.Farm;
+import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.figure.Barn;
 import com.jcloisterzone.figure.Follower;
@@ -27,8 +27,8 @@ import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.game.state.PlayersState;
-//import com.jcloisterzone.reducers.ScoreFarm;
-//import com.jcloisterzone.reducers.ScoreFarmBarn;
+import com.jcloisterzone.reducers.ScoreField;
+import com.jcloisterzone.reducers.ScoreFieldBarn;
 
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
@@ -45,7 +45,7 @@ class LegacyRanking implements GameStateRanking {
         { 0.0, 1.0, 2.5, 4.5, 7.5, 10.5, 14.5, 19.0, 29.0 };
     public static final double[]  OPEN_CITY_PENALTY =
         { 0.0, 0.5, 1.5, 3.0, 5.0, 8.0, 12.0, 17.0, 27.0 };
-    public static final double[]  OPEN_FARM_PENALTY =
+    public static final double[]  OPEN_FIELD_PENALTY =
         { 0.0, 5.0, 10.0, 19.0, 28.0, 37.0, 47.0, 57.0, 67.0 };
     public static final double[]  OPEN_CLOISTER_PENALTY =
         { 0.0, 0.0, 0.4, 0.8, 1.2, 2.0, 4.0, 7.0, 11.0 };
@@ -61,7 +61,7 @@ class LegacyRanking implements GameStateRanking {
 
     private java.util.HashMap<Edge, CompletableRanking> edges;
     private java.util.List<CompletableRanking> occupiedCompletables;
-    private java.util.List<ScoreFeatureReducer> occupiedFarms;
+    private java.util.List<ScoreFeatureReducer> occupiedFields;
 
     public LegacyRanking(Player me) {
         super();
@@ -80,7 +80,7 @@ class LegacyRanking implements GameStateRanking {
         remainingTurns = (int) Math.ceil(state.getTilePack().totalSize() / numberOfPlayers);
         edges = new java.util.HashMap<>();
         occupiedCompletables = new ArrayList<>();
-        occupiedFarms = new ArrayList<>();
+        occupiedFields = new ArrayList<>();
 
         logger.debug("--> {}", lastPlaced);
         r = ratePoints();
@@ -208,7 +208,7 @@ class LegacyRanking implements GameStateRanking {
         double r = 0.0;
         //Array<Seq<Follower>> followers = state.getPlayers().getFollowers();
         for (Player player : state.getPlayers().getPlayers()) {
-            int cloisters = 0, roads = 0, cities = 0, farms = 0;
+            int cloisters = 0, roads = 0, cities = 0, fields = 0;
 
             for (CompletableRanking cr : occupiedCompletables) {
                 Set<Player> owners  = cr.getOwners();
@@ -224,9 +224,9 @@ class LegacyRanking implements GameStateRanking {
                 }
             }
 
-            for (ScoreFeatureReducer sfr : occupiedFarms) {
+            for (ScoreFeatureReducer sfr : occupiedFields) {
                 if (sfr.getOwners().contains(player)) {
-                    farms += 1;
+                    fields += 1;
                 }
             }
 
@@ -234,7 +234,7 @@ class LegacyRanking implements GameStateRanking {
             pr -= OPEN_ROAD_PENALTY[roads];
             pr -= OPEN_CITY_PENALTY[cities];
             pr -= OPEN_CLOISTER_PENALTY[cloisters];
-            pr -= OPEN_FARM_PENALTY[farms];
+            pr -= OPEN_FIELD_PENALTY[fields];
             r += ptsforPlayer(player, pr);
         }
         return r;
@@ -292,26 +292,31 @@ class LegacyRanking implements GameStateRanking {
             r += fr;
         }
 
-        /*for (Farm farm : state.getFeatures(Farm.class)) {
-            boolean hasBarn = farm.getSpecialMeeples(state)
+        for (Field field : state.getFeatures(Field.class)) {
+            boolean hasBarn = field.getSpecialMeeples(state)
                 .find(Predicates.instanceOf(Barn.class)).isDefined();
             ScoreFeatureReducer sr;
             if (hasBarn) {
-               sr = new ScoreFarmBarn(farm, true);
+               sr = new ScoreFieldBarn(field, true);
             } else {
-               sr = new ScoreFarm(farm, true);
+               sr = new ScoreField(field, true);
             }
             sr.apply(state);
-            occupiedFarms.add(sr);
+            occupiedFields.add(sr);
 
             for (Player player : sr.getOwners()) {
-                double q = 0.99;
+                double q = -0.99;
                 if (player != me) {
                     q = -q;
                 }
-                r += q * sr.getFeaturePoints(player);
+                double fq;
+            	fq = sr.getFeaturePoints(player).getPoints();
+                r += q * fq;
             }
-        }*/
+            if (logger.isDebugEnabled()) {
+                logger.debug(String.format("  > Field       %8.5f", r));
+            }
+        }
 
         return r;
     }
