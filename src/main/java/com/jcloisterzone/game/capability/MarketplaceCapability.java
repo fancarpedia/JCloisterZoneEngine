@@ -68,9 +68,7 @@ public class MarketplaceCapability extends Capability<Void> {
     			Set<Position> positions = HashSet.empty();
     			for(FeaturePointer fp : fps) {
     				Marketplace marketplace = (Marketplace) state.getFeature(fp);
-    				System.out.println("MARKETPLACE");
-    				System.out.println(marketplace);
-            		List<Road> marketplaceRoads = marketplace.getMarketplaceRoads(state);
+    				List<Road> marketplaceRoads = marketplace.getMarketplaceRoads(state);
             		for(Road marketplaceRoad: marketplaceRoads) {
                 		Set<Position> roadPositions = marketplaceRoad.getTilePositions();
                 		positions = positions.addAll(roadPositions);

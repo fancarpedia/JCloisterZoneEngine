@@ -224,9 +224,6 @@ public class Road extends CompletableFeature<Road> implements FlowersBonusAffect
             	int counter = 0;
             	for(FeaturePointer fp: marketplaces) {
             		Integer otherRoadsTiles = marketplaceCap.getMarketplaceOtherRoadsTiles(state, this, completed);
-            		System.out.println("\n");
-            		System.out.println(fp);
-            		System.out.println(otherRoadsTiles);
             		if (otherRoadsTiles != null && otherRoadsTiles>0) {
             			exprItems.add(new ExprItem("marketplace." + counter++, otherRoadsTiles));
             		}
