@@ -13,6 +13,7 @@ import com.jcloisterzone.feature.modifier.IntegerAddModifier;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.FerriesCapability;
 import com.jcloisterzone.game.capability.FerriesCapabilityModel;
+import com.jcloisterzone.game.capability.MarketplaceCapability;
 import com.jcloisterzone.game.capability.TunnelCapability;
 import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.setup.GameElementQuery;
@@ -217,8 +218,21 @@ public class Road extends CompletableFeature<Road> implements FlowersBonusAffect
         if (wellsCount>0) {
         	exprItems.add(new ExprItem(wellsCount, "wells", (inn ? 2 : 1) * wellsCount ));
         }
-
-//        scoreScriptedModifiers(state, exprItems, java.util.Map.of("tiles", tileCount, "completed", completed));
+        if (marketplaces.length()>0) {
+        	MarketplaceCapability marketplaceCap = state.getCapabilities().get(MarketplaceCapability.class);
+            if (marketplaceCap != null) {
+            	int counter = 0;
+            	for(FeaturePointer fp: marketplaces) {
+            		Integer otherRoadsTiles = marketplaceCap.getMarketplaceOtherRoadsTiles(state, this, completed);
+            		System.out.println("\n");
+            		System.out.println(fp);
+            		System.out.println(otherRoadsTiles);
+            		if (otherRoadsTiles != null && otherRoadsTiles>0) {
+            			exprItems.add(new ExprItem("marketplace." + counter++, otherRoadsTiles));
+            		}
+            	}
+            }
+        }
         return new PointsExpression(completed ? "road" : "road.incomplete", List.ofAll(exprItems));
     }
 
