@@ -387,4 +387,15 @@ public class GameState implements ActionsMixin, BoardMixin,
     public boolean isCommited() {
         return commited;
     }
+    
+    /*
+     * Helpers
+     */
+    public Feature getFeature(FeaturePointer fp) {
+		return getFeatureMap()
+			    .get(fp.getPosition())
+			    .flatMap(m -> m.get(fp))
+			    .getOrNull();
+
+    }
 }
