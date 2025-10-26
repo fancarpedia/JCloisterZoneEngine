@@ -7,13 +7,22 @@ import com.jcloisterzone.feature.Castle;
 import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.state.GameState;
 
+import io.vavr.collection.List;
+
 public class ScoreCastle extends ScoreFeature implements ScoreFeatureReducer {
 
     private final PointsExpression points;
 
     public ScoreCastle(Castle feature, PointsExpression points, boolean isFinal) {
         super(feature, isFinal);
-        this.points = new PointsExpression("castle", new ExprItem("castle." + points.getName(), points.getPoints()));
+        List<ExprItem> items = points.getItems();
+        for(ExprItem item: items) {
+        	if (item.getName().startsWith("marketplace.")) {
+        		items = items.remove(item);
+        	}
+        }
+        Integer itemsPoints = items.map(exp -> exp.getPoints()).sum().intValue();
+    	this.points = new PointsExpression("castle", new ExprItem("castle." + points.getName(), itemsPoints));
     }
 
     @Override
