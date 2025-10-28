@@ -60,14 +60,14 @@ public class MarketplaceCapability extends Capability<Void> {
         return bonusPoints;
     }
 */
-    public Integer getMarketplaceOtherRoadsTiles(GameState state, Road road, boolean completed) {
+    public Integer getMarketplaceOtherRoadsTiles(GameState state, Road road, FeaturePointer marketplaceFp, boolean completed) {
         if (completed) {
-    		Set<FeaturePointer> fps = road.getMarketplaces();
-    		if (fps.size()>0) {
+//    		Set<FeaturePointer> fps = road.getMarketplaces();
+//    		if (fps.size()>0) {
     			Integer tiles = 0;
     			Set<Position> positions = HashSet.empty();
-    			for(FeaturePointer fp : fps) {
-    				Marketplace marketplace = (Marketplace) state.getFeature(fp);
+//    			for(FeaturePointer marketplaceFp : fps) {
+    				Marketplace marketplace = (Marketplace) state.getFeature(marketplaceFp);
     				List<Road> marketplaceRoads = marketplace.getMarketplaceRoads(state);
             		for(Road marketplaceRoad: marketplaceRoads) {
                 		Set<Position> roadPositions = marketplaceRoad.getTilePositions();
@@ -77,9 +77,9 @@ public class MarketplaceCapability extends Capability<Void> {
 //    					}
     				}
     				tiles-= road.getTilePositions().size(); // Exclude scored road tiles
-    			}
+//    			}
     			return tiles;
-    		}
+//    		}
         }
         return null;
     }
