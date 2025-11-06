@@ -388,4 +388,7 @@ public class GameState implements ActionsMixin, BoardMixin,
         return commited;
     }
     
+    public List<Tile> getTilesInPlayerSupply(Player player) {
+    	return List.empty();
+    }
 }

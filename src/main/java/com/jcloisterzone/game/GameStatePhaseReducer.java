@@ -33,7 +33,7 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
         CleanUpTurnPartPhase cleanUpTurnPartPhase;
         TilePhase tilePhase;
         ActionPhase actionPhase;
-        AbbeyPhase abbeyPhase = null;
+        TileFromSupplyPhase tileFromSupplyPhase = null;
         AbbeyEndGamePhase abbeyEndGamePhase = null;
 
         endChain = new GameOverPhase(randomGenerator, null);
@@ -76,18 +76,18 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
         if (setup.contains(AbbeyCapability.class)) {
             // if abbey is passed, commit action phase follows to change salt by following Commit message
             next = new CommitAbbeyPassPhase(randomGenerator, next);
-            next = abbeyPhase = new AbbeyPhase(randomGenerator, next);
         }
+        next = tileFromSupplyPhase = new TileFromSupplyPhase(randomGenerator, next);
         if (setup.contains(FairyCapability.class)) next = new FairyPhase(randomGenerator, next);
 
         cleanUpTurnPhase.setDefaultNext(next); //after last phase, the first is default
         cleanUpTurnPhase.setAbbeyEndGamePhase(abbeyEndGamePhase);
         cleanUpTurnPhase.setEndPhase(endChain);
-        cleanUpTurnPartPhase.setSecondPartStartPhase(abbeyPhase != null ? abbeyPhase : tilePhase);
+//        cleanUpTurnPartPhase.setSecondPartStartPhase(abbeyPhase != null ? abbeyPhase : tilePhase);
         if (abbeyEndGamePhase != null) abbeyEndGamePhase.setActionPhase(actionPhase);
-        if (abbeyPhase != null) {
-            abbeyPhase.setTilePhase(tilePhase);
-            abbeyPhase.setActionPhase(actionPhase);
+        if (tileFromSupplyPhase != null) {
+        	tileFromSupplyPhase.setTilePhase(tilePhase);
+        	tileFromSupplyPhase.setActionPhase(actionPhase);
         }
         tilePhase.setEndPhase(endChain);
         tilePhase.setCleanUpTurnPhase(cleanUpTurnPhase);

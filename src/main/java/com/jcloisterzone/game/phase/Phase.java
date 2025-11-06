@@ -6,13 +6,8 @@ import com.jcloisterzone.io.message.PassMessage;
 import com.jcloisterzone.io.message.PayRansomMessage;
 import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.PayRansom;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 public abstract class Phase {
-
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RandomGenerator random;
     private Phase defaultNext;
@@ -55,7 +50,7 @@ public abstract class Phase {
         }
 
         state = clearActions(state);
-        if (!(state.getPhase() instanceof TowerCapturePhase) && !(state.getPhase() instanceof AbbeyPhase)) {
+        if (!(state.getPhase() instanceof TowerCapturePhase) && !(state.getPhase() instanceof TileFromSupplyPhase)) {
             state = state.addFlag(Flag.NO_PHANTOM);
         }
         return next(state);
