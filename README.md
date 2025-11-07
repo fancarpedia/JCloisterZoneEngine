@@ -11,14 +11,14 @@ List of supported expansions can found [here](https://github.com/farin/JCloister
 ## Development helpers
 
 ### Dump features map
-`
+```
     System.err.println("# features: " + state.getFeatureMap().mapValues(m -> m.toJavaMap()).toJavaMap());
-`
+```
 ### Get Feature object from FeaturePointer
-`
+```
     FeaturePointer fp;
     Feature feature = state.getFeature(fp);
-`
+```
 
 ### Get FeaturePointer for Feature
 `
