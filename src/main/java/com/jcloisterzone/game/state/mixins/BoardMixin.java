@@ -186,4 +186,14 @@ public interface BoardMixin {
                 .find(t -> normFp.isPartOf(t._1))
                 .getOrNull();
     }
+    /*
+     * Get FeaturePointer from Feature object
+     */
+    default FeaturePointer getFeaturePointer(Feature feature) {
+    	return getFeatureMap().iterator()
+            .flatMap(posEntry -> posEntry._2.iterator())
+            .find(entry -> entry._2.equals(feature))
+            .map(entry -> entry._1)
+            .getOrNull();
+    }
 }

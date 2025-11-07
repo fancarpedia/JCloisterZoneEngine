@@ -18,7 +18,7 @@ import static com.jcloisterzone.XMLUtils.attributeStringValue;
 
 import org.w3c.dom.Element;
 
-public class FamiliesCapability extends Capability<PlacedTile> {
+public class FamiliesCapability extends Capability<Void> {
 
 	public static final StringStrictMergingModifier FAMILY = new StringStrictMergingModifier("family", new GameElementQuery("families"));
 

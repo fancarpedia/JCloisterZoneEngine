@@ -190,7 +190,18 @@ public class StateGsonBuilder {
 
             JsonObject tokens = new JsonObject();
             state.getTokens().get(i).forEach((token, count) -> {
-                tokens.addProperty(token.name(), count);
+                JsonObject obj = new JsonObject();
+                obj.addProperty("count",count);
+            	if (token.name().equals("KING")) {
+                    Tuple2<FeaturePointer,Integer> kingModel = root.getCapabilityModel(KingCapability.class);
+                    obj.add("fp",context.serialize(kingModel._1));
+                    obj.addProperty("size",kingModel._2);
+            	} else if (token.name().equals("ROBBER")) {
+                    Tuple2<FeaturePointer,Integer> robberModel = root.getCapabilityModel(RobberCapability.class);
+                    obj.add("fp",context.serialize(robberModel._1));
+                    obj.addProperty("size",robberModel._2);
+            	}
+        		tokens.add(token.name(), obj);
             });
             player.add("tokens", tokens);
 
