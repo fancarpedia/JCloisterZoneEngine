@@ -17,6 +17,7 @@ import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.MemoizedValue;
 import com.jcloisterzone.game.state.PlayersState;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.AddPoints;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
@@ -29,10 +30,16 @@ import io.vavr.Tuple2;
 public final class RobberCapability extends Capability<Tuple2<FeaturePointer,Integer>> {
 
     @Override
+    public GameState onStartGame(GameState state, RandomGenerator random) {
+        state = setModel(state, new Tuple2(null, 0));
+        return state;
+    }
+
+    @Override
     public GameState onTurnScoring(GameState state, HashMap<Scoreable, ScoreFeatureReducer> completed) {
         Set<Scoreable> completedFeatures = completed.keySet();
         int completedRoadsThisTurn = 0;
-        int maxRoadSize = getMaxSize(state, Road.class, completedFeatures);
+        int maxRoadSize = getModel(state)._2;
         Road longestRoadCompleted = null;
 
         for (Scoreable feature : completed.keySet()) {
