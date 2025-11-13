@@ -19,6 +19,6 @@ https://github.com/fancarpedia/FanCloisterZone/) as fork of [JCloisterZone](http
 ### Get FeaturePointer for Feature
 Usually is used feature pointer of figure placed on feature. This is for case, that feature is unoccupied, or it has no neutral figure there (like Witch/Mage).
 ```
-    Feature feature;
+    Feature f;
     FeaturePointer fp = state.getFeaturePointer(f);
 ```
