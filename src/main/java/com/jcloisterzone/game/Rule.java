@@ -17,7 +17,6 @@ public enum Rule {
     BAZAAR_NO_AUCTION("bazaar-no-auction", Boolean.class, null),
     HILL_TIEBREAKER("hill-tiebreaker", String.class, new Object[] { "at-least-one-follower", "number-of-followers" }),
     ESCAPE_VARIANT("espace-variant", String.class, new Object[] { "any-tile", "siege-tile" }),
-    GQ11_PIG_HERD("gq11-pig-herd", String.class, new Object[] { "pig", "nothing" }),
     TUNNELIZE_OTHER_EXPANSIONS("tunnelize-other-expansions", Boolean.class, null),
     MORE_TUNNEL_TOKENS("more-tunnel-tokens", String.class, new Object[] { "3/2", "2/1", "1/1" }),
     FESTIVAL_RETURN("festival-return", String.class, new Object[] { "meeple", "follower" }),
