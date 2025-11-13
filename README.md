@@ -4,10 +4,6 @@
 JCloisterZoneEngine is backend for [FanCloisterZone Edition](
 https://github.com/fancarpedia/FanCloisterZone/) as fork of [JCloisterZone](https://github.com/farin/JCloisterZone).
 
-## Supported Expansions
-
-List of supported expansions can found [here](https://github.com/farin/JCloisterZone/tree/master/src/main/resources/tile-definitions).
-
 ## Development helpers
 
 ### Dump features map
@@ -21,6 +17,8 @@ List of supported expansions can found [here](https://github.com/farin/JCloister
 ```
 
 ### Get FeaturePointer for Feature
-`
-    ???
-`
+Usually is used feature pointer of figure placed on feature. This is for case, that feature is unoccupied, or it has no neutral figure there (like Witch/Mage).
+```
+    Feature feature;
+    FeaturePointer fp = state.getFeaturePointer(f);
+```
