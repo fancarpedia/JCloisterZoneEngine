@@ -10,6 +10,7 @@ import com.jcloisterzone.event.DiceSixRollEvent;
 import com.jcloisterzone.event.FlierDiceRollEvent;
 import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.figure.Meeple;
+import com.jcloisterzone.figure.TopLeftTranslatedFigurePosition;
 import com.jcloisterzone.figure.neutral.NeutralFigure;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.capability.trait.MeteoriteProtected;
@@ -182,8 +183,26 @@ public class MeteoriteCapability extends Capability<Void> {
 	        for (Tuple2<Meeple, FeaturePointer> t: state.getDeployedMeeples()
 	        		.filter(dm -> !(dm._1 instanceof MeteoriteProtected))) {
 	            Meeple m = t._1;
-	            FeaturePointer fp = t._2;
-	            if (positions.contains(fp.getPosition())) {
+	            Position position = t._2.getPosition();
+
+	            boolean undeploy = false;
+	            
+	            if (m instanceof TopLeftTranslatedFigurePosition) {
+	                // TopLeftTranslatedPosition (as Barn/Obelisk is at a corner,
+	            	// so check if any of the 4 adjacent tile positions are in the set
+	                // If it is at position (x,y), it could be a corner of tiles at:
+	                // (x,y) - bottom-right corner
+	                // (x-1,y) - bottom-left corner  
+	                // (x,y-1) - top-right corner
+	                // (x-1,y-1) - top-left corner
+	            	undeploy = positions.contains(position) ||
+	                               positions.contains(position.add(new Position(-1, 0))) ||
+	                               positions.contains(position.add(new Position(0, -1))) ||
+	                               positions.contains(position.add(new Position(-1, -1)));
+	            } else {
+	            	undeploy = positions.contains(position);
+	            }
+	            if (undeploy) {
 	                state = (new UndeployMeeple(m, true)).apply(state);
 	            }
 	        }
@@ -192,8 +211,8 @@ public class MeteoriteCapability extends Capability<Void> {
 	        		.getDeployedNeutralFigures()
 	        		.filter(dnf -> !(dnf._1 instanceof MeteoriteProtected))) {
 	            NeutralFigure<?> f = t._1;
-	            BoardPointer bp = t._2;
-	            if (positions.contains(bp.getPosition())) {
+	            Position position = t._2.getPosition();
+	            if (positions.contains(position)) {
 	                state = (new ReturnNeutralFigure(f)).apply(state);
 	            }
 	        }
