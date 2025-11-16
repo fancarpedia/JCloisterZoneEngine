@@ -13,7 +13,7 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 
-public class Obelisk extends Special implements FlowersBonusAffected, RangeFigure {
+public class Obelisk extends Special implements FlowersBonusAffected, RangeFigure, TopLeftTranslatedFigurePosition {
 
     private static final long serialVersionUID = 1L;
 
