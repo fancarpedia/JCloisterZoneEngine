@@ -1,6 +1,7 @@
 package com.jcloisterzone.game.capability;
 
 import com.jcloisterzone.Player;
+import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.event.PointsExpression;
@@ -16,17 +17,28 @@ import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.MemoizedValue;
 import com.jcloisterzone.game.state.PlayersState;
+import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.AddPoints;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
+import io.vavr.Tuple2;
 
-public final class KingCapability extends Capability<Void> {
+/**
+ * @model Tuple2<FeaturePointer,Integer> : largest city with it's size when completed
+ */
+public final class KingCapability extends Capability<Tuple2<FeaturePointer,Integer>> {
+
+	@Override
+	public GameState onStartGame(GameState state, RandomGenerator random) {
+	    state = setModel(state, new Tuple2(null, 0));
+	    return state;
+	}
 
     @Override
     public GameState onTurnScoring(GameState state, HashMap<Scoreable, ScoreFeatureReducer> completed) {
         Set<Scoreable> completedFeatures = completed.keySet();
-        int maxCitySize = getMaxSize(state, City.class, completedFeatures);
+	    int maxCitySize = getModel(state)._2;
         int completedCitiesThisTurn = 0;
         City biggestCityCompleted = null;
 
@@ -50,6 +62,8 @@ public final class KingCapability extends Capability<Void> {
         Player turnPlayer = state.getTurnPlayer();
         PlayersState ps = state.getPlayers();
         if (biggestCityCompleted != null) {
+            state = setModel(state, new Tuple2(state.getFeaturePointer(biggestCityCompleted), biggestCityCompleted.getTilePositions().size()));
+
             for (Player p : ps.getPlayers()) {
                 ps = ps.setTokenCount(p.getIndex(), BiggestFeatureAward.KING, p.equals(turnPlayer) ? 1 : 0);
             }

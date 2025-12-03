@@ -6,7 +6,7 @@ import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Structure;
 import com.jcloisterzone.game.state.GameState;
 
-public class Barn extends Special {
+public class Barn extends Special implements TopLeftTranslatedFigurePosition {
 
     private static final long serialVersionUID = -1422237898274679967L;
 

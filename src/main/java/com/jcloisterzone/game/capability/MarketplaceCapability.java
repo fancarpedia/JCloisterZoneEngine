@@ -24,7 +24,7 @@ import io.vavr.Tuple2;
 import java.util.ArrayList;
 
 public class MarketplaceCapability extends Capability<Void> {
-
+/*
     @Override
     public List<ReceivedPoints> appendFiguresBonusPoints(GameState state, List<ReceivedPoints> bonusPoints, Scoreable feature, boolean isFinal) {
         if (feature instanceof Road && !isFinal) {
@@ -59,5 +59,28 @@ public class MarketplaceCapability extends Capability<Void> {
         }
         return bonusPoints;
     }
-
+*/
+    public Integer getMarketplaceOtherRoadsTiles(GameState state, Road road, FeaturePointer marketplaceFp, boolean completed) {
+        if (completed) {
+//    		Set<FeaturePointer> fps = road.getMarketplaces();
+//    		if (fps.size()>0) {
+    			Integer tiles = 0;
+    			Set<Position> positions = HashSet.empty();
+//    			for(FeaturePointer marketplaceFp : fps) {
+    				Marketplace marketplace = (Marketplace) state.getFeature(marketplaceFp);
+    				List<Road> marketplaceRoads = marketplace.getMarketplaceRoads(state);
+            		for(Road marketplaceRoad: marketplaceRoads) {
+                		Set<Position> roadPositions = marketplaceRoad.getTilePositions();
+                		positions = positions.addAll(roadPositions);
+//    					if (!road.equals(marketplaceRoads)) {
+    						tiles+= roadPositions.size();
+//    					}
+    				}
+    				tiles-= road.getTilePositions().size(); // Exclude scored road tiles
+//    			}
+    			return tiles;
+//    		}
+        }
+        return null;
+    }
 }

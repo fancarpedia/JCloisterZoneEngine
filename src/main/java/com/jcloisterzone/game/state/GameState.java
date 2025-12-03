@@ -387,4 +387,5 @@ public class GameState implements ActionsMixin, BoardMixin,
     public boolean isCommited() {
         return commited;
     }
+    
 }
