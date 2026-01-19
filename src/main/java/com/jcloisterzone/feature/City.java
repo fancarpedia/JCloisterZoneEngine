@@ -121,16 +121,17 @@ public class City extends CompletableFeature<City> implements FlowersBonusAffect
         if (points != null) {
             exprItems.add(new ExprItem(1, "tiles", points));
         } else {
-            int tileCount = getTilePositions().size();
-            int pennants = getModifier(state, PENNANTS, 0);
             boolean cathedral = hasModifier(state, CATHEDRAL);
 
-            if (cathedral && !completed) {
+            if (cathedral && !completed && !"ignore".equals(state.getStringRule(Rule.INN_AND_CATHEDRAL_FINAL_SCORING))) {
                 return new PointsExpression("city.incomplete", new ExprItem("cathedral", 0));
             }
 
-            tinyCity = completed && tileCount == 2 && "2".equals(state.getStringRule(Rule.TINY_CITY_SCORING));
             boolean besieged = hasModifier(state, BESIEGED);
+            int pennants = getModifier(state, PENNANTS, 0);
+            int tileCount = getTilePositions().size();
+
+            tinyCity = completed && tileCount == 2 && "2".equals(state.getStringRule(Rule.TINY_CITY_SCORING));
 
             exprItems.add(new ExprItem(tileCount, "tiles", tileCount * (completed && !tinyCity ? 2 : 1)));
             if (pennants > 0) {
@@ -139,7 +140,7 @@ public class City extends CompletableFeature<City> implements FlowersBonusAffect
             if (besieged) {
                 exprItems.add(new ExprItem("besieged", -tileCount - pennants));
             }
-            if (cathedral) {
+            if (cathedral && completed) {
                 exprItems.add(new ExprItem("cathedral", tileCount + pennants));
             }
             if (completed && hasModifier(state, DARMSTADTIUM)) {

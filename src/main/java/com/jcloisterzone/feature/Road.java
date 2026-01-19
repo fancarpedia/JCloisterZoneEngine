@@ -194,21 +194,21 @@ public class Road extends CompletableFeature<Road> implements FlowersBonusAffect
 
     @Override
     public PointsExpression getStructurePoints(GameState state, boolean completed) {
-        int tileCount = getTilePositions().size();
-        Map<String, Integer> args = HashMap.of("tiles", tileCount);
 
         boolean inn = hasModifier(state, INN);
-        boolean labyrinth = hasModifier(state, LABYRINTH);
-        int wellsCount = getModifier(state, WELL, 0);
 
-        if (inn && !completed) {
+        if (inn && !completed && !"ignore".equals(state.getStringRule(Rule.INN_AND_CATHEDRAL_FINAL_SCORING))) {
             return new PointsExpression("road.incomplete", new ExprItem("inn", 0));
         }
+
+        boolean labyrinth = hasModifier(state, LABYRINTH);
+        int tileCount = getTilePositions().size();
+        int wellsCount = getModifier(state, WELL, 0);
 
         var exprItems = new ArrayList<ExprItem>();
         exprItems.add(new ExprItem(tileCount, "tiles", tileCount));
 
-        if (inn) {
+        if (inn && completed) {
             exprItems.add(new ExprItem("inn", tileCount));
         }
         if (labyrinth && completed) {
