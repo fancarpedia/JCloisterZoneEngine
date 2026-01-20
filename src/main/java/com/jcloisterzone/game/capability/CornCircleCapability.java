@@ -52,7 +52,7 @@ public class CornCircleCapability extends Capability<CornCircleOption> {
             	modifier = CORN_CIRCLE_CITY;
             	break;
             case "Field":
-            	if (!state.getBooleanRule(Rule.FARMERS)) {
+            	if (!state.getBooleanRule(Rule.FARMERS) && !state.getBooleanRule(Rule.FISHERMEN)) {
             		return tile;
 				}
             	modifier = CORN_CIRCLE_FIELD;

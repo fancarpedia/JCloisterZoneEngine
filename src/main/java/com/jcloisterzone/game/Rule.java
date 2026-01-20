@@ -31,8 +31,9 @@ public enum Rule {
     VINEYARDS_FOR_GARDEN("vineyards-for-garden", Boolean.class, null),
 
     ROBBERS_SON_ACTION("robbers-son-action", String.class, new Object[] { "may", "must" }),
-    METEORITE_IMPACT("meteorite-impact", String.class, new Object[] { "standard", "extended", "combination" });
-
+    METEORITE_IMPACT("meteorite-impact", String.class, new Object[] { "standard", "extended", "combination" }),
+    FISHERMEN("fishermen", Boolean.class, null);
+	
     String key;
     Class<?> type;
     Object[] allowedValues;
