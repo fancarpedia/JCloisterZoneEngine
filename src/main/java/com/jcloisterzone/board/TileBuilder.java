@@ -30,6 +30,7 @@ public class TileBuilder {
     private static final FeatureModifier[] CITY_MODIFIERS = new FeatureModifier[] { City.PENNANTS, City.CATHEDRAL, City.PRINCESS, City.BESIEGED, City.DARMSTADTIUM, City.POINTS_MODIFIER };
     private static final FeatureModifier[] ROAD_MODIFIERS = new FeatureModifier[] { Road.INN, Road.LABYRINTH, Road.ROBBERS_SON, Road.WELL };
     private static final FeatureModifier[] FIELD_MODIFIERS = new FeatureModifier[] { Field.FLOWERS };
+    private static final FeatureModifier[] RIVER_MODIFIERS = new FeatureModifier[] {};
 
     private java.util.List<FeatureModifier> externalModifiers;
     private java.util.Map<String, java.util.List<FeatureModifier>> modifiersByType;
@@ -57,6 +58,7 @@ public class TileBuilder {
         modifiersByType.put("city", new ArrayList<>(Arrays.asList(CITY_MODIFIERS)));
         modifiersByType.put("monastery", new ArrayList<>(Arrays.asList(MONASTERY_MODIFIERS)));
         modifiersByType.put("field", new ArrayList<>(Arrays.asList(FIELD_MODIFIERS)));
+        modifiersByType.put("river", new ArrayList<>(Arrays.asList(RIVER_MODIFIERS)));
         for (FeatureModifier mod : externalModifiers) {
             String key = mod.getSelector().split("\\[")[0];
             var list = modifiersByType.get(key);
@@ -299,9 +301,13 @@ public class TileBuilder {
     }
 
     private void processRiverElement(Element e) {
-        Stream<Location> sides = contentAsLocations(e);
+        Stream<Location> sides = contentAsLocations(e).flatMap(loc -> loc.isInner() ? List.of(loc) : loc.splitToSides());
         FeaturePointer fp = initFeaturePointer(sides, River.class);
-        initFeature(e, new River(List.of(fp)));
+        Set<Edge> openEdges = initOpenEdges(sides);
+        
+        Map<FeatureModifier<?>, Object> modifiers = getFeatureModifiers("river", e);
+        River river = new River(List.of(fp), openEdges, modifiers);
+        initFeature(e, river);
     }
 
     private void processFieldElement(Element e) {
