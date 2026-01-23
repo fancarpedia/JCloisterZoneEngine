@@ -55,30 +55,50 @@ public class RiverCapability extends Capability<Void> {
             adjPos2.add(side.prev()),
             adjPos2.add(side.next())
         );
-        return reservedTiles.find(p -> state.getPlacedTiles().containsKey(p)).isEmpty();
+        if (!reservedTiles.find(p -> state.getPlacedTiles().containsKey(p)).isEmpty()) {
+        	// Found regular U-turn
+        	return false;
+        }
+        
+        // Possible future testing like no river tile in streight line, also on adjacent tile left-right
+        // Check possible collisions with other open river branches
+        return true;
     }
 
     @Override
     public boolean isTilePlacementAllowed(GameState state, Tile tile, PlacementOption placement) {
         Position pos = placement.getPosition();
         Rotation rot = placement.getRotation();
-        Location riverLoc = tile.getInitialFeatures()
-            .filterValues(Predicates.instanceOf(River.class))
-            .map(Tuple2::_1)
-            .map(fp -> fp.getLocation().rotateCW(rot))
-            .getOrNull();
+        List<Location> riverLocations = tile.getInitialFeatures()
+                .filterValues(Predicates.instanceOf(River.class))
+                .map(Tuple2::_1)
+                .map(fp -> fp.getLocation().rotateCW(rot))
+                .toList();
 
-        if (riverLoc == null) {
+        if (riverLocations.size() == 0) {
             return true;
         }
 
-        List<Location> sides = riverLoc.splitToSides();
+        boolean foundValidRiverPlacement = false;
+        
+        for (Location riverLoc : riverLocations) {
 
-        List<Location> openSides = sides.filter(side -> !isConnectedToPlacedRiver(state, pos, side));
-        if (sides.size() == openSides.size()) {
-            return false;
+            List<Location> sides = riverLoc.splitToSides();
+            List<Location> openSides = sides.filter(side -> !isConnectedToPlacedRiver(state, pos, side));
+            List<Location> connectedSides = sides.filter(side -> isConnectedToPlacedRiver(state, pos, side));
+
+            int openSidesSize = openSides.size();
+            
+            if (sides.size() != openSidesSize) {
+            	foundValidRiverPlacement = true;
+
+            	if (openSides.filter(side -> isContinuationFree(state, pos, side)).size() != openSidesSize) {
+	            	return false;
+	            }
+            }
         }
-
-        return !openSides.find(side -> !isContinuationFree(state, pos, side)).isDefined();
+        
+        return foundValidRiverPlacement;
+ 
     }
 }

@@ -9,6 +9,7 @@ import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
+import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.state.GameState;
 
 import io.vavr.collection.HashSet;
@@ -16,7 +17,7 @@ import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 
-public class River extends CompletableFeature<River> implements ModifiedFeature<River> {
+public class River extends CompletableFeature<River> implements FlowersBonusAffected, ModifiedFeature<River> {
 
     private final Map<FeatureModifier<?>, Object> modifiers;
 

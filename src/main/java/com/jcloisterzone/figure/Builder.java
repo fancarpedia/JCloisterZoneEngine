@@ -2,10 +2,9 @@ package com.jcloisterzone.figure;
 
 import com.jcloisterzone.Player;
 import com.jcloisterzone.board.pointer.FeaturePointer;
-import com.jcloisterzone.feature.City;
 import com.jcloisterzone.feature.Completable;
-import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.feature.Structure;
+import com.jcloisterzone.game.capability.trait.BuilderExtendable;
 import com.jcloisterzone.game.state.GameState;
 
 public class Builder extends Special {
@@ -18,8 +17,8 @@ public class Builder extends Special {
 
     @Override
     public DeploymentCheckResult isDeploymentAllowed(GameState state, FeaturePointer fp, Structure feature) {
-        if (!(feature instanceof City || feature instanceof Road) ) {
-            return new DeploymentCheckResult("Builder must be placed in city or on road only.");
+        if (!(feature instanceof BuilderExtendable)) {
+            return new DeploymentCheckResult("Builder must be placed on BuilderExtendable feature only.");
         }
         Completable cf = (Completable) feature;
         if (cf.isCompleted(state)) {
