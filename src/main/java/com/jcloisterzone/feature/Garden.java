@@ -7,6 +7,7 @@ import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.game.capability.VineyardCapability;
+import com.jcloisterzone.game.capability.trait.WagonEligible;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
@@ -17,7 +18,7 @@ import io.vavr.collection.Stream;
 import io.vavr.Tuple2;
 import java.util.ArrayList;
 
-public class Garden extends TileFeature implements Monastic {
+public class Garden extends TileFeature implements WagonEligible, Monastic {
 
     private static final long serialVersionUID = 1L;
     private static final List<FeaturePointer> INITIAL_PLACE = List.of(new FeaturePointer(Position.ZERO, Garden.class, Location.I));
