@@ -16,7 +16,7 @@ import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 
-public class River extends CompletableFeature<River> implements ModifiedFeature<River> {
+public class River extends CompletableFeature<River> implements FlowersBonusAffected, ModifiedFeature<River> {
 
     private final Map<FeatureModifier<?>, Object> modifiers;
 
