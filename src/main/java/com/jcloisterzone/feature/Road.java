@@ -15,6 +15,7 @@ import com.jcloisterzone.game.capability.FerriesCapability;
 import com.jcloisterzone.game.capability.FerriesCapabilityModel;
 import com.jcloisterzone.game.capability.MarketplaceCapability;
 import com.jcloisterzone.game.capability.TunnelCapability;
+import com.jcloisterzone.game.capability.trait.BuilderExtendable;
 import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.setup.RuleQuery;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.function.Function;
 
-public class Road extends CompletableFeature<Road> implements FlowersBonusAffected, ModifiedFeature<Road> {
+public class Road extends CompletableFeature<Road> implements BuilderExtendable, FlowersBonusAffected, ModifiedFeature<Road> {
 
     private static final long serialVersionUID = 1L;
 

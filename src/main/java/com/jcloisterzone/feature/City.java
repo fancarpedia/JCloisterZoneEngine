@@ -12,6 +12,7 @@ import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
 import com.jcloisterzone.feature.modifier.IntegerNonMergingModifier;
 import com.jcloisterzone.game.Rule;
+import com.jcloisterzone.game.capability.trait.BuilderExtendable;
 import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
@@ -20,7 +21,7 @@ import io.vavr.collection.*;
 
 import java.util.ArrayList;
 
-public class City extends CompletableFeature<City> implements FlowersBonusAffected, ModifiedFeature<City> {
+public class City extends CompletableFeature<City> implements BuilderExtendable, FlowersBonusAffected, ModifiedFeature<City> {
 
     private static final long serialVersionUID = 1L;
 
