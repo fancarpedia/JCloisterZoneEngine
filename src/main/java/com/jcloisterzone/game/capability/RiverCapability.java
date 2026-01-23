@@ -56,8 +56,12 @@ public class RiverCapability extends Capability<Void> {
             adjPos2.add(side.next())
         );
         if (!reservedTiles.find(p -> state.getPlacedTiles().containsKey(p)).isEmpty()) {
+        	// Found regular U-turn
         	return false;
         }
+        
+        // Possible future testing like no river tile in streight line, also on adjacent tile left-right
+        // Check possible collisions with other open river branches
         return true;
     }
 
