@@ -11,11 +11,12 @@ import io.vavr.Predicates;
 import io.vavr.Tuple2;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Stream;
 
 public class RiverCapability extends Capability<Void> {
 
 	private static final long serialVersionUID = 1L;
-
+	
     @Override
     public GameState onStartGame(GameState state, RandomGenerator random) {
         state = state.mapTilePack(pack -> {
@@ -90,25 +91,31 @@ public class RiverCapability extends Capability<Void> {
 
     	List<Position> check = List.empty();
         
+    	int edgeI = -1;
+
     	if (side.equals(Location.N)) {
+    		edgeI = 0;
 			for(int y = minY; y<pos.y; y++) {
 	    		check = check.append(new Position(pos.x-1,y));
 	    		check = check.append(new Position(pos.x,y));
 	    		check = check.append(new Position(pos.x+1,y));
 			}
     	} else if (side.equals(Location.E)) {
+    		edgeI = 1;
 			for(int x = pos.x+1; x<=maxX; x++) {
 				check = check.append(new Position(x,pos.y-1));
 				check = check.append(new Position(x,pos.y));
 				check = check.append(new Position(x,pos.y+1));
 			}
     	} else if (side.equals(Location.S)) {
+    		edgeI = 2;
 			for(int y = pos.y+1; y<=maxY; y++) {
 	    		check = check.append(new Position(pos.x-1,y));
 	    		check = check.append(new Position(pos.x,y));
 	    		check = check.append(new Position(pos.x+1,y));
 			}
     	} else if (side.equals(Location.W)) {
+    		edgeI = 3;
 			for(int x = minX; x<pos.x; x++) {
 				check = check.append(new Position(x,pos.y-1));
 				check = check.append(new Position(x,pos.y));
@@ -116,13 +123,51 @@ public class RiverCapability extends Capability<Void> {
 			}
 		}
 		if (check.size()>0 && check.exists(p -> placedTiles.containsKey(p))) {
+			// In straight direction of river branch is at least one tile, which can cause problem with River finishing
 		    return false;
 		}
 		
+        Stream<Tuple2<Position, EdgePattern>> availableUnfilteredPlacements = _state.getAvailablePlacements();
+        
+        List<Position> edgePositions = List.empty();
+
+        for (Tuple2<Position, EdgePattern> placement : availableUnfilteredPlacements) {
+            EdgeType[] edges = placement._2.getEdges();
+            // We are checking opposite edge
+            if (edges[(edgeI+2)%4] == EdgeType.RIVER) {
+            	edgePositions = edgePositions.append(placement._1);
+            }
+        }
+        boolean hasConsecutivePosition = false;
+        	
+        if (edgePositions.size()>=2) {
+
+        	for (int i = 0; i < edgePositions.size(); i++) {
+        	    Position p1 = edgePositions.get(i);
+        	    for (int j = i + 1; j < edgePositions.size(); j++) {
+        	        Position p2 = edgePositions.get(j);
+
+        	        if (edgeI == 0 || edgeI == 2) {
+        	        	if (Math.abs(p1.x - p2.x) == 1) { // consecutive x
+        	        		hasConsecutivePosition = true;
+        	        		break;
+        	        	}
+        	        } else {
+        	        	if (Math.abs(p1.y - p2.y) == 1) { // consecutive y
+        	        		hasConsecutivePosition = true;
+        	        		break;
+        	        	}
+        	        }
+        	    }
+        	}
+    	    if (hasConsecutivePosition) {
+    	        // River junction following river curve. Two open neighbouring river branches with same direction
+    	    	return false;
+    	    }
+        }
         // Possible future testings
-        // TODO: River junction following river curve. Two open neighbouring river branches with same direction
-		
-		return true;
+        // TODO: Check possible collision with all unfinished river branch in straight lines
+        return true;
     }
 
     @Override
