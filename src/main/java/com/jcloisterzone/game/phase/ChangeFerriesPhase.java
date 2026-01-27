@@ -80,27 +80,38 @@ public class ChangeFerriesPhase extends Phase {
 	    		_as = new ActionsState(state.getTurnPlayer(), Vector.of(new FerriesAction(options)), true);
 	    		boolean isBlocked = false;
 	    		for (FeatureCompletionBlocker cap : state.getCapabilities().toSeq(FeatureCompletionBlocker.class)) {
-	        		GameState _state = state.setPlayerActions(_as);
-	                FerriesCapabilityModel _model =  _state.getCapabilityModel(FerriesCapability.class);
+	    			if (!isBlocked) {
+		        		GameState _state = state.setPlayerActions(_as);
+		                FerriesCapabilityModel _model =  _state.getCapabilityModel(FerriesCapability.class);
+		
+		                Position _pos = newFerry.getPosition();
+		                FeaturePointer oldFerry = _model.getFerries().find(f -> f.getPosition().equals(_pos)).get();
+		
+		            	_state = _state.setCapabilityModel(FerriesCapability.class, _model.mapMovedFerries(
+		                    mf -> mf.put(pos, new Tuple2<>(oldFerry.getLocation(), newFerry.getLocation()))
+		                ));
+		                _state = (new ChangeFerry(oldFerry, newFerry)).apply(_state);
+		                
+		                // Roads for Ferries are stored by Edge Location not joined locations for option to split Road segments after move of Ferry
+
+		                List<Location> newLocations = newFerry.getLocation().splitToSides().removeAll(oldFerry.getLocation().splitToSides());
+
+	                   	for(Location _loc: newLocations) {
+		                	FeaturePointer _fp = new FeaturePointer(oldFerry.getPosition(),Road.class,_loc);
+		                   	if (!isBlocked && cap.isFeatureCompletionBlocked(_state, _fp)) {
+		                		isBlocked = true;
+		                	}
+		                }
 	
-	                Position _pos = newFerry.getPosition();
-	                FeaturePointer oldFerry = _model.getFerries().find(f -> f.getPosition().equals(_pos)).get();
-	
-	            	_state = _state.setCapabilityModel(FerriesCapability.class, _model.mapMovedFerries(
-	                    mf -> mf.put(pos, new Tuple2<>(oldFerry.getLocation(), newFerry.getLocation()))
-	                ));
-	                _state = (new ChangeFerry(oldFerry, newFerry)).apply(_state);
-	                
-	                List<Location> leavingLocations = oldFerry.getLocation().splitToSides().removeAll(newFerry.getLocation().splitToSides());
-	                
-	                System.out.println(leavingLocations);
-	
-	                for(Location _loc: leavingLocations) {
-	                	FeaturePointer _fp = new FeaturePointer(oldFerry.getPosition(),Road.class,_loc);
-	                   	if (!isBlocked && cap.isFeatureCompletionBlocked(_state, _fp)) {
-	                		isBlocked = true;
-	                	}
-	                }
+		                List<Location> leavingLocations = oldFerry.getLocation().splitToSides().removeAll(newFerry.getLocation().splitToSides());
+		                
+	                   	for(Location _loc: leavingLocations) {
+		                	FeaturePointer _fp = new FeaturePointer(oldFerry.getPosition(),Road.class,_loc);
+		                   	if (!isBlocked && cap.isFeatureCompletionBlocked(_state, _fp)) {
+		                		isBlocked = true;
+		                	}
+		                }
+	    			}
 	        	}
 	            if (!isBlocked) {
 	        		allowedOptions = allowedOptions.add(newFerry);
