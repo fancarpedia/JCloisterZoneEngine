@@ -1,6 +1,7 @@
 package com.jcloisterzone.game.phase;
 
 import com.jcloisterzone.action.FerriesAction;
+import com.jcloisterzone.action.TunnelAction;
 import com.jcloisterzone.board.Location;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.pointer.FeaturePointer;
@@ -10,14 +11,22 @@ import com.jcloisterzone.game.capability.FerriesCapability;
 import com.jcloisterzone.game.capability.FerriesCapability.FerryToken;
 import com.jcloisterzone.game.capability.FerriesCapabilityModel;
 import com.jcloisterzone.game.capability.RussianPromosTrapCapability;
+import com.jcloisterzone.game.capability.TunnelCapability;
+import com.jcloisterzone.game.capability.trait.FeatureCompletionBlocker;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.io.message.PlaceTokenMessage;
 import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.ChangeFerry;
+import com.jcloisterzone.reducers.PlaceTunnel;
+
 import io.vavr.Tuple2;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
+import io.vavr.collection.Vector;
 
 public class ChangeFerriesPhase extends Phase {
 
@@ -59,10 +68,48 @@ public class ChangeFerriesPhase extends Phase {
 
         if (options.isEmpty()) {
             return next(state);
-        }
+        } 
+
+        Set<FeaturePointer> allowedOptions = options;
+		Seq<FeatureCompletionBlocker> completionBlockers = state.getCapabilities().toSeq(FeatureCompletionBlocker.class);
+
+		if (completionBlockers.size()>0) {
+	    	allowedOptions = HashSet.empty();
+	    	for(FeaturePointer newFerry: options) {
+	        	ActionsState _as;
+	    		_as = new ActionsState(state.getTurnPlayer(), Vector.of(new FerriesAction(options)), true);
+	    		boolean isBlocked = false;
+	    		for (FeatureCompletionBlocker cap : state.getCapabilities().toSeq(FeatureCompletionBlocker.class)) {
+	        		GameState _state = state.setPlayerActions(_as);
+	                FerriesCapabilityModel _model =  _state.getCapabilityModel(FerriesCapability.class);
+	
+	                Position _pos = newFerry.getPosition();
+	                FeaturePointer oldFerry = _model.getFerries().find(f -> f.getPosition().equals(_pos)).get();
+	
+	            	_state = _state.setCapabilityModel(FerriesCapability.class, _model.mapMovedFerries(
+	                    mf -> mf.put(pos, new Tuple2<>(oldFerry.getLocation(), newFerry.getLocation()))
+	                ));
+	                _state = (new ChangeFerry(oldFerry, newFerry)).apply(_state);
+	                
+	                List<Location> leavingLocations = oldFerry.getLocation().splitToSides().removeAll(newFerry.getLocation().splitToSides());
+	                
+	                System.out.println(leavingLocations);
+	
+	                for(Location _loc: leavingLocations) {
+	                	FeaturePointer _fp = new FeaturePointer(oldFerry.getPosition(),Road.class,_loc);
+	                   	if (!isBlocked && cap.isFeatureCompletionBlocked(_state, _fp)) {
+	                		isBlocked = true;
+	                	}
+	                }
+	        	}
+	            if (!isBlocked) {
+	        		allowedOptions = allowedOptions.add(newFerry);
+	            }
+	        }
+		}
 
         return promote(state.setPlayerActions(
-            new ActionsState(state.getTurnPlayer(), new FerriesAction(options), true)
+            new ActionsState(state.getTurnPlayer(), new FerriesAction(allowedOptions), true)
         ));
     }
 
