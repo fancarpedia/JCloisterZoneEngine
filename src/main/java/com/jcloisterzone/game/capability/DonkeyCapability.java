@@ -8,9 +8,11 @@ import com.jcloisterzone.board.Tile;
 import com.jcloisterzone.board.pointer.BoardPointer;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.feature.Completable;
+import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.figure.neutral.Donkey;
 import com.jcloisterzone.figure.neutral.Witch;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.capability.trait.FeatureCompletionBlocker;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.random.RandomGenerator;
@@ -21,7 +23,7 @@ import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 import io.vavr.Tuple2;
 
-public class DonkeyCapability extends Capability<Void> {
+public class DonkeyCapability extends Capability<Void> implements FeatureCompletionBlocker {
 
     private static final long serialVersionUID = 1L;
 
@@ -89,4 +91,12 @@ public class DonkeyCapability extends Capability<Void> {
         }
         return completed;
     }
+    
+	public boolean isFeatureCompletionBlocked(GameState state, FeaturePointer fp) {
+		Feature f = state.getFeature(fp);
+		if (f instanceof Completable c && c.isCompleted(state)) {
+			return c.getTilePositions().contains(state.getNeutralFigures().getDonkeyDeployment().getPosition());
+		}
+		return false;
+	}
 }
