@@ -218,7 +218,7 @@ public class Road extends CompletableFeature<Road> implements BuilderExtendable,
             exprItems.add(new ExprItem(meeplesCount, "meeples", 2 * meeplesCount));
         }
         if (wellsCount>0) {
-        	exprItems.add(new ExprItem(wellsCount, "wells", (inn ? 2 : 1) * wellsCount ));
+        	exprItems.add(new ExprItem(wellsCount, "wells", ((inn && completed) ? 2 : 1) * wellsCount ));
         }
         if (marketplaces.length()>0) {
         	MarketplaceCapability marketplaceCap = state.getCapabilities().get(MarketplaceCapability.class);
