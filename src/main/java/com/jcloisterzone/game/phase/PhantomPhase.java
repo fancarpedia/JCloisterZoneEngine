@@ -36,7 +36,7 @@ public class PhantomPhase extends AbstractActionPhase {
         Player player = state.getTurnPlayer();
 
         Vector<PlayerAction<?>> actions = prepareMeepleActions(state, Vector.of(Phantom.class));
-
+        
         state = state.setPlayerActions(
             new ActionsState(player, actions, true)
         );
@@ -57,8 +57,8 @@ public class PhantomPhase extends AbstractActionPhase {
         if (tunnelCapability != null) {
             state = tunnelCapability.onActionPhaseEntered(state);
         }
-
-        if (actions.isEmpty()) {
+        
+        if (state.getPlayerActions().getActions().isEmpty()) {
             return next(state);
         } else {
             return promote(state);
