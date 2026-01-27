@@ -36,7 +36,9 @@ class ObjectName implement RequiredStuffName
 **Known traits**
 _Official expansions:_
 1. BuilderExtendable - each feature which is extendable by Builder
+2. WagonEligible - if it is possible to place wagon to a feature 
 
 _Fan-expansions:_
 1. FlowersBonusAffected - feature and special figure affected by Flowers on tiles during scoring
 2. MeteoriteProtected - features protected agains Meteorite impact - all meeples and stuff placed there kept untouch
+3. FeatureCompletionBlocker - contains `isFeatureCompletionBlocked()` to test if it not possible to complete a feature, like Tunnel token placement join and finish with 2nd road with Donkey.  
