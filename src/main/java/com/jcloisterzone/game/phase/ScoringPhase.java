@@ -123,11 +123,7 @@ public class ScoringPhase extends Phase {
         }
 
         if (state.getCapabilities().contains(MarketplaceCapability.class)) {
-        	Set<Position> lastPlacedAndAdjacentPositions = state.getAdjacentTiles(pos)
-        			.map(PlacedTile::getPosition)
-        			.toSet()
-        			.add(lastPlaced.getPosition());
-            for (Tuple2<FeaturePointer, Road> t : state.getTileFeatures2ForPositions(lastPlacedAndAdjacentPositions, Road.class)) {
+            for (Tuple2<FeaturePointer, Road> t : state.getTileFeatures2ForPositions(HashSet.of(lastPlaced.getPosition()), Road.class)) {
             	Set<FeaturePointer> fps = t._2.getMarketplaces();
         		if (fps.size()>0) {
         			for(FeaturePointer fp : fps) {
@@ -153,7 +149,6 @@ public class ScoringPhase extends Phase {
                 collectCompleted(state, monastic);
             }
         }
-
 
         for (Capability<?> cap : state.getCapabilities().toSeq()) {
             state = cap.beforeCompletableScore(state, completedMutable.keySet());
