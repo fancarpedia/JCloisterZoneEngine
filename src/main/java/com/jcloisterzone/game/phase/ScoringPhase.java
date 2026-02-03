@@ -70,9 +70,11 @@ public class ScoringPhase extends Phase {
     }
 
     private void collectCompletedOnAdjacentEdges(GameState state, Position pos) {
-        for (Tuple2<Location, PlacedTile> t : state.getAdjacentTiles2(pos)) {
+    	boolean isMarketplaceCap = state.getCapabilities().contains(MarketplaceCapability.class);
+    	for (Tuple2<Location, PlacedTile> t : state.getAdjacentTiles2(pos)) {
             PlacedTile pt = t._2;
             var adj = state.getFeaturePartOf2(pt.getPosition(), t._1.rev());
+
             if (adj == null) {
                 continue;
             }
@@ -90,6 +92,18 @@ public class ScoringPhase extends Phase {
                     City another = (City) state.getFeature(multiEdge._2);
                     collectCompleted(state, another);
                 }
+            }
+            if (isMarketplaceCap && feature instanceof Road road) {
+            	if (road.isCompleted(state)) {
+                	Set<FeaturePointer> marketplaces = road.getMarketplaces();
+                	for (FeaturePointer mfp: marketplaces) {
+                		Marketplace marketplace = (Marketplace) state.getFeature(mfp);
+                		List<Road> marketplaceRoads = marketplace.getMarketplaceRoads(state);
+        				for(Road marketplaceRoad: marketplaceRoads) {
+        	                collectCompleted(state, (Completable) marketplaceRoad);
+        				}
+                	}
+            	}
             }
         }
     }
