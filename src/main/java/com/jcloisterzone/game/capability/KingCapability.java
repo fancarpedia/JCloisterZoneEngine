@@ -45,7 +45,9 @@ public final class KingCapability extends Capability<Tuple2<FeaturePointer,Integ
         for (Scoreable feature : completed.keySet()) {
             if (feature instanceof City) {
                 completedCitiesThisTurn++;
-                if (feature.getTilePositions().size() > maxCitySize) {
+                int citySize = feature.getTilePositions().size();
+                if (citySize > maxCitySize) {
+                	maxCitySize = citySize;
                     biggestCityCompleted = (City) feature;
                 }
             }
