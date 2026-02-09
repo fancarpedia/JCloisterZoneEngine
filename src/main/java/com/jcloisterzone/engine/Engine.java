@@ -176,6 +176,7 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"flowers", FlowersCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"marketplace", MarketplaceCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"meteorite", MeteoriteCapability.class);
+        capabilities = addCapabilities(capabilities, setupMsg,"gamblersluck", GamblersLuckCapability.class);
 
         GameSetup gameSetup = new GameSetup(
                 HashMap.ofAll(setupMsg.getSets()),

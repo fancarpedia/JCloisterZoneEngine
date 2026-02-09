@@ -18,7 +18,6 @@ import com.jcloisterzone.game.capability.*;
 import com.jcloisterzone.game.capability.FerriesCapability.FerryToken;
 import com.jcloisterzone.game.capability.GoldminesCapability.GoldToken;
 import com.jcloisterzone.game.capability.LittleBuildingsCapability.LittleBuilding;
-import com.jcloisterzone.game.capability.SheepToken;
 import com.jcloisterzone.game.phase.DragonMovePhase;
 import com.jcloisterzone.game.phase.Phase;
 import com.jcloisterzone.game.phase.RussianPromosTrapPhase;
@@ -145,7 +144,7 @@ public class StateGsonBuilder {
                 jsonItem.add("flocks", jsonFlocks);
                 obj.add("sheep", jsonItem);
             }
-
+            
             return obj;
         }
     }
@@ -359,6 +358,41 @@ public class StateGsonBuilder {
             }
             if (tower.size() > 0) {
                 tokens.add(LittleBuilding.LB_TOWER.name(), tower);
+            }
+        }
+
+    	Map<FeaturePointer, GamblersLuckCapability.GamblersLuckShieldToken> gamblersLuckShields = root.getCapabilityModel(GamblersLuckCapability.class);
+    	if (gamblersLuckShields != null) {
+            JsonArray shields_0 = new JsonArray();
+            JsonArray shields_1 = new JsonArray();
+            JsonArray shields_2 = new JsonArray();
+            JsonArray shields_3 = new JsonArray();
+            JsonArray shields_X = new JsonArray();
+    		gamblersLuckShields.forEach((fp, shieldToken) -> {
+                JsonObject token = new JsonObject();
+                token.add("position", context.serialize(fp.getPosition()));
+                token.add("location", context.serialize(fp.getLocation()));
+                token.addProperty("feature", "GamblersLuckShield");
+                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0) shields_0.add(token);
+                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1) shields_1.add(token);
+                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2) shields_2.add(token);
+                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3) shields_3.add(token);
+                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X) shields_X.add(token);
+            });
+            if (shields_0.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0.name(), shields_0);
+            }
+            if (shields_1.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1.name(), shields_1);
+            }
+            if (shields_2.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2.name(), shields_2);
+            }
+            if (shields_3.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3.name(), shields_3);
+            }
+            if (shields_X.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X.name(), shields_X);
             }
         }
 
