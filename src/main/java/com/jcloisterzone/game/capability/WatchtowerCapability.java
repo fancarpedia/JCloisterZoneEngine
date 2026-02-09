@@ -74,12 +74,19 @@ public class WatchtowerCapability  extends Capability<Void> {
             GameState _state = state;
             switch (watchtower.subject) {
                 case "coat-of-arms":
-                    count = getNeigbouringFeatures(state, pos).map(f -> {
+                	Stream<PlacedTile> pts = _state
+                    	.getAdjacentAndDiagonalTiles(pos)
+                    	.append(_state.getPlacedTile(pos));
+                	for(PlacedTile pt: pts) {
+                	  for (Feature f: pt.getTile().getInitialFeatures().values()) {
                         if (f instanceof City) {
-                            return ((City)f).getModifier(_state, City.PENNANTS, 0);
+                           	FeaturePointer fp = ((City) f).getPlaces().get().setPosition(pt.getPosition()).rotateCW(pt.getRotation());
+                            if (!((City) _state.getFeature(fp)).hasModifier(_state, City.ELIMINATED_PENNANTS)) {
+                              count+=((City) f).getModifier(_state, City.PENNANTS, 0);
+                            }
                         }
-                        return 0;
-                    }).sum().intValue();
+                      }
+                	}
                     exprName = "pennants";
                     break;
                 case "monastery":

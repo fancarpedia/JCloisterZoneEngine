@@ -20,6 +20,7 @@ import com.jcloisterzone.figure.neutral.Donkey;
 import com.jcloisterzone.figure.neutral.Fairy;
 import com.jcloisterzone.figure.neutral.NeutralFigure;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.capability.GamblersLuckCapability;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.capability.BridgeCapability.BridgeToken;
@@ -63,6 +64,13 @@ public class ActionPhase extends AbstractActionPhase {
         );
 
         Vector<PlayerAction<?>> actions = prepareMeepleActions(state, meepleTypes);
+        
+        boolean canPass = true;
+        
+    	if (state.hasCapability(GamblersLuckCapability.class)) {
+            canPass = canPass && !state.getCapabilities().get(GamblersLuckCapability.class).hasPlacedTileGamblersLuckShields(state);
+        }
+
 
         state = state.setPlayerActions(
             new ActionsState(player, actions, true)

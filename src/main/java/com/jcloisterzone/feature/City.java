@@ -7,8 +7,10 @@ import com.jcloisterzone.board.ShortEdge;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
+import com.jcloisterzone.feature.GamblersLuckShield;
 import com.jcloisterzone.feature.modifier.BooleanAnyModifier;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
+import com.jcloisterzone.feature.modifier.FeaturePointerAddModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
 import com.jcloisterzone.feature.modifier.IntegerNonMergingModifier;
 import com.jcloisterzone.game.Rule;
@@ -32,6 +34,8 @@ public class City extends CompletableFeature<City> implements BuilderExtendable,
     public static final BooleanAnyModifier CATHEDRAL = new BooleanAnyModifier("city[cathedral]", new GameElementQuery("cathedral"));
     public static final BooleanAnyModifier PRINCESS = new BooleanAnyModifier("city[princess]", new GameElementQuery("princess"));
     public static final IntegerNonMergingModifier POINTS_MODIFIER = new IntegerNonMergingModifier("city[points]", null);
+    public static final FeaturePointerAddModifier GAMBLERS_LUCK_SHIELDS = new FeaturePointerAddModifier<GamblersLuckShield>("city[gamblers-luck-shield]", null, GamblersLuckShield.class);
+    public static final BooleanAnyModifier ELIMINATED_PENNANTS = new BooleanAnyModifier("city[eliminated-pennants]", null);
     
     private final Set<Tuple2<ShortEdge, FeaturePointer>> multiEdges; // HS.CC!.v abstraction, multiple cities can connect to same edge
     private final Map<FeatureModifier<?>, Object> modifiers;
@@ -131,6 +135,9 @@ public class City extends CompletableFeature<City> implements BuilderExtendable,
 
             boolean besieged = hasModifier(state, BESIEGED);
             int pennants = getModifier(state, PENNANTS, 0);
+            if (hasModifier(state, ELIMINATED_PENNANTS)) {
+            	pennants = 0;
+            }
             int tileCount = getTilePositions().size();
 
             tinyCity = completed && tileCount == 2 && "2".equals(state.getStringRule(Rule.TINY_CITY_SCORING));

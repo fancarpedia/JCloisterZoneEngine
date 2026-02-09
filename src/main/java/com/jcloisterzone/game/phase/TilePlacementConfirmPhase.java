@@ -2,6 +2,7 @@ package com.jcloisterzone.game.phase;
 
 import com.jcloisterzone.action.TilePlacementConfirmAction;
 import com.jcloisterzone.board.Tile;
+import com.jcloisterzone.game.capability.GamblersLuckCapability;
 import com.jcloisterzone.game.capability.MeteoriteCapability;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
@@ -33,7 +34,7 @@ public class TilePlacementConfirmPhase extends Phase {
     	if (state.hasCapability(MeteoriteCapability.class)) {
             state = state.getCapabilities().get(MeteoriteCapability.class).confirmedTilePlacement(state);
         }
-
+    	
         state = clearActions(state);
         return next(state);
     }

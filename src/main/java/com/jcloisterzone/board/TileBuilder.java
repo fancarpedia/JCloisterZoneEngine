@@ -21,15 +21,33 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.jcloisterzone.XMLUtils.*;
 
-
 public class TileBuilder {
 
     protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final FeatureModifier[] MONASTERY_MODIFIERS = new FeatureModifier[] { Monastery.SPECIAL_MONASTERY, Monastery.SHRINE, Monastery.CHURCH };
-    private static final FeatureModifier[] CITY_MODIFIERS = new FeatureModifier[] { City.PENNANTS, City.CATHEDRAL, City.PRINCESS, City.BESIEGED, City.DARMSTADTIUM, City.POINTS_MODIFIER };
-    private static final FeatureModifier[] ROAD_MODIFIERS = new FeatureModifier[] { Road.INN, Road.LABYRINTH, Road.ROBBERS_SON, Road.WELL };
-    private static final FeatureModifier[] FIELD_MODIFIERS = new FeatureModifier[] { Field.FLOWERS };
+    private static final FeatureModifier[] MONASTERY_MODIFIERS = new FeatureModifier[] {
+    	Monastery.SPECIAL_MONASTERY,
+    	Monastery.SHRINE,
+    	Monastery.CHURCH
+    };
+    private static final FeatureModifier[] CITY_MODIFIERS = new FeatureModifier[] {
+    	City.PENNANTS,
+    	City.CATHEDRAL,
+    	City.PRINCESS,
+    	City.BESIEGED,
+    	City.DARMSTADTIUM,
+    	City.POINTS_MODIFIER,
+    	City.GAMBLERS_LUCK_SHIELDS
+    };
+    private static final FeatureModifier[] ROAD_MODIFIERS = new FeatureModifier[] {
+    	Road.INN,
+    	Road.LABYRINTH,
+    	Road.ROBBERS_SON,
+    	Road.WELL
+    };
+    private static final FeatureModifier[] FIELD_MODIFIERS = new FeatureModifier[] {
+    	Field.FLOWERS
+    };
     private static final FeatureModifier[] RIVER_MODIFIERS = new FeatureModifier[] {};
 
     private java.util.List<FeatureModifier> externalModifiers;
@@ -125,6 +143,9 @@ public class TileBuilder {
                     break;
                 case "marketplace":
                     initFeature(el, new Marketplace());
+                    break;
+                case "gamblersluckshield":
+                    initFeature(el, new GamblersLuckShield(contentAsLocations(el).get())); // Location
                     break;
             }
         }
