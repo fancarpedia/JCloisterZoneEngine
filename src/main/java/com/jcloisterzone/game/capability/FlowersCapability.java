@@ -160,9 +160,6 @@ public class FlowersCapability extends Capability<Void> {
                                     .filter(f -> f.getPlayer().equals(player))
                                     .map(f -> new ScoreEvent.ReceivedPoints(new PointsExpression("flowers", expr), player, new ScoreMeeplePositionsPointer(f.getDeployment(state), f.getId(), positions)))
                             );
-//                            if (players.contains(player)) {
-//                                bonusPoints = bonusPoints.append(new ScoreEvent.ReceivedPoints(new PointsExpression("flowers", expr), player, new MeeplePointer(fps.get(), positions)));
-//                            }
                         }
                     }
                 }
