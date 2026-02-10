@@ -32,17 +32,17 @@ import java.util.function.Function;
 public class GamblersLuckDicePhase extends Phase {
 
 	public static final Map<Integer, Tuple3<Integer, String, GamblersLuckCapability.GamblersLuckShieldToken>> DICE_REGULAR = TreeMap.of(
-		1, new Tuple3(1, "blue", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1),
-		2, new Tuple3(2, "blue", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2),
-		3, new Tuple3(3, "blue", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3),
+		1, new Tuple3(1, "grey", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1),
+		2, new Tuple3(2, "blue-red", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2),
+		3, new Tuple3(3, "grey", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3),
 		4, new Tuple3(null, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X),
 		5, new Tuple3(0, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0),
 		6, new Tuple3(0, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0)
 	);
 	
 	public static final Map<Integer, Tuple3<Integer, String, GamblersLuckCapability.GamblersLuckShieldToken>> DICE_MAYOR = TreeMap.of(
-			1, new Tuple3(1, "blue", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1),
-			2, new Tuple3(2, "blue", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2),
+			1, new Tuple3(1, "grey", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1),
+			2, new Tuple3(2, "grey", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2),
 			3, new Tuple3(null, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X),
 			4, new Tuple3(null, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X),
 			5, new Tuple3(0, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0),
@@ -65,7 +65,7 @@ public class GamblersLuckDicePhase extends Phase {
         	return next(state);
         }
 
-        Map<FeaturePointer, GamblersLuckCapability.GamblersLuckShieldToken> model = cap.getModel(state);
+        Map<FeaturePointer, Tuple2<GamblersLuckCapability.GamblersLuckShieldToken,Integer>> model = cap.getModel(state);
 
         Map<Integer, Tuple3<Integer, String, GamblersLuckCapability.GamblersLuckShieldToken>> dice = DICE_REGULAR;
         if (state.getElements().get("mayor").getOrNull() != null) {
@@ -74,9 +74,10 @@ public class GamblersLuckDicePhase extends Phase {
         
     	for(Tuple2<FeaturePointer,GamblersLuckShield> shield: shields) {
         	int diceValue = state.getPhase().getRandom().getNextInt(6)+1;
-        	model = model.put(shield._1, dice.get(diceValue).get()._3);
+        	int randomRotation = state.getPhase().getRandom().getNextInt(8)-5;
+        	model = model.put(shield._1, new Tuple2(dice.get(diceValue).get()._3,randomRotation));
 			state = state.appendEvent(new DiceSixRollEvent(
-	                PlayEventMeta.createWithActivePlayer(state), HashSet.of(pos), diceValue, "gamblers-luck-dice"));
+	                PlayEventMeta.createWithActivePlayer(state), HashSet.of(pos), diceValue, String.format("%s.%s", "gamblers-luck-dice", dice.get(diceValue).get()._3)));
         }
         
         state = cap.setModel(state, model);
@@ -97,8 +98,8 @@ public class GamblersLuckDicePhase extends Phase {
 			for(FeaturePointer initialShield: initialShields) {
 				FeaturePointer placedShield = initialShield.setPosition(pos);
 				placedShields = placedShields.append(placedShield);
-				GamblersLuckCapability.GamblersLuckShieldToken currentToken = model.get(placedShield).getOrNull();
-				Tuple3<Integer, String, GamblersLuckCapability.GamblersLuckShieldToken> diceValue = findByToken(dice, currentToken);
+				Tuple2<GamblersLuckCapability.GamblersLuckShieldToken,Integer> currentToken = model.get(placedShield).getOrNull();
+				Tuple3<Integer, String, GamblersLuckCapability.GamblersLuckShieldToken> diceValue = findByToken(dice, currentToken._1);
 				if (diceValue._1 == null) {
 					eliminatedPennats = true;
 				} else if (diceValue._1 > 0) {

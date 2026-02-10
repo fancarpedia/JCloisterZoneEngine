@@ -361,7 +361,7 @@ public class StateGsonBuilder {
             }
         }
 
-    	Map<FeaturePointer, GamblersLuckCapability.GamblersLuckShieldToken> gamblersLuckShields = root.getCapabilityModel(GamblersLuckCapability.class);
+    	Map<FeaturePointer, Tuple2<GamblersLuckCapability.GamblersLuckShieldToken,Integer>> gamblersLuckShields = root.getCapabilityModel(GamblersLuckCapability.class);
     	if (gamblersLuckShields != null) {
             JsonArray shields_0 = new JsonArray();
             JsonArray shields_1 = new JsonArray();
@@ -372,12 +372,13 @@ public class StateGsonBuilder {
                 JsonObject token = new JsonObject();
                 token.add("position", context.serialize(fp.getPosition()));
                 token.add("location", context.serialize(fp.getLocation()));
+                token.add("extraRotation", context.serialize(shieldToken._2));
                 token.addProperty("feature", "GamblersLuckShield");
-                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0) shields_0.add(token);
-                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1) shields_1.add(token);
-                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2) shields_2.add(token);
-                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3) shields_3.add(token);
-                if (shieldToken == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X) shields_X.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0) shields_0.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1) shields_1.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2) shields_2.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3) shields_3.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X) shields_X.add(token);
             });
             if (shields_0.size() > 0) {
                 tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0.name(), shields_0);

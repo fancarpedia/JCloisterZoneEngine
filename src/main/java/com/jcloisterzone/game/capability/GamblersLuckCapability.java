@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
  * Capability model is {@code Map<FeaturePointer, String>} - Gambler's Luck Shield Tokens,
  *   key is Gambler's Luck Shield Token id or null if nothing is placed
  */
-public final class GamblersLuckCapability extends Capability<Map<FeaturePointer, GamblersLuckCapability.GamblersLuckShieldToken>> {
+public final class GamblersLuckCapability extends Capability<Map<FeaturePointer, Tuple2<GamblersLuckCapability.GamblersLuckShieldToken,Integer>>> {
 	
 	public enum GamblersLuckShieldToken implements Token {
 		GAMBLERSLUCKSHIELD_0,
