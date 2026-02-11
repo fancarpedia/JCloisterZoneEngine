@@ -11,6 +11,7 @@ import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.game.Rule;
+import com.jcloisterzone.game.capability.FamiliesCapability;
 import com.jcloisterzone.game.capability.GamblersLuckCapability;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
@@ -33,7 +34,7 @@ public class GamblersLuckDicePhase extends Phase {
 
 	public static final Map<Integer, Tuple3<Integer, String, GamblersLuckCapability.GamblersLuckShieldToken>> DICE_REGULAR = TreeMap.of(
 		1, new Tuple3(1, "grey", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1),
-		2, new Tuple3(2, "blue-red", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2),
+		2, new Tuple3(2, "grey" /*both*/, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2),
 		3, new Tuple3(3, "grey", GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3),
 		4, new Tuple3(null, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X),
 		5, new Tuple3(0, null, GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0),
@@ -94,7 +95,7 @@ public class GamblersLuckDicePhase extends Phase {
 			Stream<FeaturePointer> placedShields = Stream.empty();
 			int newShields = city._2.getModifier(state, City.PENNANTS, 0);
 			boolean eliminatedPennats = false;
-			Set<String> colors = HashSet.empty();
+			String family = null;
 			for(FeaturePointer initialShield: initialShields) {
 				FeaturePointer placedShield = initialShield.setPosition(pos);
 				placedShields = placedShields.append(placedShield);
@@ -104,7 +105,9 @@ public class GamblersLuckDicePhase extends Phase {
 					eliminatedPennats = true;
 				} else if (diceValue._1 > 0) {
 					newShields += diceValue._1;
-					colors = colors.add(diceValue._2).distinct();
+					if (family == null || !family.equals("both")) {
+						family = diceValue._2;
+					}
 				}
 			}
 			Map<FeatureModifier<?>, Object> modifiers = city._2.getModifiers();
@@ -113,6 +116,7 @@ public class GamblersLuckDicePhase extends Phase {
 			}
 			if (newShields>0) {
 				modifiers = modifiers.put(City.PENNANTS, newShields);
+				modifiers = modifiers.put(FamiliesCapability.FAMILY, family);
 			}
 			modifiers = modifiers.replace(City.GAMBLERS_LUCK_SHIELDS,initialShields,placedShields);
 

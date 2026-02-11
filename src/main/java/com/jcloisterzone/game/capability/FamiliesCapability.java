@@ -4,7 +4,7 @@ import com.jcloisterzone.board.*;
 import com.jcloisterzone.feature.City;
 import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.feature.Structure;
-import com.jcloisterzone.feature.modifier.StringStrictMergingModifier;
+import com.jcloisterzone.feature.modifier.FamiliesModifier;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 
 public class FamiliesCapability extends Capability<Void> {
 
-	public static final StringStrictMergingModifier FAMILY = new StringStrictMergingModifier("family", new GameElementQuery("families"));
+	public static final FamiliesModifier FAMILY = new FamiliesModifier("family", new GameElementQuery("families"));
 
 	@Override
     public Feature initFeature(GameState state, String tileId, Feature feature, Element xml) {
@@ -48,7 +48,7 @@ public class FamiliesCapability extends Capability<Void> {
         final GameState finalState = (new PlaceTile(tile, pos, rot)).apply(state);
 
         Stream<City> cities = finalState.getTileFeatures2(pos, Structure.class)
-        	    .filter(fp -> fp._2 instanceof City && ((City) fp._2).getModifier(finalState, City.PENNANTS, 0) > 0)
+        	    .filter(fp -> fp._2 instanceof City && (!((City) fp._2).hasModifier(finalState, City.ELIMINATED_PENNANTS) && ((City) fp._2).getModifier(finalState, City.PENNANTS, 0) > 0))
         	    .map(fp -> (City) fp._2)
         	    .toStream();
         
@@ -58,7 +58,7 @@ public class FamiliesCapability extends Capability<Void> {
         }
         
         return !cities.exists(city ->
-            city.getModifier(finalState, FAMILY, null).equals(StringStrictMergingModifier.CONFLICT)
+            city.getModifier(finalState, FAMILY, null).equals(FamiliesModifier.CONFLICT)
         );
     }
 }

@@ -36,20 +36,6 @@ public final class GamblersLuckCapability extends Capability<Map<FeaturePointer,
 	}
 	
 	private static final long serialVersionUID = 1L;
-	
-	@Override
-    public Feature initFeature(GameState state, String tileId, Feature feature, Element xml) {
-        if (feature instanceof City) {
-    	    if (!("".equals(attributeStringValue(xml, "gamblers-luck-shield", "")))) {
-                String family = "unknown";
-                if (xml.hasAttribute("family")) {
-                    family = xml.getAttribute("family");
-                }
-                feature = ((City) feature).putModifier(FamiliesCapability.FAMILY, family);
-    	    }
-        }
-        return feature;
-    }
 
 	@Override
 	public GameState onStartGame(GameState state, RandomGenerator random) {
