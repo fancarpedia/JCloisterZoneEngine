@@ -34,6 +34,8 @@ public class TokenAdapter extends TypeAdapter<Token> {
             String token = in.nextString();
             switch (token) {
             case "TOWER_PIECE": return TowerToken.TOWER_PIECE;
+            case "BLACK_TOWER_PIECE": return TowerToken.BLACK_TOWER_PIECE;
+            case "WHITE_TOWER_PIECE": return TowerToken.WHITE_TOWER_PIECE;
             case "BRIDGE": return BridgeToken.BRIDGE;
             case "LB_SHED": return LittleBuilding.LB_SHED;
             case "LB_HOUSE": return LittleBuilding.LB_HOUSE;
