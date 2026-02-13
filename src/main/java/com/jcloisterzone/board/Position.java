@@ -119,6 +119,12 @@ public class Position implements BoardPointer, Comparable<Position> {
         return Math.abs(x - p.x) + Math.abs(y - p.y);
     }
 
+    public int diagonalDistance(Position p) {
+    	int dx = Math.abs(x - p.x);
+    	int dy = Math.abs(y - p.y);
+    	return dx == dy ? dx : 0;
+    }
+
     @Override
     public int hashCode() {
         return (x << 16) ^ y;

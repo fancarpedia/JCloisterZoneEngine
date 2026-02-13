@@ -415,7 +415,9 @@ public class StateGsonBuilder {
             });
             item.add("places", places);
             if (f instanceof Tower) {
-                item.addProperty("height", ((Tower) f).getHeight());
+                item.addProperty("height", ((Tower) f).getPieces().size());
+                TowerCapability.TowerToken lastPiece = ((Tower) f).getPieces().lastOption().getOrNull();
+                item.addProperty("lastPiece", (lastPiece != null) ? lastPiece.toString() : null);
             }
             if (f instanceof Scoreable) {
                 JsonArray owners = new JsonArray();
@@ -934,6 +936,7 @@ public class StateGsonBuilder {
         public JsonElement serialize(TowerPieceAction action, Type type, JsonSerializationContext context) {
             JsonObject json = new JsonObject();
             json.addProperty("type", "TowerPiece");
+            json.addProperty("token", action.getToken().name());
             JsonArray options = new JsonArray();
             action.getOptions().forEach(pos -> {
                 options.add(context.serialize(pos));
