@@ -17,9 +17,9 @@ public class FamiliesModifier extends FeatureModifier<String> {
     public String mergeValues(String a, String b) {
         if (a == null) return b;
         if (b == null) return a;
-        if (a.equals("grey")) return b;
-        if (b.equals("grey")) return a;
-        if (a.equals("both") || b.equals("any")) return "both";
+        if (a.equals("grey")) return b; // Gambler's Luck
+        if (b.equals("grey")) return a; // Gambler's Luck
+        if (a.equals("both") || b.equals("both")) return "both"; // Both Colors
     	return a.equals(b) ? a : CONFLICT;
     }
 
