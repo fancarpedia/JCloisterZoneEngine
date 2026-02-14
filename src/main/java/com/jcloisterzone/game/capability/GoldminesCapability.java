@@ -8,29 +8,34 @@ import com.jcloisterzone.board.TileModifier;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.event.PointsExpression;
+import com.jcloisterzone.event.TokenPlacedEvent;
 import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
 import com.jcloisterzone.event.TokenReceivedEvent;
+import com.jcloisterzone.event.TokenRemovedEvent;
 import com.jcloisterzone.feature.Castle;
 import com.jcloisterzone.feature.Monastic;
 import com.jcloisterzone.feature.Scoreable;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.Token;
+import com.jcloisterzone.game.capability.GoldminesCapability.GoldToken;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.game.state.PlayersState;
 import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.AddPoints;
+
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import io.vavr.collection.Vector;
-import org.w3c.dom.Element;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map.Entry;
+
+import org.w3c.dom.Element;
 
 /**
  * Model is map of placed gold tokens.
@@ -182,4 +187,19 @@ public class GoldminesCapability  extends Capability<Map<Position, Integer>> {
         }
         return state;
     }
+    
+    public GameState onMeteoriteImpact(GameState state, PlacedTile pt, Set<Position> positions) {
+    	Map<Position, Integer> model = getModel(state);
+    	for(Position pos: positions) {
+    		Integer count = model.get(pos).getOrNull();
+    		if (count != null) {
+	    	    state = state.appendEvent(new TokenRemovedEvent(
+	    	    	PlayEventMeta.createWithActivePlayer(state), GoldToken.GOLD, pos, count, true
+	    	    ));
+    		}
+    	}
+    	state = setModel(state, getModel(state).removeAll(positions));
+    	return state;
+    }
+
 }
