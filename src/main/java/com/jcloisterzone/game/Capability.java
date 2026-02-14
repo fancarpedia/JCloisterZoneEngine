@@ -14,17 +14,19 @@ import com.jcloisterzone.figure.Special;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.random.RandomGenerator;
+
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
-import io.vavr.collection.Vector;
+import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
-
-import org.w3c.dom.Element;
+import io.vavr.collection.Vector;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Function;
+
+import org.w3c.dom.Element;
 
 @Immutable
 public abstract class Capability<T> implements Serializable {
@@ -116,6 +118,10 @@ public abstract class Capability<T> implements Serializable {
 
     public boolean isMeepleDeploymentAllowed(GameState state, Position pos) {
         return true;
+    }
+    
+    public GameState onMeteoriteImpact(GameState state, PlacedTile pt, Set<Position> positions) {
+    	return state;
     }
 
     @SuppressWarnings("unchecked")
