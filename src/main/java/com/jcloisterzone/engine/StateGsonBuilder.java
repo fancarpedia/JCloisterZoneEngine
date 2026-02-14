@@ -596,6 +596,17 @@ public class StateGsonBuilder {
                 turnEvents.add(data);
                 continue;
             }
+            if (ev instanceof TokenRemovedEvent) {
+                TokenRemovedEvent tev = (TokenRemovedEvent) ev;
+                JsonObject data = new JsonObject();
+                data.addProperty("type", "token-removed");
+                data.addProperty("token", tev.getToken().name());
+                data.addProperty("count", tev.getCount());
+                data.addProperty("forced", tev.getForced());
+                data.add("from", context.serialize(tev.getPointer()));
+                turnEvents.add(data);
+                continue;
+            }
             if (ev instanceof NeutralFigureMoved) {
                 if (volcanoTile) {
                     // ignore dragon move on volcano tile
