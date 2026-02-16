@@ -12,6 +12,7 @@ import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.TopLeftTranslatedFigurePosition;
 import com.jcloisterzone.figure.neutral.NeutralFigure;
+import com.jcloisterzone.feature.Castle;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.capability.trait.MeteoriteProtected;
 import com.jcloisterzone.game.Rule;
@@ -199,6 +200,9 @@ public class MeteoriteCapability extends Capability<Void> {
 	                               positions.contains(position.add(new Position(-1, 0))) ||
 	                               positions.contains(position.add(new Position(0, -1))) ||
 	                               positions.contains(position.add(new Position(-1, -1)));
+	            } else if (state.getFeature(t._2) instanceof Castle){
+	            	// Impact can be just on part of Castle
+	            	undeploy = ((Castle) state.getFeature(t._2)).getPlaces().map(p -> p.getPosition()).contains(position);
 	            } else {
 	            	undeploy = positions.contains(position);
 	            }
