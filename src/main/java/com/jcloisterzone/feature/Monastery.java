@@ -12,6 +12,7 @@ import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.game.capability.VineyardCapability;
+import com.jcloisterzone.game.capability.trait.WagonEligible;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 /**
  * Monastery, shrine, special monastery from German monasteries expansion or Church from Darmstart
  */
-public class Monastery extends TileFeature implements Monastic, ModifiedFeature<Monastery> {
+public class Monastery extends TileFeature implements WagonEligible, Monastic, ModifiedFeature<Monastery> {
 
     private static final long serialVersionUID = 1L;
     private static final List<FeaturePointer> INITIAL_PLACE = List.of(new FeaturePointer(Position.ZERO, Monastery.class, Location.I));
@@ -151,7 +152,7 @@ public class Monastery extends TileFeature implements Monastic, ModifiedFeature<
         }
         String baseName = isShrine(state) ? "shrine" : "monastery";
 
-        scoreScriptedModifiers(state, exprItems, java.util.Map.of("tiles", adjacent + 1, "completed", completed));
+//        scoreScriptedModifiers(state, exprItems, java.util.Map.of("tiles", adjacent + 1, "completed", completed));
         
         return new PointsExpression(completed ? baseName : baseName + ".incomplete",  List.ofAll(exprItems));
     }

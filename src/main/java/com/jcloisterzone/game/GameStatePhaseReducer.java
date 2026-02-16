@@ -51,9 +51,12 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
         }
         if (setup.contains(CountCapability.class)) next = new CocFollowerPhase(randomGenerator, next);
         if (setup.contains(BigTopCapability.class)) next = new BigTopPhase(randomGenerator, next);
+//        if (setup.contains(RussianPromosTrapCapability.class)) next = new RussianPromosTrapPhase(randomGenerator, next);
         if (setup.contains(WagonCapability.class)) next = new WagonPhase(randomGenerator, next);
         next = new ScoringPhase(randomGenerator, next);
+//        if (setup.contains(RussianPromosTrapCapability.class)) next = new RussianPromosTrapPhase(randomGenerator, next);
         if (setup.contains(CountCapability.class)) next = new CocScoringPhase(randomGenerator, next);
+        if (setup.contains(GamblersLuckCapability.class)) next = new GamblersLuckDicePhase(randomGenerator, next);
         next = new CommitActionPhase(randomGenerator, next);
         if (setup.contains(CastleCapability.class)) next = new CastlePhase(randomGenerator, next);
         if (setup.contains(DragonCapability.class) && !"after-scoring".equals(setup.getStringRule(Rule.DRAGON_MOVEMENT))) {

@@ -7,12 +7,16 @@ import com.jcloisterzone.board.ShortEdge;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
+import com.jcloisterzone.feature.GamblersLuckShield;
 import com.jcloisterzone.feature.modifier.BooleanAnyModifier;
 import com.jcloisterzone.feature.modifier.FeatureModifier;
+import com.jcloisterzone.feature.modifier.FeaturePointerAddModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
 import com.jcloisterzone.feature.modifier.IntegerNonMergingModifier;
 import com.jcloisterzone.game.Rule;
+import com.jcloisterzone.game.capability.trait.BuilderExtendable;
 import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
+import com.jcloisterzone.game.capability.trait.WagonEligible;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
 import io.vavr.Tuple2;
@@ -20,7 +24,7 @@ import io.vavr.collection.*;
 
 import java.util.ArrayList;
 
-public class City extends CompletableFeature<City> implements FlowersBonusAffected, ModifiedFeature<City> {
+public class City extends CompletableFeature<City> implements BuilderExtendable, FlowersBonusAffected, WagonEligible, ModifiedFeature<City> {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,6 +34,8 @@ public class City extends CompletableFeature<City> implements FlowersBonusAffect
     public static final BooleanAnyModifier CATHEDRAL = new BooleanAnyModifier("city[cathedral]", new GameElementQuery("cathedral"));
     public static final BooleanAnyModifier PRINCESS = new BooleanAnyModifier("city[princess]", new GameElementQuery("princess"));
     public static final IntegerNonMergingModifier POINTS_MODIFIER = new IntegerNonMergingModifier("city[points]", null);
+    public static final FeaturePointerAddModifier GAMBLERS_LUCK_SHIELDS = new FeaturePointerAddModifier<GamblersLuckShield>("city[gamblers-luck-shield]", null, GamblersLuckShield.class);
+    public static final BooleanAnyModifier ELIMINATED_PENNANTS = new BooleanAnyModifier("city[eliminated-pennants]", null);
     
     private final Set<Tuple2<ShortEdge, FeaturePointer>> multiEdges; // HS.CC!.v abstraction, multiple cities can connect to same edge
     private final Map<FeatureModifier<?>, Object> modifiers;
@@ -121,16 +127,20 @@ public class City extends CompletableFeature<City> implements FlowersBonusAffect
         if (points != null) {
             exprItems.add(new ExprItem(1, "tiles", points));
         } else {
-            int tileCount = getTilePositions().size();
-            int pennants = getModifier(state, PENNANTS, 0);
             boolean cathedral = hasModifier(state, CATHEDRAL);
 
-            if (cathedral && !completed) {
+            if (cathedral && !completed && !"ignore".equals(state.getStringRule(Rule.INN_AND_CATHEDRAL_FINAL_SCORING))) {
                 return new PointsExpression("city.incomplete", new ExprItem("cathedral", 0));
             }
 
-            tinyCity = completed && tileCount == 2 && "2".equals(state.getStringRule(Rule.TINY_CITY_SCORING));
             boolean besieged = hasModifier(state, BESIEGED);
+            int pennants = getModifier(state, PENNANTS, 0);
+            if (hasModifier(state, ELIMINATED_PENNANTS)) {
+            	pennants = 0;
+            }
+            int tileCount = getTilePositions().size();
+
+            tinyCity = completed && tileCount == 2 && "2".equals(state.getStringRule(Rule.TINY_CITY_SCORING));
 
             exprItems.add(new ExprItem(tileCount, "tiles", tileCount * (completed && !tinyCity ? 2 : 1)));
             if (pennants > 0) {
@@ -139,7 +149,7 @@ public class City extends CompletableFeature<City> implements FlowersBonusAffect
             if (besieged) {
                 exprItems.add(new ExprItem("besieged", -tileCount - pennants));
             }
-            if (cathedral) {
+            if (cathedral && completed) {
                 exprItems.add(new ExprItem("cathedral", tileCount + pennants));
             }
             if (completed && hasModifier(state, DARMSTADTIUM)) {

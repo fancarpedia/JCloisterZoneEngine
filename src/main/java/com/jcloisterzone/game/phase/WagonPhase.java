@@ -17,6 +17,7 @@ import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.MonasteriesCapability;
 import com.jcloisterzone.game.capability.RussianPromosTrapCapability;
 import com.jcloisterzone.game.capability.WagonCapability;
+import com.jcloisterzone.game.capability.trait.WagonEligible;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.io.message.CommitMessage;
@@ -47,15 +48,11 @@ public class WagonPhase extends Phase {
             Wagon wagon = item._1;
 
             Feature feature = state.getFeature(item._2);
-            if (feature instanceof Completable) { // skip Castle
+            if (feature instanceof WagonEligible) { // consoder only eligible features
                 GameState _state = state;
                 Set<FeaturePointer> options = getAdjacentFeatures(state, (Completable)feature, item._2)
                         .filter(t -> {
                             Structure f = t._2;
-                            if (f instanceof Castle) {
-                                // empty castle is considered completed and occupied exclude wagon too
-                                return false;
-                            }
                             if (f instanceof Completable) {
                                 Completable nei = (Completable) f;
                                 if (wagon.isDeploymentAllowed(_state, t._1, f) != DeploymentCheckResult.OK) {

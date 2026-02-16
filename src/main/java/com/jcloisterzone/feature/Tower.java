@@ -4,34 +4,43 @@ import com.jcloisterzone.board.Location;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.Rotation;
 import com.jcloisterzone.board.pointer.FeaturePointer;
-import io.vavr.collection.List;
+import com.jcloisterzone.game.capability.TowerCapability;
 
+import io.vavr.collection.List;
 
 public class Tower extends TileFeature implements Structure {
 
-    private final int height;
     private static final List<FeaturePointer> INITIAL_PLACE = List.of(new FeaturePointer(Position.ZERO, Tower.class, Location.I));
 
+    private List<TowerCapability.TowerToken> pieces = List.empty();
+
     public Tower() {
-        this(INITIAL_PLACE, 0);
+        this(INITIAL_PLACE, List.empty());
     }
 
-    public Tower(List<FeaturePointer> places, int height) {
+    public Tower(List<FeaturePointer> places, List<TowerCapability.TowerToken> pieces) {
         super(places);
-        this.height = height;
+        this.pieces = pieces;
     }
 
     @Override
     public Tower placeOnBoard(Position pos, Rotation rot) {
-        return new Tower(placeOnBoardPlaces(pos, rot), height);
+        return new Tower(placeOnBoardPlaces(pos, rot), pieces);
     }
 
-    public Tower increaseHeight() {
-        return new Tower(places, height + 1);
+    public Tower addPiece(TowerCapability.TowerToken token) {
+        return new Tower(places, pieces.append(token));
     }
 
-    public int getHeight() {
-        return height;
+    public List<TowerCapability.TowerToken> getPieces() {
+        return pieces;
+    }
+
+    public boolean matchLastPiece(TowerCapability.TowerToken token) {
+    	if (getPieces().size()==0) {
+    		return false;
+    	}
+    	return getPieces().lastOption().get().equals(token);
     }
 
     public static String name() {

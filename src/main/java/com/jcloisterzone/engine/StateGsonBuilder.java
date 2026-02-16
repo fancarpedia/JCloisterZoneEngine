@@ -18,7 +18,6 @@ import com.jcloisterzone.game.capability.*;
 import com.jcloisterzone.game.capability.FerriesCapability.FerryToken;
 import com.jcloisterzone.game.capability.GoldminesCapability.GoldToken;
 import com.jcloisterzone.game.capability.LittleBuildingsCapability.LittleBuilding;
-import com.jcloisterzone.game.capability.SheepToken;
 import com.jcloisterzone.game.phase.DragonMovePhase;
 import com.jcloisterzone.game.phase.Phase;
 import com.jcloisterzone.game.phase.RussianPromosTrapPhase;
@@ -145,7 +144,7 @@ public class StateGsonBuilder {
                 jsonItem.add("flocks", jsonFlocks);
                 obj.add("sheep", jsonItem);
             }
-
+            
             return obj;
         }
     }
@@ -362,6 +361,42 @@ public class StateGsonBuilder {
             }
         }
 
+    	Map<FeaturePointer, Tuple2<GamblersLuckCapability.GamblersLuckShieldToken,Integer>> gamblersLuckShields = root.getCapabilityModel(GamblersLuckCapability.class);
+    	if (gamblersLuckShields != null) {
+            JsonArray shields_0 = new JsonArray();
+            JsonArray shields_1 = new JsonArray();
+            JsonArray shields_2 = new JsonArray();
+            JsonArray shields_3 = new JsonArray();
+            JsonArray shields_X = new JsonArray();
+    		gamblersLuckShields.forEach((fp, shieldToken) -> {
+                JsonObject token = new JsonObject();
+                token.add("position", context.serialize(fp.getPosition()));
+                token.add("location", context.serialize(fp.getLocation()));
+                token.add("extraRotation", context.serialize(shieldToken._2));
+                token.addProperty("feature", "GamblersLuckShield");
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0) shields_0.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1) shields_1.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2) shields_2.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3) shields_3.add(token);
+                if (shieldToken._1 == GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X) shields_X.add(token);
+            });
+            if (shields_0.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_0.name(), shields_0);
+            }
+            if (shields_1.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_1.name(), shields_1);
+            }
+            if (shields_2.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_2.name(), shields_2);
+            }
+            if (shields_3.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_3.name(), shields_3);
+            }
+            if (shields_X.size() > 0) {
+                tokens.add(GamblersLuckCapability.GamblersLuckShieldToken.GAMBLERSLUCKSHIELD_X.name(), shields_X);
+            }
+        }
+
         return tokens;
     }
 
@@ -380,7 +415,9 @@ public class StateGsonBuilder {
             });
             item.add("places", places);
             if (f instanceof Tower) {
-                item.addProperty("height", ((Tower) f).getHeight());
+                item.addProperty("height", ((Tower) f).getPieces().size());
+                TowerCapability.TowerToken lastPiece = ((Tower) f).getPieces().lastOption().getOrNull();
+                item.addProperty("lastPiece", (lastPiece != null) ? lastPiece.toString() : null);
             }
             if (f instanceof Scoreable) {
                 JsonArray owners = new JsonArray();
@@ -556,6 +593,17 @@ public class StateGsonBuilder {
                 data.addProperty("type", "token-placed");
                 data.addProperty("token", tev.getToken().name());
                 data.add("to", context.serialize(tev.getPointer()));
+                turnEvents.add(data);
+                continue;
+            }
+            if (ev instanceof TokenRemovedEvent) {
+                TokenRemovedEvent tev = (TokenRemovedEvent) ev;
+                JsonObject data = new JsonObject();
+                data.addProperty("type", "token-removed");
+                data.addProperty("token", tev.getToken().name());
+                data.addProperty("count", tev.getCount());
+                data.addProperty("forced", tev.getForced());
+                data.add("from", context.serialize(tev.getPointer()));
                 turnEvents.add(data);
                 continue;
             }
@@ -899,6 +947,7 @@ public class StateGsonBuilder {
         public JsonElement serialize(TowerPieceAction action, Type type, JsonSerializationContext context) {
             JsonObject json = new JsonObject();
             json.addProperty("type", "TowerPiece");
+            json.addProperty("token", action.getToken().name());
             JsonArray options = new JsonArray();
             action.getOptions().forEach(pos -> {
                 options.add(context.serialize(pos));

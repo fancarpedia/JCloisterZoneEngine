@@ -13,6 +13,7 @@ import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.phase.Phase;
 import com.jcloisterzone.game.state.mixins.*;
+
 import io.vavr.collection.*;
 
 import java.io.Serializable;

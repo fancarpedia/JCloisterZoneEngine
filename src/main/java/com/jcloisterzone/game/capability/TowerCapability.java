@@ -24,30 +24,38 @@ import io.vavr.collection.Vector;
 public final class TowerCapability extends Capability<Array<List<Follower>>> {
 
 	public enum TowerToken implements Token {
-		TOWER_PIECE
+		TOWER_PIECE,
+		BLACK_TOWER_PIECE,
+		WHITE_TOWER_PIECE
     }
 
 	private static final long serialVersionUID = 1L;
 
     public static final int RANSOM_POINTS = 3;
 
-    private int getInitialPiecesCount(GameState state) {
+    private int[] getInitialPiecesCount(GameState state) {
         switch (state.getPlayers().getPlayers().length()) {
-        case 1:
-        case 2: return 10;
-        case 3: return 9;
-        case 4: return 7;
-        case 5: return 6;
-        case 6: return 5;
-        case 7: return 4;
-        default: return 3;
+	        case 1:
+	        case 2: return new int [] {10, 8, 4, 2};
+	        case 3: return new int [] { 9, 7, 3, 2};
+	        case 4: return new int [] { 7, 6, 3, 1};
+	        case 5: return new int [] { 6, 5, 2, 1};
+	        case 6: return new int [] { 5, 4, 2, 1};
+	        case 7: return new int [] { 4, 3, 2, 1};
+	        default: return new int [] {3, 2, 1, 1};
         }
     }
 
     @Override
     public GameState onStartGame(GameState state, RandomGenerator random) {
-        int pieces = getInitialPiecesCount(state);
-        state = state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(TowerToken.TOWER_PIECE, pieces));
+        int[] pieces = getInitialPiecesCount(state);
+        if (state.hasCapability(BlackTowerCapability.class)) {
+        	state = state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(TowerToken.TOWER_PIECE, pieces[1]));
+        	state = state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(TowerToken.BLACK_TOWER_PIECE, pieces[2]));
+        	state = state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(TowerToken.WHITE_TOWER_PIECE, pieces[3]));
+        } else {
+        	state = state.mapPlayers(ps -> ps.setTokenCountForAllPlayers(TowerToken.TOWER_PIECE, pieces[0]));
+        }
         state = setModel(state, Array.fill(state.getPlayers().length(), List::empty));
         return state;
     }
@@ -62,14 +70,17 @@ public final class TowerCapability extends Capability<Array<List<Follower>>> {
             .toSet();
 
         Set<Tower> openTowers = state.getFeatures(Tower.class).filter(tower -> tower.getPlaces().toSet().intersect(occupiedTowers).isEmpty()).toSet();
-        Set<FeaturePointer> openTowersForPiece = openTowers.map(Tower::getPlace);
-        Set<FeaturePointer> openTowersForFollower = openTowers.filter(t -> t.getHeight() > 0).map(Tower::getPlace);
+        Set<FeaturePointer> openTowersForPiece = openTowers.filter(t -> !t.matchLastPiece(TowerToken.WHITE_TOWER_PIECE)).map(Tower::getPlace);
+        Set<FeaturePointer> openTowersForFollower = openTowers.filter(t -> !t.matchLastPiece(TowerToken.WHITE_TOWER_PIECE) && t.getPieces().size() > 0).map(Tower::getPlace);
 
         ActionsState as = state.getPlayerActions();
 
         if (!openTowersForPiece.isEmpty()) {
             if (state.getPlayers().getPlayerTokenCount(player.getIndex(), TowerToken.TOWER_PIECE) > 0) {
-                as = as.appendAction(new TowerPieceAction(openTowersForPiece.map(FeaturePointer::getPosition)));
+                as = as.appendAction(new TowerPieceAction(openTowersForPiece.map(FeaturePointer::getPosition), TowerToken.TOWER_PIECE));
+            }
+            if (state.getPlayers().getPlayerTokenCount(player.getIndex(), TowerToken.BLACK_TOWER_PIECE) > 0) {
+                as = as.appendAction(new TowerPieceAction(openTowersForPiece.map(FeaturePointer::getPosition), TowerToken.BLACK_TOWER_PIECE));
             }
         }
 
@@ -82,6 +93,10 @@ public final class TowerCapability extends Capability<Array<List<Follower>>> {
                 new MeepleAction(meeple, openTowersForFollower)
             );
             as = as.appendActions(actions).mergeMeepleActions();
+            
+            if (state.getPlayers().getPlayerTokenCount(player.getIndex(), TowerToken.WHITE_TOWER_PIECE) > 0) {
+            	as = as.appendAction(new TowerPieceAction(openTowersForFollower.map(FeaturePointer::getPosition), TowerToken.WHITE_TOWER_PIECE));
+            }
         }
 
         return state.setPlayerActions(as);

@@ -20,6 +20,7 @@ import com.jcloisterzone.figure.neutral.Donkey;
 import com.jcloisterzone.figure.neutral.Fairy;
 import com.jcloisterzone.figure.neutral.NeutralFigure;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.capability.GamblersLuckCapability;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.capability.BridgeCapability.BridgeToken;
@@ -28,6 +29,7 @@ import com.jcloisterzone.game.capability.FestivalCapability;
 import com.jcloisterzone.game.capability.LittleBuildingsCapability.LittleBuilding;
 import com.jcloisterzone.game.capability.PrincessCapability;
 import com.jcloisterzone.game.capability.RobbersSonCapability;
+import com.jcloisterzone.game.capability.TowerCapability;
 import com.jcloisterzone.game.capability.TowerCapability.TowerToken;
 import com.jcloisterzone.game.capability.TunnelCapability.Tunnel;
 import com.jcloisterzone.game.ReturnMeepleSource;
@@ -40,8 +42,8 @@ import com.jcloisterzone.io.message.PlaceTokenMessage;
 import com.jcloisterzone.io.message.ReturnMeepleMessage;
 import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.*;
-import io.vavr.collection.Vector;
 
+import io.vavr.collection.Vector;
 
 public class ActionPhase extends AbstractActionPhase {
 
@@ -63,6 +65,13 @@ public class ActionPhase extends AbstractActionPhase {
         );
 
         Vector<PlayerAction<?>> actions = prepareMeepleActions(state, meepleTypes);
+        
+        boolean canPass = true;
+        
+    	if (state.hasCapability(GamblersLuckCapability.class)) {
+            canPass = canPass && !state.getCapabilities().get(GamblersLuckCapability.class).hasPlacedTileGamblersLuckShields(state);
+        }
+
 
         state = state.setPlayerActions(
             new ActionsState(player, actions, true)
@@ -198,18 +207,27 @@ public class ActionPhase extends AbstractActionPhase {
     private StepResult handlePlaceTower(GameState state, PlaceTokenMessage msg) {
         FeaturePointer ptr = (FeaturePointer) msg.getPointer();
         Tower tower = (Tower) state.getFeature(ptr);
+        TowerToken token = (TowerToken) msg.getToken();
+
         if (tower == null) {
-            new IllegalArgumentException("No tower");
+            new IllegalArgumentException("No tower on position: " + ptr);
         }
-        tower = tower.increaseHeight();
+        if (tower.matchLastPiece(TowerToken.WHITE_TOWER_PIECE)) {
+            new IllegalArgumentException("White tower on position: " + ptr);
+        }
+        tower = tower.addPiece(token);
 
         state = state.putFeature(ptr, tower);
         state = state.appendEvent(new TokenPlacedEvent(
-            PlayEventMeta.createWithActivePlayer(state), TowerToken.TOWER_PIECE, ptr)
+            PlayEventMeta.createWithActivePlayer(state), token, ptr)
         );
 
         state = clearActions(state);
-        return next(state, towerCapturePhase);
+        if (token.equals(TowerToken.WHITE_TOWER_PIECE)) {
+        	return next(state);
+        } else {
+        	return next(state, towerCapturePhase);
+        }
     }
 
     private StepResult handlePlaceBridge(GameState state, PlaceTokenMessage msg) {

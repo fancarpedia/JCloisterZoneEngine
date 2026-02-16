@@ -70,9 +70,11 @@ public class ScoringPhase extends Phase {
     }
 
     private void collectCompletedOnAdjacentEdges(GameState state, Position pos) {
-        for (Tuple2<Location, PlacedTile> t : state.getAdjacentTiles2(pos)) {
+    	boolean isMarketplaceCap = state.getCapabilities().contains(MarketplaceCapability.class);
+    	for (Tuple2<Location, PlacedTile> t : state.getAdjacentTiles2(pos)) {
             PlacedTile pt = t._2;
             var adj = state.getFeaturePartOf2(pt.getPosition(), t._1.rev());
+
             if (adj == null) {
                 continue;
             }
@@ -90,6 +92,18 @@ public class ScoringPhase extends Phase {
                     City another = (City) state.getFeature(multiEdge._2);
                     collectCompleted(state, another);
                 }
+            }
+            if (isMarketplaceCap && feature instanceof Road road) {
+            	if (road.isCompleted(state)) {
+                	Set<FeaturePointer> marketplaces = road.getMarketplaces();
+                	for (FeaturePointer mfp: marketplaces) {
+                		Marketplace marketplace = (Marketplace) state.getFeature(mfp);
+                		List<Road> marketplaceRoads = marketplace.getMarketplaceRoads(state);
+        				for(Road marketplaceRoad: marketplaceRoads) {
+        	                collectCompleted(state, (Completable) marketplaceRoad);
+        				}
+                	}
+            	}
             }
         }
     }
@@ -123,11 +137,7 @@ public class ScoringPhase extends Phase {
         }
 
         if (state.getCapabilities().contains(MarketplaceCapability.class)) {
-        	Set<Position> lastPlacedAndAdjacentPositions = state.getAdjacentTiles(pos)
-        			.map(PlacedTile::getPosition)
-        			.toSet()
-        			.add(lastPlaced.getPosition());
-            for (Tuple2<FeaturePointer, Road> t : state.getTileFeatures2ForPositions(lastPlacedAndAdjacentPositions, Road.class)) {
+            for (Tuple2<FeaturePointer, Road> t : state.getTileFeatures2ForPositions(HashSet.of(lastPlaced.getPosition()), Road.class)) {
             	Set<FeaturePointer> fps = t._2.getMarketplaces();
         		if (fps.size()>0) {
         			for(FeaturePointer fp : fps) {
@@ -153,7 +163,6 @@ public class ScoringPhase extends Phase {
                 collectCompleted(state, monastic);
             }
         }
-
 
         for (Capability<?> cap : state.getCapabilities().toSeq()) {
             state = cap.beforeCompletableScore(state, completedMutable.keySet());

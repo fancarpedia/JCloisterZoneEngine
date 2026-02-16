@@ -55,8 +55,11 @@ public abstract class AbstractActionPhase extends Phase {
             Stream<Tuple2<FeaturePointer, Structure>> places = state.getTileFeatures2(pos, Structure.class);
 
             // TODO use interface instead
-            places = places.filter(t -> !(t._2 instanceof Castle) && !(t._2 instanceof SoloveiRazboynik) && !(t._2 instanceof Acrobats) && !(t._2 instanceof Circus));
+            places = places.filter(t -> !(t._2 instanceof Castle) && !(t._2 instanceof SoloveiRazboynik) && !(t._2 instanceof Acrobats) && !(t._2 instanceof Circus) && !(t._2 instanceof GamblersLuckShield));
 
+            if (!state.getBooleanRule(Rule.FISHERMEN)) {
+                places = places.filter(t -> !(t._2 instanceof River));
+            }
             // towers are handled by Tower capability separately (needs collect towers on all tiles)
             // (and flier or magic portal use is also not allowed to be placed on tower
             places = places.filter(t -> !(t._2 instanceof Tower));

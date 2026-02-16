@@ -33,11 +33,11 @@ public class TowerCapturePhase extends Phase {
     @Override
     public StepResult enter(GameState state) {
         TokenPlacedEvent event = (TokenPlacedEvent) state.getEvents().last();
-        assert event.getToken() == TowerToken.TOWER_PIECE;
+        assert event.getToken() == TowerToken.TOWER_PIECE || event.getToken() == TowerToken.BLACK_TOWER_PIECE;
 
         FeaturePointer ptr = (FeaturePointer) event.getPointer();
         Tower tower = (Tower) state.getFeature(ptr);
-        int towerHeight = tower.getHeight();
+        int towerHeight = tower.getPieces().size();
         Position towerPosition = ptr.getPosition();
 
         GameState _state = state;
@@ -46,8 +46,8 @@ public class TowerCapturePhase extends Phase {
                 Position pos = t._2.getPosition();
                 return
                     (t._1 instanceof Follower) &&
-                    (pos.x == towerPosition.x || pos.y == towerPosition.y) &&
-                    (pos.squareDistance(towerPosition) <= towerHeight);
+                    (event.getToken() == TowerToken.TOWER_PIECE ? (pos.x == towerPosition.x || pos.y == towerPosition.y) : Math.abs(pos.x - towerPosition.x) == Math.abs(pos.y - towerPosition.y)) &&
+                    ((event.getToken() == TowerToken.TOWER_PIECE ? pos.squareDistance(towerPosition) : pos.diagonalDistance(towerPosition)) <= towerHeight);
             })
             .filter(t -> !(_state.getFeature(t._2) instanceof Castle))
             .map(MeeplePointer::new)

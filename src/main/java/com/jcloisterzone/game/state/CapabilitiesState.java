@@ -88,6 +88,12 @@ public class CapabilitiesState implements Serializable {
         return capabilities.values();
     }
 
+    public <T> Seq<T> toSeq(Class<T> type) {
+        return toSeq()
+                .filter(type::isInstance)
+                .map(type::cast);
+    }
+
     @Override
     public String toString() {
         return String.join(", ", toSeq().map(cap -> cap.toString()));

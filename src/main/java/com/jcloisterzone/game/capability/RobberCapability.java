@@ -45,7 +45,9 @@ public final class RobberCapability extends Capability<Tuple2<FeaturePointer,Int
         for (Scoreable feature : completed.keySet()) {
             if (feature instanceof Road) {
                 completedRoadsThisTurn++;
-                if (feature.getTilePositions().size() > maxRoadSize) {
+                int roadSize = feature.getTilePositions().size();
+                if (roadSize > maxRoadSize) {
+                	maxRoadSize = roadSize;
                     longestRoadCompleted = (Road) feature;
                 }
             }

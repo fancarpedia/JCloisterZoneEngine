@@ -15,7 +15,9 @@ import com.jcloisterzone.game.capability.FerriesCapability;
 import com.jcloisterzone.game.capability.FerriesCapabilityModel;
 import com.jcloisterzone.game.capability.MarketplaceCapability;
 import com.jcloisterzone.game.capability.TunnelCapability;
+import com.jcloisterzone.game.capability.trait.BuilderExtendable;
 import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
+import com.jcloisterzone.game.capability.trait.WagonEligible;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.setup.RuleQuery;
 import com.jcloisterzone.game.state.GameState;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.function.Function;
 
-public class Road extends CompletableFeature<Road> implements FlowersBonusAffected, ModifiedFeature<Road> {
+public class Road extends CompletableFeature<Road> implements BuilderExtendable, FlowersBonusAffected, WagonEligible, ModifiedFeature<Road> {
 
     private static final long serialVersionUID = 1L;
 
@@ -194,21 +196,21 @@ public class Road extends CompletableFeature<Road> implements FlowersBonusAffect
 
     @Override
     public PointsExpression getStructurePoints(GameState state, boolean completed) {
-        int tileCount = getTilePositions().size();
-        Map<String, Integer> args = HashMap.of("tiles", tileCount);
 
         boolean inn = hasModifier(state, INN);
-        boolean labyrinth = hasModifier(state, LABYRINTH);
-        int wellsCount = getModifier(state, WELL, 0);
 
-        if (inn && !completed) {
+        if (inn && !completed && !"ignore".equals(state.getStringRule(Rule.INN_AND_CATHEDRAL_FINAL_SCORING))) {
             return new PointsExpression("road.incomplete", new ExprItem("inn", 0));
         }
+
+        boolean labyrinth = hasModifier(state, LABYRINTH);
+        int tileCount = getTilePositions().size();
+        int wellsCount = getModifier(state, WELL, 0);
 
         var exprItems = new ArrayList<ExprItem>();
         exprItems.add(new ExprItem(tileCount, "tiles", tileCount));
 
-        if (inn) {
+        if (inn && completed) {
             exprItems.add(new ExprItem("inn", tileCount));
         }
         if (labyrinth && completed) {
@@ -216,7 +218,7 @@ public class Road extends CompletableFeature<Road> implements FlowersBonusAffect
             exprItems.add(new ExprItem(meeplesCount, "meeples", 2 * meeplesCount));
         }
         if (wellsCount>0) {
-        	exprItems.add(new ExprItem(wellsCount, "wells", (inn ? 2 : 1) * wellsCount ));
+        	exprItems.add(new ExprItem(wellsCount, "wells", ((inn && completed) ? 2 : 1) * wellsCount ));
         }
         if (marketplaces.length()>0) {
         	MarketplaceCapability marketplaceCap = state.getCapabilities().get(MarketplaceCapability.class);

@@ -4,6 +4,7 @@ import com.jcloisterzone.Player;
 import com.jcloisterzone.action.TunnelAction;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.capability.trait.FeatureCompletionBlocker;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.Token;
 import com.jcloisterzone.game.state.ActionsState;
@@ -11,12 +12,16 @@ import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTunnelToken;
 import com.jcloisterzone.random.RandomGenerator;
+import com.jcloisterzone.reducers.PlaceTunnel;
+
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
+import io.vavr.collection.Vector;
 
 import java.util.ArrayList;
 
@@ -80,22 +85,44 @@ public final class TunnelCapability extends Capability<Map<FeaturePointer, Place
     public java.util.List<TunnelAction> createTunnelActions(GameState state) {
         java.util.List actions = new ArrayList(3);
         Player player = state.getTurnPlayer();
+        Player activePlayer = state.getActivePlayer();
 
         Set<FeaturePointer> openTunnels = getModel(state)
                 .filterValues(Predicates.isNull())
                 .map(Tuple2::_1)
                 .toSet();
-
+        
         if (openTunnels.isEmpty()) {
             return actions;
         }
-
-        ActionsState as = state.getPlayerActions();
         for (Tunnel token : Tunnel.values()) {
-            if (state.getPlayers().getPlayerTokenCount(player.getIndex(), token) == 0) {
+        	int count = state.getPlayers().getPlayerTokenCount(player.getIndex(), token);
+            if (count == 0) {
                 continue;
             }
-            actions.add(new TunnelAction(openTunnels, token));
+            TunnelAction tunnelAction = new TunnelAction(openTunnels, token);
+            Set<FeaturePointer> allowedTunnels = HashSet.empty();
+            if (count == 1) {
+            	// Check only unfinished pairs
+	            for (FeatureCompletionBlocker cap : state.getCapabilities().toSeq(FeatureCompletionBlocker.class)) {
+	            	for(FeaturePointer fp: openTunnels) {
+	            		ActionsState _as;
+	                    if (activePlayer != null) {
+		            		_as = state.getPlayerActions().appendAction(new TunnelAction(openTunnels, token));
+	                    } else {
+	                    	_as = new ActionsState(player, Vector.of(new TunnelAction(openTunnels, token)), true);
+	                    }
+	            		GameState _state = state.setPlayerActions(_as);
+	                    _state = (new PlaceTunnel((TunnelCapability.Tunnel) token, fp)).apply(_state);
+	                    if (!cap.isFeatureCompletionBlocked(_state, fp)) {
+	                    	allowedTunnels = allowedTunnels.add(fp);
+	                    }
+	            	}
+	            }
+            } else {
+            	allowedTunnels = openTunnels;
+            }
+            actions.add(new TunnelAction(allowedTunnels, token));
         }
         return actions;
     }

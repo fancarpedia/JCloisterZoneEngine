@@ -217,6 +217,11 @@ public class MeteoriteCapability extends Capability<Void> {
 	            }
 	        }
 
+	        for (Capability<?> cap: state.getCapabilities().toSeq()) {
+	            state = cap.onMeteoriteImpact(state, pt, positions);
+	        }
+
+
         }
 
         return state;

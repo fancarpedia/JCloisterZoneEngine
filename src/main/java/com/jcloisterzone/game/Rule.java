@@ -27,10 +27,13 @@ public enum Rule {
     TINY_CITY_SCORING("tiny-city-scoring", String.class, new Object[] { "4", "2" }),
     COC_FINAL_SCORING("coc-final-scoring", String.class, new Object[] { "market-only", "any-district"}),
     COUNT_MOVE("count-move", String.class, new Object[] { "by-player", "clockwise", "follow-meeple"}),
+    INN_AND_CATHEDRAL_FINAL_SCORING("inn-and-cathedral-final-scoring", String.class, new Object[] { "zero", "ignore" }),
+    VINEYARDS_FOR_GARDEN("vineyards-for-garden", Boolean.class, null),
 
     ROBBERS_SON_ACTION("robbers-son-action", String.class, new Object[] { "may", "must" }),
-    METEORITE_IMPACT("meteorite-impact", String.class, new Object[] { "standard", "extended", "combination" });
-
+    METEORITE_IMPACT("meteorite-impact", String.class, new Object[] { "standard", "extended", "combination" }),
+    FISHERMEN("fishermen", Boolean.class, null);
+	
     String key;
     Class<?> type;
     Object[] allowedValues;
