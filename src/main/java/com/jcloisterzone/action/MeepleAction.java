@@ -76,7 +76,7 @@ public class MeepleAction implements SelectFeatureAction {
     
     @Override
     public ReplayableMessage select(FeaturePointer fp) {
-    	System.out.println(fp);
+//    	System.out.println(fp);
 //      if (fp.getLocation() == Location.FLYING_MACHINE) {
 //          return new DeployFlierMessage(fp, getMeepleIdFor(fp));
 //      }

@@ -299,7 +299,7 @@ public class Engine implements Runnable {
             	AiMessage aiMessage = gson.fromJson(line,AiMessage.class);
                 Integer playerRequestIdx = aiMessage.getPlayer();
                 Integer seq = aiMessage.getSeq();
-            	log.println("Message "+playerRequestIdx+' '+oldActivePlayer.getIndex());
+//            	log.println("Message "+playerRequestIdx+' '+oldActivePlayer.getIndex());
                 if (playerRequestIdx == oldActivePlayer.getIndex()) { //Integer.parseInt(playerRequestIdx.toString().split("\\.")[0]) == oldActivePlayer.getIndex()) {
                     AiPlayer aiPlayer = new LegacyAiPlayer(phaseReducer, new Player(playerRequestIdx));
 
