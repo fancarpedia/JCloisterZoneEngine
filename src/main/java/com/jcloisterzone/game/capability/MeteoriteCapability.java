@@ -203,8 +203,8 @@ public class MeteoriteCapability extends Capability<Void> {
 	            } else if (state.getFeature(t._2) instanceof Castle){
 	            	// Impact can be just on part of Castle
 	            	undeploy = ((Castle) state.getFeature(t._2)).getPlaces().map(p -> p.getPosition()).contains(position);
-	            } else {
-	            	undeploy = positions.contains(position);
+	            } else if (t._2.getLocation().isCityOfCarcassonneQuarter()) {
+	            	undeploy = false;
 	            }
 	            if (undeploy) {
 	                state = (new UndeployMeeple(m, true)).apply(state);
