@@ -278,8 +278,6 @@ public class Engine implements Runnable {
             }
 
             if (log != null) {
-            	log.println("");
-            	log.println("Received line");
                 log.println(line);
             }
 
@@ -290,9 +288,6 @@ public class Engine implements Runnable {
 
             Message msg = parser.fromJson(line);
             Player oldActivePlayer = state.getActivePlayer();
-//        	log.println("");
- //       	log.println("Request1: ");
-  //      	log.println(line);
 
             if (msg instanceof AiMessage) {
             	// Accept request only for current active player
@@ -358,9 +353,9 @@ public class Engine implements Runnable {
 
                 game.replaceState(state);
                 game.setReplay(game.getReplay().prepend((ReplayableMessage) msg));
-            } else if (msg instanceof UndoMessage) {
-                game.undo();
-                state = game.getState();
+//            } else if (msg instanceof UndoMessage) {
+//                game.undo();
+//                state = game.getState();
             } else {
 	            if (msg instanceof ReplayableMessage) {
 	                if (msg instanceof RandomChangingMessage) {
@@ -372,12 +367,13 @@ public class Engine implements Runnable {
 	                state = phaseReducer.apply(state, msg);
 	
 	                Player newActivePlayer = state.getActivePlayer();
-	                boolean undoAllowed = (!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
+	                boolean undoAllowed = (
+	                		(!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
 	                        && newActivePlayer != null
 	                        && newActivePlayer.equals(oldActivePlayer)
 	                        && !(msg instanceof DeployMeepleMessage && ((DeployMeepleMessage)msg).getMeepleId().contains("shepherd"))
-	                        && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"));
-	
+	                        && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"))
+	                );
 	                if (undoAllowed) {
 	                    game.markUndo();
 	                } else {
