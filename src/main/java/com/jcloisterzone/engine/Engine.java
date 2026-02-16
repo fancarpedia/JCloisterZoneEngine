@@ -2,17 +2,24 @@ package com.jcloisterzone.engine;
 
 import com.github.zafarkhaja.semver.Version;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jcloisterzone.Player;
+import com.jcloisterzone.action.PlayerAction;
+import com.jcloisterzone.ai.AiPlayer;
+//import com.jcloisterzone.ai.player.DummyAiPlayer;
+import com.jcloisterzone.ai.player.LegacyAiPlayer;
 import com.jcloisterzone.figure.*;
 import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.GameSetup;
 import com.jcloisterzone.game.GameStatePhaseReducer;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.*;
+import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.phase.GameOverPhase;
 import com.jcloisterzone.game.phase.Phase;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.GameStateBuilder;
+import com.jcloisterzone.io.MessageCommand;
 import com.jcloisterzone.io.MessageParser;
 import com.jcloisterzone.io.message.*;
 import com.sampullara.cli.Args;
@@ -21,6 +28,7 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
+import io.vavr.collection.Vector;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -29,6 +37,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 public class Engine implements Runnable {
 
@@ -269,6 +278,8 @@ public class Engine implements Runnable {
             }
 
             if (log != null) {
+            	log.println("");
+            	log.println("Received line");
                 log.println(line);
             }
 
@@ -279,15 +290,56 @@ public class Engine implements Runnable {
 
             Message msg = parser.fromJson(line);
             Player oldActivePlayer = state.getActivePlayer();
+//        	log.println("");
+ //       	log.println("Request1: ");
+  //      	log.println(line);
 
-            if (msg instanceof ReplayableMessage) {
-                if (msg instanceof RandomChangingMessage) {
-                    RandomChangingMessage rndChangeMsg = (RandomChangingMessage) msg;
-                    if (rndChangeMsg.getRandom() != null) {
-                        phaseReducer.getRandomGanerator().setRandom(rndChangeMsg.getRandom());
-                    }
+            if (msg instanceof AiMessage) {
+            	// Accept request only for current active player
+            	AiMessage aiMessage = gson.fromJson(line,AiMessage.class);
+                Integer playerRequestIdx = aiMessage.getPlayer();
+                Integer seq = aiMessage.getSeq();
+//            	log.println("Message "+playerRequestIdx+' '+oldActivePlayer.getIndex());
+                if (playerRequestIdx == oldActivePlayer.getIndex()) { //Integer.parseInt(playerRequestIdx.toString().split("\\.")[0]) == oldActivePlayer.getIndex()) {
+                    AiPlayer aiPlayer = new LegacyAiPlayer(phaseReducer, new Player(playerRequestIdx));
+
+                	ReplayableMessage message = aiPlayer.apply(state);
+//	            	// Client request to finish current phase by AI
+//	            	Vector<ReplayableMessage> messages = aiPlayer.getPossibleActions(state);
+//	
+//	            	String bestSoFar = "0";
+//	//            	String chainStr = messages.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
+//	            	
+//	                Random random = new Random();
+//	
+//	            	ReplayableMessage message = messages.get(random.nextInt(messages.length()));
+	            	
+	            	Gson gson = new Gson();
+	            	String messageCommand = message.getClass().getAnnotation(MessageCommand.class).value();
+	            	String aiResponse = String.format("{ \"type\": \"AI_MESSAGE\", \"payload\": { \"type\": \"%s\", \"payload\": %s, \"player\": %s }}",
+	            	    messageCommand,
+	            	    this.gson.toJson(message).toString(),
+	            	    oldActivePlayer.getIndex()
+	            	);
+/*
+	            	GsonBuilder gsonBuilder = new GsonBuilder().serializeNulls().create();
+	            	gsonBuilder.type = message.getClass().getAnnotation(MessageCommand.class).value();
+	            	gsonBuilder.payload = message;
+	            	aiResponse.add("type", "AI_MESSAGE";
+	            	gsonBuilder.player = oldActivePlayer.getIndex();
+	            	aiResponse.add("seq", seq);
+	            	aiResponse.addProperty("phase", payload);
+*/
+//	            	log.println("Response2: ");
+//	            	log.println(aiResponse);
+	            	out.println(aiResponse);
+/*	            	try {
+	                    Thread.sleep(1000); // delay for 2000 ms = 2 seconds
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }*/
                 }
-                state = phaseReducer.apply(state, msg);
+//                state = phaseReducer.apply(state, msg);
 
                 Player newActivePlayer = state.getActivePlayer();
                 boolean undoAllowed = (
@@ -310,14 +362,50 @@ public class Engine implements Runnable {
                 game.undo();
                 state = game.getState();
             } else {
-                throw new IllegalStateException("Unknown message");
-            }
-
-            gameIsOver = game.getState().getPhase() instanceof GameOverPhase;
-
-            if (!bulk || gameIsOver) {
-                out.println(gson.toJson(game));
-            }
+	            if (msg instanceof ReplayableMessage) {
+	                if (msg instanceof RandomChangingMessage) {
+	                    RandomChangingMessage rndChangeMsg = (RandomChangingMessage) msg;
+	                    if (rndChangeMsg.getRandom() != null) {
+	                        phaseReducer.getRandomGanerator().setRandom(rndChangeMsg.getRandom());
+	                    }
+	                }
+	                state = phaseReducer.apply(state, msg);
+	
+	                Player newActivePlayer = state.getActivePlayer();
+	                boolean undoAllowed = (!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
+	                        && newActivePlayer != null
+	                        && newActivePlayer.equals(oldActivePlayer)
+	                        && !(msg instanceof DeployMeepleMessage && ((DeployMeepleMessage)msg).getMeepleId().contains("shepherd"))
+	                        && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"));
+	
+	                if (undoAllowed) {
+	                    game.markUndo();
+	                } else {
+	                    game.clearUndo();
+	                }
+	
+	                game.replaceState(state);
+	                game.setReplay(game.getReplay().prepend((ReplayableMessage) msg));
+	            } else if (msg instanceof UndoMessage) {
+	                game.undo();
+	                state = game.getState();
+	            } else {
+	                throw new IllegalStateException("Unknown message");
+	            }
+	
+	            gameIsOver = game.getState().getPhase() instanceof GameOverPhase;
+	
+	            if (!bulk || gameIsOver) {
+//	            	log.println("Response");
+//	            	log.println(game);
+	                out.println(gson.toJson(game));
+	            }
+/*	        	try {
+	                Thread.sleep(100); // delay for 2000 ms = 2 seconds
+	            } catch (InterruptedException e) {
+	                e.printStackTrace();
+	            }*/
+        	}
         }
     }
 

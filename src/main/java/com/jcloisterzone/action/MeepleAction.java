@@ -1,7 +1,11 @@
 package com.jcloisterzone.action;
 
+import com.jcloisterzone.board.PlacementOption;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.figure.Meeple;
+import com.jcloisterzone.io.message.DeployMeepleMessage;
+import com.jcloisterzone.io.message.ReplayableMessage;
+
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
@@ -69,4 +73,14 @@ public class MeepleAction implements SelectFeatureAction {
         }
         return new MeepleAction(meepleType, options, origin);
     }
+    
+    @Override
+    public ReplayableMessage select(FeaturePointer fp) {
+//    	System.out.println(fp);
+//      if (fp.getLocation() == Location.FLYING_MACHINE) {
+//          return new DeployFlierMessage(fp, getMeepleIdFor(fp));
+//      }
+        return new DeployMeepleMessage(fp, getMeepleIdFor(fp));
+    }
+
 }
