@@ -31,6 +31,9 @@ public class Wagon extends Follower {
         if (feature instanceof Garden) {
             return new DeploymentCheckResult("Cannot place wagon on the garden.");
         }
+        if (feature instanceof River) {
+            return new DeploymentCheckResult("Cannot place wagon on the river.");
+        }
         return super.isDeploymentAllowed(state, fp, feature);
     }
 }
