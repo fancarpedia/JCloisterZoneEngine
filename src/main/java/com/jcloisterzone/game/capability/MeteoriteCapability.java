@@ -205,6 +205,8 @@ public class MeteoriteCapability extends Capability<Void> {
 	            	undeploy = ((Castle) state.getFeature(t._2)).getPlaces().map(p -> p.getPosition()).contains(position);
 	            } else if (t._2.getLocation().isCityOfCarcassonneQuarter()) {
 	            	undeploy = false;
+	            } else {
+	            	undeploy = positions.contains(position);
 	            }
 	            if (undeploy) {
 	                state = (new UndeployMeeple(m, true)).apply(state);
