@@ -12,6 +12,7 @@ import io.vavr.Tuple2;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Stream;
+import io.vavr.collection.Vector;
 
 public class RiverCapability extends Capability<Void> {
 
@@ -24,9 +25,25 @@ public class RiverCapability extends Capability<Void> {
             pack = pack.deactivateGroup("river-lake");
             pack = pack.mapGroup("river", g -> g.setSuccessiveGroup("river-lake"));
             pack = pack.mapGroup("river-lake", g -> g.setSuccessiveGroup("default"));
+            
             if (pack.hasGroup("river-fork")) {
+                TileGroup riverForks = pack.getGroup("river-fork");
+                int riverForksLocationsCount = riverForks.getTiles().map(t -> getRiverLocations(t, Rotation.R0)).flatMap(list -> list.flatMap(loc -> loc.splitToSides())).size();
+
                 pack = pack.mapGroup("river-fork", g -> g.setSuccessiveGroup("river"));
                 pack = pack.deactivateGroup("river");
+
+                TileGroup riverLakes = pack.getGroup("river-lake");
+                int riverLakesCount = riverLakes.getTiles().toList().size();
+
+                int createdNewRiverBranches = riverForksLocationsCount - riverForks.getTiles().size()*2;
+                
+                int lakesDifference = createdNewRiverBranches - riverLakesCount;
+                
+                if (lakesDifference != 0) {
+                    Vector<Tile> updatedRiverLakes = adjustRandomTiles(riverLakes.getTiles(), lakesDifference, random);
+                    pack = pack.updateGroup("river-lake", updatedRiverLakes);
+                }
             }
             pack = pack.removeGroup("river-spring"); // remove unused springs
             return pack;
@@ -36,7 +53,8 @@ public class RiverCapability extends Capability<Void> {
 
     @Override
     public GameState onTilePlaced(GameState state, PlacedTile placedTile) {
-        if (placedTile.getTile().getId().equals("RI.2/III")) {
+    	if (state.getPlacedTiles().size()>1) {
+    	    // Already placed first tile. It was first river-fork if exists
             // mix other forks between other river tiles (this is applied when multiple rivers are enabled
             state = state.mapTilePack(pack -> pack.activateGroup("river"));
         }
@@ -53,7 +71,10 @@ public class RiverCapability extends Capability<Void> {
             .filterValues(Predicates.instanceOf(River.class))
             .map(Tuple2::_1)
             .map(fp -> fp.getLocation().rotateCW(rot))
-            .toList();
+            .flatMap(riverLoc -> riverLoc.splitToSides())
+            .reduceOption(Location::union)
+            .map(loc -> List.of(loc))
+            .getOrElse(List.of());
 
 	    return riverLocations;
     }
@@ -183,7 +204,6 @@ public class RiverCapability extends Capability<Void> {
         boolean foundValidRiverPlacement = false;
         
         for (Location riverLoc : riverLocations) {
-
             List<Location> sides = riverLoc.splitToSides();
             List<Location> openSides = sides.filter(side -> !isConnectedToPlacedRiver(state, pos, side));
             List<Location> connectedSides = sides.filter(side -> isConnectedToPlacedRiver(state, pos, side));
@@ -200,6 +220,18 @@ public class RiverCapability extends Capability<Void> {
         }
         
         return foundValidRiverPlacement;
- 
+    }
+    
+    private Vector<Tile> adjustRandomTiles(Vector<Tile> tiles, int count, RandomGenerator random) {
+        if (count > 0) {
+            return tiles.appendAll(Vector.range(0, count)
+                .map(i -> tiles.get(random.getNextInt(tiles.size()))));
+        } else {
+            Vector<Tile> result = tiles;
+            for (int i = 0; i < -count; i++) {
+                result = result.removeAt(random.getNextInt(result.size()));
+            }
+            return result;
+        }
     }
 }
