@@ -5,6 +5,7 @@ import com.jcloisterzone.board.Location;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Garden;
+import com.jcloisterzone.feature.River;
 import com.jcloisterzone.feature.Structure;
 import com.jcloisterzone.feature.Tower;
 import com.jcloisterzone.game.state.GameState;
@@ -30,6 +31,9 @@ public class Wagon extends Follower {
         }
         if (feature instanceof Garden) {
             return new DeploymentCheckResult("Cannot place wagon on the garden.");
+        }
+        if (feature instanceof River) {
+            return new DeploymentCheckResult("Cannot place wagon on the river.");
         }
         return super.isDeploymentAllowed(state, fp, feature);
     }

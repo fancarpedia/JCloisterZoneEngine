@@ -47,6 +47,14 @@ public class TilePack implements Serializable {
     public LinkedHashMap<String, TileGroup> getGroups() {
         return groups;
     }
+    
+    public TilePack updateGroup(String key, Vector<Tile> tiles) {
+    	LinkedHashMap<String, TileGroup> _groups = groups.mapValues(tileGroup -> {
+            tileGroup.setTiles(tiles);
+            return tileGroup;
+        });
+    	return new TilePack(_groups, hiddenUnderHills);
+    }
 
     /**
      * Gets number of tiles secretly put face-down under the hill
