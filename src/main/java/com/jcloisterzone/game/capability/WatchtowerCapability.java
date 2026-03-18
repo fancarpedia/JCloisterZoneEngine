@@ -88,9 +88,13 @@ public class WatchtowerCapability  extends Capability<Void> {
                 	  for (Feature f: pt.getTile().getInitialFeatures().values()) {
                         if (f instanceof City) {
                            	FeaturePointer fp = ((City) f).getPlaces().get().setPosition(pt.getPosition()).rotateCW(pt.getRotation());
-                            if (!((City) _state.getFeature(fp)).hasModifier(_state, City.ELIMINATED_PENNANTS)) {
-                              count+=((City) f).getModifier(_state, City.PENNANTS, 0);
-                            }
+                           	City city = (City) _state.getFeature(fp);
+                           	if (city != null) {
+                    		// City still exists (not converted to Castle)
+	                            if (!city.hasModifier(_state, City.ELIMINATED_PENNANTS)) {
+	                              count+=((City) f).getModifier(_state, City.PENNANTS, 0);
+	                            }
+                        	}
                         }
                       }
                 	}
