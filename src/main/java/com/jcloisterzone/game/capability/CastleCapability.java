@@ -38,9 +38,9 @@ public class CastleCapability extends Capability<Void> {
     public Feature initFeature(GameState state, String tileId, Feature feature, Element xml) {
         if (feature instanceof City) {
             City city = (City) feature;
-            boolean castleForbidden = "false".equals(xml.getAttribute( "castle-base"));
-            if (city.getOpenEdges().size() == 1 && city.getMultiEdges().isEmpty() && !castleForbidden) {
-                feature = ((City) feature).putModifier(CASTLE_BASE, true);
+            boolean castleForbidden = "false".equals(xml.getAttribute( "castle-base")) || "no".equals(xml.getAttribute( "castle-base"));
+            if (city.getOpenEdges().size() == 1 && city.getMultiEdges().isEmpty()) {
+                feature = ((City) feature).putModifier(CASTLE_BASE, !castleForbidden);
             }
         }
         return feature;
