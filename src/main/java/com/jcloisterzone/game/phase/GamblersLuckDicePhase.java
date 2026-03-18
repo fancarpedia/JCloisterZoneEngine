@@ -172,6 +172,11 @@ public class GamblersLuckDicePhase extends Phase {
         
         FeaturePointer cityOnBoard = city._1.setPosition(pos).rotateCW(state.getPlacedTile(pos).getRotation());
         
+        if (state.getFeature(cityOnBoard) == null) {
+        	// When City was transformed to Castle, we skip it
+        	return state;
+        }
+        
         List<FeaturePointer> places = state.getFeature(cityOnBoard).getPlaces();
 
         final GameState capturedState = state;  // Capture in final variable
