@@ -35,8 +35,9 @@ class ObjectName implement RequiredStuffName
 
 **Known traits**
 _Official expansions:_
-1. BuilderExtendable - each feature which is extendable by Builder
-2. WagonEligible - if it is possible to place wagon to a feature 
+1. BuilderExtendable - each feature which is extendable by a Builder
+2. UnaffectedByBarn - figure not affected by a Barn placement or by Field joining with a field with a Barn 
+3. WagonEligible - if it is possible to place a Wagon to a feature
 
 _Fan-expansions:_
 1. FlowersBonusAffected - feature and special figure affected by Flowers on tiles during scoring

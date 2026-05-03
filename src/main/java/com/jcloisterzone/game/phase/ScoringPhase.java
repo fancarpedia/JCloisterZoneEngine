@@ -10,6 +10,7 @@ import com.jcloisterzone.figure.Barn;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.Wagon;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.capability.*;
 import com.jcloisterzone.game.capability.TunnelCapability.Tunnel;
@@ -178,7 +179,7 @@ public class ScoringPhase extends Phase {
             if (placedBarnField != null) {
                 //ScoreFeature is scoring just followers!
                 state = (new ScoreField(placedBarnField, false, "barn-placed")).apply(state);
-                state = (new UndeployMeeples(placedBarnField, false)).apply(state);
+                state = (new UndeployMeeples(placedBarnField, true, ReturnMeepleSource.BARN_PLACEMENT)).apply(state);
             }
 
             GameState _state = state;
@@ -192,7 +193,7 @@ public class ScoringPhase extends Phase {
                             .isDefined()
                     )) {
                 state = (new ScoreFieldWhenBarnIsConnected(field)).apply(state);
-                state = (new UndeployMeeples(field, false)).apply(state);
+                state = (new UndeployMeeples(field, true, ReturnMeepleSource.BARN_FIELD_JOIN)).apply(state);
             }
         }
 

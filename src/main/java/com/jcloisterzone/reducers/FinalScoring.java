@@ -10,6 +10,7 @@ import com.jcloisterzone.feature.*;
 import com.jcloisterzone.figure.Barn;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.state.GameState;
 import io.vavr.Predicates;
 import io.vavr.collection.List;
@@ -82,7 +83,7 @@ public class FinalScoring implements Reducer {
                 if (hasFollowers) {
                     // special case, followers deployed using City of Carcassonne before final scoring
                     state = (new ScoreFieldWhenBarnIsConnected(field)).apply(state);
-                    state = (new UndeployMeeples(field, false)).apply(state);
+                    state = (new UndeployMeeples(field, true, ReturnMeepleSource.BARN_FIELD_JOIN)).apply(state);
                 }
                 state = (new ScoreFieldBarn(field, true)).apply(state);
             } else {

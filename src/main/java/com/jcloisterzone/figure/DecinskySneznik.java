@@ -7,12 +7,13 @@ import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Structure;
 import com.jcloisterzone.figure.RangeFigure;
 import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
+import com.jcloisterzone.game.capability.trait.UnaffectedByBarn;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import io.vavr.collection.Stream;
 import io.vavr.Tuple2;
 
-public class DecinskySneznik extends Special implements FlowersBonusAffected, RangeFigure {
+public class DecinskySneznik extends Special implements FlowersBonusAffected, RangeFigure, UnaffectedByBarn {
 
     private static final long serialVersionUID = 1L;
 

@@ -12,6 +12,7 @@ import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.Obelisk;
 import com.jcloisterzone.figure.Shepherd;
 import com.jcloisterzone.game.ReturnMeepleSource;
+import com.jcloisterzone.game.capability.trait.UnaffectedByBarn;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.NeutralFiguresState;
 import io.vavr.Tuple2;
@@ -53,7 +54,7 @@ public class UndeployMeeples implements Reducer {
         for (Tuple2<Meeple, FeaturePointer> t : state
                 .getDeployedMeeples()
                 .filter(t -> fps.contains(t._2))
-                .filter(t -> !(t._1 instanceof Barn) &&  !(t._1 instanceof Shepherd) && !(t._1 instanceof Obelisk))
+                .filter(t -> !((returnMeepleSource == ReturnMeepleSource.BARN_FIELD_JOIN || returnMeepleSource == ReturnMeepleSource.BARN_PLACEMENT) && t._1 instanceof UnaffectedByBarn))
             ) {
             meeples.add(t._1);
             events.add(

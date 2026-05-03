@@ -7,13 +7,14 @@ import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Structure;
 import com.jcloisterzone.figure.RangeFigure;
 import com.jcloisterzone.game.capability.trait.FlowersBonusAffected;
+import com.jcloisterzone.game.capability.trait.UnaffectedByBarn;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 
-public class Obelisk extends Special implements FlowersBonusAffected, RangeFigure, TopLeftTranslatedFigurePosition {
+public class Obelisk extends Special implements FlowersBonusAffected, RangeFigure, TopLeftTranslatedFigurePosition, UnaffectedByBarn {
 
     private static final long serialVersionUID = 1L;
 

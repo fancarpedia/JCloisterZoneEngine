@@ -13,6 +13,7 @@ import com.jcloisterzone.feature.Monastery;
 import com.jcloisterzone.feature.Scoreable;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.ReturnMeepleSource;
 import com.jcloisterzone.game.ScoreFeatureReducer;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.reducers.UndeployMeeples;
@@ -55,7 +56,7 @@ public final class ShrineCapability extends Capability<Void> {
             PointsExpression expr = new PointsExpression(monastery.isShrine(state) ? "shrine.challenged" : "monastery.challenged", new ExprItem("shrine-challenge", 0));
             ScoreEvent scoreEvent = new ScoreEvent(new ReceivedPoints(expr, meeple.getPlayer(), meeple.getDeployment(state)), true, false);
             state = state.appendEvent(scoreEvent);
-            state = (new UndeployMeeples(monastery, true)).apply(state);
+            state = (new UndeployMeeples(monastery, true, ReturnMeepleSource.MONASTERY_SHRINE_CHALLENGE)).apply(state);
         }
         return state;
     }

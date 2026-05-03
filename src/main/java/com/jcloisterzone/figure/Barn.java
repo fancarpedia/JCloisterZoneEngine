@@ -4,9 +4,10 @@ import com.jcloisterzone.Player;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Structure;
+import com.jcloisterzone.game.capability.trait.UnaffectedByBarn;
 import com.jcloisterzone.game.state.GameState;
 
-public class Barn extends Special implements TopLeftTranslatedFigurePosition {
+public class Barn extends Special implements TopLeftTranslatedFigurePosition, UnaffectedByBarn {
 
     private static final long serialVersionUID = -1422237898274679967L;
 
