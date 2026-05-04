@@ -6,6 +6,11 @@
 
 ---
 
+## Before You Start
+- [ ] I discussed this change on Discord before implementation (if applicable)
+
+---
+
 ## Checklist
 
 ### Scope
@@ -30,17 +35,6 @@
 ### Size & Clarity
 - [ ] PR is reasonably small and easy to review
 - [ ] Large changes are split into multiple PRs if needed
-
-### i18n
-- [ ] No hardcoded user-facing strings
-- [ ] All text uses the i18n system
-- [ ] New translation keys are added where needed
-- [ ] English translation is provided
-
----
-
-## Before You Start
-- [ ] I discussed this change on Discord before implementation (if applicable)
 
 ---
 
