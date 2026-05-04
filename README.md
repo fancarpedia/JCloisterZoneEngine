@@ -1,8 +1,48 @@
 
 # JCloisterZoneEngine
 
-JCloisterZoneEngine is backend for [FanCloisterZone Edition](
+JCloisterZoneEngine is backend for [FanCloisterZone](
 https://github.com/fancarpedia/FanCloisterZone/) as fork of [JCloisterZone](https://github.com/farin/JCloisterZone).
+
+### Pull Request Guidelines
+
+To avoid mistakes, submit clean, focused, and ready-to-merge pull requests.
+
+Before starting work, discuss your idea on our Discord server.
+
+#### One Idea per Pull Request
+
+* One bug, feature, or refactor only
+* Do not mix unrelated changes
+
+#### Clean Commits
+
+* One logical change per commit
+* Use clear commit messages
+* Keep history readable (rebase/squash if needed)
+
+#### Ready Before Review
+
+* Review and test your code
+* Follow project style
+* Pull Request should be ready to merge, not a draft
+
+#### Handle Feedback Properly
+
+* Address all review comments
+* Update existing commits (don’t just add fixes on top)
+
+#### Keep Pull Requests Small
+
+* Easy to review
+* Split large changes into multiple PRs
+
+#### Pull Request Description
+
+Include:
+
+* What problem it solves
+* What was changed
 
 ## Development helpers
 
