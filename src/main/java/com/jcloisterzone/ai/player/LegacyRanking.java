@@ -14,11 +14,11 @@ import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.Rotation;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.feature.City;
-//import com.jcloisterzone.feature.CloisterLike;
 import com.jcloisterzone.feature.Completable;
 import com.jcloisterzone.feature.CompletableFeature;
 import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Road;
+import com.jcloisterzone.feature.Monastery;
 import com.jcloisterzone.figure.Barn;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.Meeple;
@@ -47,7 +47,7 @@ class LegacyRanking implements GameStateRanking {
         { 0.0, 0.5, 1.5, 3.0, 5.0, 8.0, 12.0, 17.0, 27.0 };
     public static final double[]  OPEN_FIELD_PENALTY =
         { 0.0, 5.0, 10.0, 19.0, 28.0, 37.0, 47.0, 57.0, 67.0 };
-    public static final double[]  OPEN_CLOISTER_PENALTY =
+    public static final double[]  OPEN_MONASTERY_PENALTY =
         { 0.0, 0.0, 0.4, 0.8, 1.2, 2.0, 4.0, 7.0, 11.0 };
 
     private final Player me;
@@ -159,15 +159,13 @@ class LegacyRanking implements GameStateRanking {
         double prob = 1.0;
         Stream<Position> adjacent = null;
 
-        /*if (completable instanceof CloisterLike) {
-            CloisterLike cl = (CloisterLike) completable;
-            Position pos = cl.getTilePositions().get();
+        if (completable instanceof Monastery) {
+        	Monastery cm = (Monastery) completable;
+            Position pos = cm.getTilePositions().get();
             adjacent = Stream.ofAll(Position.ADJACENT_AND_DIAGONAL.values())
                 .map(offset -> pos.add(offset))
                 .filter(p -> positionProbability.containsKey(p));
-
-
-        } else */if (completable instanceof CompletableFeature) {
+        } else if (completable instanceof CompletableFeature) {
             CompletableFeature<?> cf = (CompletableFeature<?>) completable;
             adjacent = Stream.ofAll(cf.getOpenEdges().map(edge -> {
                 if (positionProbability.containsKey(edge.getP1())) {
@@ -193,14 +191,14 @@ class LegacyRanking implements GameStateRanking {
         if (prob > 0.85) {
             prob = 1.0;
         }
-        /*if (cr.getFeature() instanceof CloisterLike) {
+        if (cr.getFeature() instanceof Monastery) {
             int uncertain = 9 - cr.getIncompletePoints();
             return cr.getIncompletePoints() + prob * 0.5 * uncertain;
-        } else {*/
+        } else {
             int uncertain = cr.getCompletePoints() - cr.getIncompletePoints();
             // multiply with 0.8 to advantage closed features
             return cr.getIncompletePoints() + prob * 0.8 * uncertain;
-//        }
+        }
     }
 
     private double rateOpenFeatures() {
@@ -208,16 +206,16 @@ class LegacyRanking implements GameStateRanking {
         double r = 0.0;
         //Array<Seq<Follower>> followers = state.getPlayers().getFollowers();
         for (Player player : state.getPlayers().getPlayers()) {
-            int cloisters = 0, roads = 0, cities = 0, fields = 0;
+            int monasteries = 0, roads = 0, cities = 0, fields = 0;
 
             for (CompletableRanking cr : occupiedCompletables) {
                 Set<Player> owners  = cr.getOwners();
                 if (owners.size() != 1) continue;
                 if (owners.get().getIndex() != player.getIndex()) continue;
 
-                /*if (cr.getFeature() instanceof CloisterLike) {
-                    cloisters += 1;
-                } else*/ if (cr.getFeature() instanceof Road) {
+                if (cr.getFeature() instanceof Monastery) {
+                    monasteries += 1;
+                } else if (cr.getFeature() instanceof Road) {
                     roads += 1;
                 } else if (cr.getFeature() instanceof City) {
                     cities += 1;
@@ -233,7 +231,7 @@ class LegacyRanking implements GameStateRanking {
             double pr = 0.0;
             pr -= OPEN_ROAD_PENALTY[roads];
             pr -= OPEN_CITY_PENALTY[cities];
-            pr -= OPEN_CLOISTER_PENALTY[cloisters];
+            pr -= OPEN_MONASTERY_PENALTY[monasteries];
             pr -= OPEN_FIELD_PENALTY[fields];
             r += ptsforPlayer(player, pr);
         }
