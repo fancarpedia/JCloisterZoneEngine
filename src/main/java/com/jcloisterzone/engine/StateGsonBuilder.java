@@ -302,6 +302,12 @@ public class StateGsonBuilder {
             data.add("placement", context.serialize(pos));
             neutral.add("bigtop", data);
         }
+        fp = state.getCourierDeployment();
+        if (fp != null) {
+        	JsonObject data = new JsonObject();
+            data.add("placement", context.serialize(fp));
+        	neutral.add("courier", data);
+        }
         pos = state.getDonkeyDeployment();
         if (pos != null) {
             JsonObject data = new JsonObject();

@@ -41,6 +41,7 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
         if (setup.contains(AbbeyCapability.class)) endChain = abbeyEndGamePhase = new AbbeyEndGamePhase(randomGenerator, endChain);
 
         next = cleanUpTurnPhase = new CleanUpTurnPhase(randomGenerator, null);
+        if (setup.contains(CourierCapability.class)) next = new CourierPhase(randomGenerator, next);
         if (setup.contains(BazaarCapability.class)) next = new BazaarPhase(randomGenerator, next);
         if (setup.getBooleanRule(Rule.ESCAPE)) next = new EscapePhase(randomGenerator, next);
         next = cleanUpTurnPartPhase = new CleanUpTurnPartPhase(randomGenerator, next);
