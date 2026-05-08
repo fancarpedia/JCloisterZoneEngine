@@ -4,6 +4,7 @@
 /screenshots
 /build
 /out
+/dependency-reduced-pom.xml
 
 Thumbs.db
 reports
