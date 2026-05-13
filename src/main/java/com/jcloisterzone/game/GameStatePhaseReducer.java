@@ -63,7 +63,10 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
         if (setup.contains(DragonCapability.class) && !"after-scoring".equals(setup.getStringRule(Rule.DRAGON_MOVEMENT))) {
             next = new DragonPhase(randomGenerator, next);
         }
-        if (setup.contains(SheepCapability.class)) next = new ShepherdPhase(randomGenerator, next);
+        if (setup.contains(SheepCapability.class)) {
+            next = new ShepherdPhase(randomGenerator, next);
+            next = new ShepherdPlacementConfirmPhase(randomGenerator, next);
+        }
         if (setup.contains(FerriesCapability.class)) {
             next = new ChangeFerriesPhase(randomGenerator, next);
             next = new PlaceFerryPhase(randomGenerator, next);

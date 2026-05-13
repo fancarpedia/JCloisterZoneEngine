@@ -49,7 +49,7 @@ public class RussianPromosTrapCapability extends Capability<Void> {
     @Override
     public GameState onActionPhaseEntered(GameState state) {
         ActionsState actions = state.getPlayerActions();
-        HashSet places = HashSet.empty();
+        HashSet<MeeplePointer> places = HashSet.empty();
         Player active = state.getActivePlayer();
         Position placeTilePos = state.getLastPlaced().getPosition();
         for (Tuple2<Meeple, FeaturePointer> t : state.getDeployedMeeples()) {
