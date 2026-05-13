@@ -29,6 +29,7 @@ public class CommandRegistry {
             .put(t(FlockMessage.class))
             .put(t(ScoreAcrobatsMessage.class))
             .put(t(TilePlacementConfirmMessage.class))
+            .put(t(ShepherdPlacementConfirmMessage.class))
             .put(t(CommitMessage.class));
 
     }
