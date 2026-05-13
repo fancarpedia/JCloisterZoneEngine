@@ -6,7 +6,7 @@
     <name>JCloisterZone</name>
     <version>5-SNAPSHOT</version>
     <description>Carcassonne board game Java implementation</description>
-    <url>https://jcloisterzone.com</url>
+    <url>https://wikicarpedia.com/car/FanCloisterZone</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
