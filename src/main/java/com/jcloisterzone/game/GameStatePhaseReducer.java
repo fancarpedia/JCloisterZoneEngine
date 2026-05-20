@@ -42,6 +42,7 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
 
         next = cleanUpTurnPhase = new CleanUpTurnPhase(randomGenerator, null);
         if (setup.contains(BazaarCapability.class)) next = new BazaarPhase(randomGenerator, next);
+        if (setup.contains(CourierCapability.class)) next = new CourierPhase(randomGenerator, next);
         if (setup.getBooleanRule(Rule.ESCAPE)) next = new EscapePhase(randomGenerator, next);
         next = cleanUpTurnPartPhase = new CleanUpTurnPartPhase(randomGenerator, next);
         if (setup.contains(CornCircleCapability.class)) next = new CornCirclePhase(randomGenerator, next);

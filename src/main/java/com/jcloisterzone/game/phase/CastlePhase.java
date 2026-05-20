@@ -7,10 +7,12 @@ import com.jcloisterzone.board.pointer.BoardPointer;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.board.pointer.MeeplePointer;
 import com.jcloisterzone.event.CastleCreated;
+import com.jcloisterzone.event.MeepleDeployed;
 import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.feature.Castle;
 import com.jcloisterzone.feature.City;
 import com.jcloisterzone.figure.Follower;
+import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.neutral.Fairy;
 import com.jcloisterzone.game.capability.CastleCapability;
 import com.jcloisterzone.game.capability.CastleCapability.CastleToken;
@@ -21,6 +23,7 @@ import com.jcloisterzone.io.message.PlaceTokenMessage;
 import com.jcloisterzone.random.RandomGenerator;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
+import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 
@@ -91,6 +94,12 @@ public class CastlePhase extends Phase {
         state = state.mapPlayers(ps ->
            ps.addTokenCount(player.getIndex(), CastleToken.CASTLE, -1)
         );
+
+        state = state.appendEvent(new CastleCreated(
+            PlayEventMeta.createWithPlayer(player),
+            castle
+        ));
+
         for (var t : city.getFollowers2(state)) {
             if (fairyMeeplePtr != null && fairyMeeplePtr.asFeaturePointer().equals(t._2)) {
                 MeeplePointer _fairyMeeplePtr = fairyMeeplePtr;
@@ -102,6 +111,9 @@ public class CastlePhase extends Phase {
             }
             var meeples = state.getDeployedMeeples();
             state = state.setDeployedMeeples(meeples.put(t._1, t._2.setFeature(Castle.class)));
+            state = state.appendEvent(
+                new MeepleDeployed(PlayEventMeta.createWithActivePlayer(state), t._1, t._2.setFeature(Castle.class), msg.getPointer())
+            );
         }
         state = state.mapFeatureMap(m -> {
             for (var fp : city.getPlaces()) {
@@ -110,10 +122,6 @@ public class CastlePhase extends Phase {
             }
             return m;
         });
-        state = state.appendEvent(new CastleCreated(
-           PlayEventMeta.createWithPlayer(player),
-           castle
-        ));
 
         Player nextPlayer = player.getNextPlayer(state);
         state = clearActions(state);
