@@ -13,8 +13,8 @@ if "%~1"=="" (
 echo Build date: %builddate%
 echo Version: %version%
 
-call mvn package -Dengine.version=%1 -Dengine.builddate=%builddate%
+call mvn clean package -Dengine.version=%1 -Dengine.builddate=%builddate%
 if errorlevel 1 exit /b 1
 
 call %~dp0\rundev
-if errorlevel 1 exit /b 1
+if errorlevel 1 exit /b 2
