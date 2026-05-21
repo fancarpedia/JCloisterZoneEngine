@@ -2,7 +2,7 @@ package com.jcloisterzone.io.message;
 
 import com.jcloisterzone.io.MessageCommand;
 
-@MessageCommand("TILE_CONFIRMED")
+@MessageCommand("TILE_CONFIRM")
 public class TilePlacementConfirmMessage extends AbstractMessage implements ReplayableMessage, RandomChangingMessage {
 
     private Double random;
