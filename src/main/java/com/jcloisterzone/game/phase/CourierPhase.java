@@ -48,7 +48,8 @@ public class CourierPhase extends Phase {
 
         List<MeepleDeployed> deployedThisTurn = List.ofAll(state.getCurrentTurnPartEvents())
             .filter(Predicates.instanceOf(MeepleDeployed.class))
-            .map(ev -> (MeepleDeployed) ev);
+            .map(ev -> (MeepleDeployed) ev)
+        	.filter(ev -> (ev.getMeeple() instanceof Follower));
 
         boolean castleCreatedThisTurn = List.ofAll(state.getCurrentTurnPartEvents())
             .exists(Predicates.instanceOf(CastleCreated.class));
