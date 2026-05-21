@@ -135,6 +135,7 @@ public class StateGsonBuilder {
                     JsonObject flock = new JsonObject();
                     JsonArray jsonTokens = new JsonArray();
                     tokens.forEach(token -> jsonTokens.add(token.name()));
+                    flock.add("feature", context.serialize(fp.getFeature().getSimpleName()));
                     flock.add("position", context.serialize(fp.getPosition()));
                     flock.add("location", context.serialize(fp.getLocation()));
                     flock.add("tokens", jsonTokens);
