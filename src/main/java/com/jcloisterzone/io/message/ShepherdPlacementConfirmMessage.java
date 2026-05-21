@@ -2,7 +2,7 @@ package com.jcloisterzone.io.message;
 
 import com.jcloisterzone.io.MessageCommand;
 
-@MessageCommand("SHEPHERD_CONFIRMED")
+@MessageCommand("SHEPHERD_CONFIRM")
 public class ShepherdPlacementConfirmMessage extends AbstractMessage implements ReplayableMessage, RandomChangingMessage {
 
     private Double random;
