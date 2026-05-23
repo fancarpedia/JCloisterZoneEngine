@@ -343,7 +343,6 @@ public class Engine implements Runnable {
                 		(!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
                         && newActivePlayer != null
                         && newActivePlayer.equals(oldActivePlayer)
-                        && !(msg instanceof DeployMeepleMessage && ((DeployMeepleMessage)msg).getMeepleId().contains("shepherd"))
                         && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"))
                 );
 
@@ -373,7 +372,6 @@ public class Engine implements Runnable {
 	                		(!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
 	                        && newActivePlayer != null
 	                        && newActivePlayer.equals(oldActivePlayer)
-	                        && !(msg instanceof DeployMeepleMessage && ((DeployMeepleMessage)msg).getMeepleId().contains("shepherd"))
 	                        && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"))
 	                );
 	                if (undoAllowed) {
