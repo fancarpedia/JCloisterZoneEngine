@@ -31,12 +31,14 @@ public class Position implements BoardPointer, Comparable<Position> {
         Location.W, new Position(-1, 0)
     );
 
-    public static final Map<Location, Position> ADJACENT_AND_DIAGONAL = ADJACENT.merge(HashMap.of(
-        Location.NE, new Position(1, -1),
-        Location.SE, new Position(1, 1),
-        Location.SW, new Position(-1, 1),
-        Location.NW, new Position(-1, -1)
-    ));
+    public static final LinkedHashMap<Location, Position> DIAGONAL = LinkedHashMap.of(
+           Location.NE, new Position(1, -1),
+           Location.SE, new Position(1, 1),
+           Location.SW, new Position(-1, 1),
+           Location.NW, new Position(-1, -1)
+    );
+
+    public static final Map<Location, Position> ADJACENT_AND_DIAGONAL = ADJACENT.merge(DIAGONAL);
 
 
     public Position(int x, int y) {
