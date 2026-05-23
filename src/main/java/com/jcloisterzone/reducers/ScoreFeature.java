@@ -4,8 +4,10 @@ import com.jcloisterzone.Player;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.pointer.BoardPointer;
 import com.jcloisterzone.board.pointer.FeaturePointer;
+import com.jcloisterzone.board.pointer.ScorePositionsFeaturePointer;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
+import com.jcloisterzone.feature.RangeFeature;
 import com.jcloisterzone.feature.Scoreable;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.game.Capability;
@@ -46,17 +48,27 @@ public abstract class ScoreFeature implements ScoreFeatureReducer {
 
     private BoardPointer getSampleSource(GameState state, Player player, List<ReceivedPoints> bonusPoints) {
         List<Tuple2<Follower, FeaturePointer>> followers = feature.getFollowers2(state).filter(t -> t._1.getPlayer().equals(player)).toList();
+        BoardPointer returnSource = null;
         for (ReceivedPoints bonus : bonusPoints) {
             if (!bonus.getPlayer().equals(player)) {
                 continue;
             }
             for (Tuple2<Follower, FeaturePointer> t : followers) {
                 if (t._2.equals(bonus.getSource())) {
-                    return t._2;
+                	if (returnSource != null) {
+                		returnSource = t._2;
+                	}
                 }
             }
         }
-        return followers.get()._2;
+        if (returnSource == null) {
+            returnSource = followers.get()._2;
+        }
+        if (feature instanceof RangeFeature rangeFeature ) {
+        	return new ScorePositionsFeaturePointer((FeaturePointer) returnSource, rangeFeature.getRangeTiles(state).toSet().map(t -> t.getPosition()) );
+        } else {
+        	return returnSource;
+        }
     }
 
     protected GameState addFiguresBonusPoints(GameState state) {
