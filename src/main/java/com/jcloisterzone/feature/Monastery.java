@@ -158,10 +158,14 @@ public class Monastery extends TileFeature implements WagonEligible, Monastic, M
     }
     
     public Stream<PlacedTile> getRangeTiles(GameState state) {
-        return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2).append(state.getPlacedTile(getPlace().getPosition()));
+    	if (isSpecialMonastery(state)) {
+    		return getRangeTilesSpecialMonastery(state);
+    	} else {
+            return state.getAdjacentAndDiagonalTiles2(getPlace().getPosition()).map(Tuple2::_2).append(state.getPlacedTile(getPlace().getPosition()));
+    	}
     }
 
-    public Stream<PlacedTile> getRangeTilesSpecialMonastery(GameState state) {
+    private Stream<PlacedTile> getRangeTilesSpecialMonastery(GameState state) {
         Position monasteryPosition = getPosition();
         List<PlacedTile> tiles = List.empty();
         for(Location direction: Location.SIDES) {
