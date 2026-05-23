@@ -147,6 +147,9 @@ public class TileBuilder {
                 case "gamblersluckshield":
                     initFeature(el, new GamblersLuckShield(contentAsLocations(el).get())); // Location
                     break;
+                case "fishhut":
+                    initFeature(el, new FishHut(contentAsLocations(el).get())); // Location
+                    break;
             }
         }
 
