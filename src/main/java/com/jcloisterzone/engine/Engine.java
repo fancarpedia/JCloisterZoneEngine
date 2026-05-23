@@ -296,20 +296,12 @@ public class Engine implements Runnable {
             	AiMessage aiMessage = gson.fromJson(line,AiMessage.class);
                 Integer playerRequestIdx = aiMessage.getPlayer();
                 Integer seq = aiMessage.getSeq();
-//            	log.println("Message "+playerRequestIdx+' '+oldActivePlayer.getIndex());
-                if (playerRequestIdx == oldActivePlayer.getIndex()) { //Integer.parseInt(playerRequestIdx.toString().split("\\.")[0]) == oldActivePlayer.getIndex()) {
-                    AiPlayer aiPlayer = new LegacyAiPlayer(phaseReducer, new Player(playerRequestIdx));
+                if (playerRequestIdx == oldActivePlayer.getIndex()) {
+                	AiPlayer aiPlayer = new LegacyAiPlayer(phaseReducer, new Player(playerRequestIdx));
 
                 	ReplayableMessage message = aiPlayer.apply(state);
-//	            	// Client request to finish current phase by AI
-//	            	Vector<ReplayableMessage> messages = aiPlayer.getPossibleActions(state);
-//	
-//	            	String bestSoFar = "0";
-//	//            	String chainStr = messages.map(_msg -> _msg.getClass().getSimpleName()).toJavaStream().collect(Collectors.joining(", "));
-//	            	
-//	                Random random = new Random();
-//	
-//	            	ReplayableMessage message = messages.get(random.nextInt(messages.length()));
+                	
+                	long startTime = System.currentTimeMillis();
 	            	
 	            	Gson gson = new Gson();
 	            	String messageCommand = message.getClass().getAnnotation(MessageCommand.class).value();
@@ -318,25 +310,18 @@ public class Engine implements Runnable {
 	            	    this.gson.toJson(message).toString(),
 	            	    oldActivePlayer.getIndex()
 	            	);
-/*
-	            	GsonBuilder gsonBuilder = new GsonBuilder().serializeNulls().create();
-	            	gsonBuilder.type = message.getClass().getAnnotation(MessageCommand.class).value();
-	            	gsonBuilder.payload = message;
-	            	aiResponse.add("type", "AI_MESSAGE";
-	            	gsonBuilder.player = oldActivePlayer.getIndex();
-	            	aiResponse.add("seq", seq);
-	            	aiResponse.addProperty("phase", payload);
-*/
-//	            	log.println("Response2: ");
-//	            	log.println(aiResponse);
+	            	
+	            	long diff = System.currentTimeMillis() - startTime;
+	            	
+	            	if (diff < 300) {
+	                    try {
+	                        Thread.sleep(300 - diff);
+	                    } catch (InterruptedException e) {
+	                        Thread.currentThread().interrupt();
+	                    }
+	                }
 	            	out.println(aiResponse);
-/*	            	try {
-	                    Thread.sleep(1000); // delay for 2000 ms = 2 seconds
-	                } catch (InterruptedException e) {
-	                    e.printStackTrace();
-	                }*/
                 }
-//                state = phaseReducer.apply(state, msg);
 
                 Player newActivePlayer = state.getActivePlayer();
                 boolean undoAllowed = (
