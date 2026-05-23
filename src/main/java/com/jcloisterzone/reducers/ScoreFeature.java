@@ -65,7 +65,7 @@ public abstract class ScoreFeature implements ScoreFeatureReducer {
             returnSource = followers.get()._2;
         }
         if (feature instanceof RangeFeature rangeFeature ) {
-        	return new ScorePositionsFeaturePointer((FeaturePointer) returnSource, rangeFeature.getRangeTiles(state).toSet().map(t -> t.getPosition()) );
+        	return new ScorePositionsFeaturePointer((FeaturePointer) returnSource, rangeFeature.getRangeTilesWithFeature(state).toSet().map(t -> t.getPosition()) );
         } else {
         	return returnSource;
         }
