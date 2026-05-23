@@ -78,7 +78,7 @@ public class FlowersCapability extends Capability<Void> {
             if (feature instanceof Monastery) {
                 if (((Monastery) feature).isSpecialMonastery(state)) {
                     if (isFinal) {
-                        tiles = ((Monastery) feature).getRangeTilesSpecialMonastery(state);
+                        tiles = ((Monastery) feature).getRangeTiles(state);
                     }
                 } else {
                     tiles = ((Monastery) feature).getRangeTiles(state);
