@@ -3,6 +3,7 @@ package com.jcloisterzone.reducers;
 import com.jcloisterzone.Player;
 import com.jcloisterzone.board.Location;
 import com.jcloisterzone.board.Position;
+import com.jcloisterzone.board.pointer.ScorePositionsFeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
@@ -62,7 +63,7 @@ public class FinalScoring implements Reducer {
 
             for (Player player : monastery.getMonasteryOwners(state)) {
                 Follower follower = monastery.getMonasterySampleFollower(state, player);
-                receivedPoints = receivedPoints.append(new ReceivedPoints(expr, player, follower.getDeployment(state)));
+                receivedPoints = receivedPoints.append(new ReceivedPoints(expr, player, new ScorePositionsFeaturePointer(follower.getDeployment(state), monastery.getRangeTilesWithFeature(state).toSet().map(t -> t.getPosition()))));
             }
             if (!receivedPoints.isEmpty()) {
                 state = (new AddPoints(receivedPoints, true, true)).apply(state);
