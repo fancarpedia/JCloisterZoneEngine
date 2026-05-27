@@ -6,7 +6,6 @@ package com.jcloisterzone.game;
  *
  */
 public enum Rule {
-    FARMERS(null, Boolean.class, null),
     ESCAPE(null, Boolean.class, null),
 
     PRINCESS_ACTION("princess-action", String.class, new Object[] { "may", "must" }),
@@ -31,8 +30,7 @@ public enum Rule {
     VINEYARDS_FOR_GARDEN("vineyards-for-garden", Boolean.class, null),
 
     ROBBERS_SON_ACTION("robbers-son-action", String.class, new Object[] { "may", "must" }),
-    METEORITE_IMPACT("meteorite-impact", String.class, new Object[] { "standard", "extended", "combination" }),
-    FISHERMEN("fishermen", Boolean.class, null);
+    METEORITE_IMPACT("meteorite-impact", String.class, new Object[] { "standard", "extended", "combination" });
 	
     String key;
     Class<?> type;

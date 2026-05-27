@@ -12,6 +12,8 @@ import com.jcloisterzone.feature.modifier.FeatureModifier;
 import com.jcloisterzone.feature.modifier.IntegerAddModifier;
 import com.jcloisterzone.feature.modifier.MultisetStringIntegerAddModifier;
 import com.jcloisterzone.figure.Pig;
+import com.jcloisterzone.game.Capability;
+import com.jcloisterzone.game.capability.FieldCapability;
 import com.jcloisterzone.game.setup.GameElementQuery;
 import com.jcloisterzone.game.state.GameState;
 import io.vavr.collection.*;
@@ -46,6 +48,11 @@ public class Field extends TileFeature implements Scoreable, MultiTileFeature<Fi
     public Field setModifiers(Map<FeatureModifier<?>, Object> modifiers) {
         if (this.modifiers == modifiers) return this;
         return new Field(places, adjoiningCities, adjoiningCityOfCarcassonne, modifiers);
+    }
+
+    @Override
+    public Class<? extends Capability<?>> getRequiredCapability() {
+        return FieldCapability.class;
     }
 
     @Override

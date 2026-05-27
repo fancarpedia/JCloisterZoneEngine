@@ -112,9 +112,6 @@ public class Engine implements Runnable {
         meeples = addMeeples(meeples, setupMsg, "decinsky-sneznik", DecinskySneznik.class);
 
         Map<Rule, Object> rules = HashMap.empty();
-        if (setupMsg.getElements().containsKey("farmers")) {
-            rules = rules.put(Rule.FARMERS,true);
-        }
         if (setupMsg.getElements().containsKey("escape")) {
             rules = rules.put(Rule.ESCAPE, true);
         }
@@ -124,6 +121,7 @@ public class Engine implements Runnable {
         }
 
         Set<Class<? extends Capability<?>>> capabilities = HashSet.empty();
+        capabilities = addCapabilities(capabilities, setupMsg,"farmers", FieldCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"abbot", AbbotCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"barn", BarnCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"builder", BuilderCapability.class);
@@ -163,7 +161,7 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"acrobats", AcrobatsCapability.class);
 
         if (setupMsg.getElements().containsKey("fishermen")) {
-            rules = rules.put(Rule.FISHERMEN,true);
+            capabilities = addCapabilities(capabilities, setupMsg,"fishermen", FishermenCapability.class);
         } else {
         	capabilities = addCapabilities(capabilities, setupMsg,"river", RiverCapability.class);
         }
@@ -188,7 +186,7 @@ public class Engine implements Runnable {
         capabilities = addCapabilities(capabilities, setupMsg,"gamblersluck", GamblersLuckCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"black-tower", BlackTowerCapability.class);
         capabilities = addCapabilities(capabilities, setupMsg,"courier", CourierCapability.class);
-    	capabilities = addCapabilities(capabilities, setupMsg,"fishhuts", FishHutsCapability.class);
+    	capabilities = addCapabilities(capabilities, setupMsg,"fishhut", FishHutsCapability.class);
 
         GameSetup gameSetup = new GameSetup(
                 HashMap.ofAll(setupMsg.getSets()),

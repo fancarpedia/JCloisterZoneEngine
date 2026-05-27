@@ -5,6 +5,7 @@ import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.figure.Meeple;
 import com.jcloisterzone.figure.Special;
+import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.state.GameState;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
@@ -53,5 +54,13 @@ public interface Structure extends Feature {
 
     default boolean isOccupiedBy(GameState state, Player p) {
         return !getFollowers(state).find(m -> m.getPlayer().equals(p)).isEmpty();
+    }
+
+    /**
+     * Capability that must be present for meeples to be deployed on this structure.
+     * {@code null} means the structure is always deployable.
+     */
+    default Class<? extends Capability<?>> getRequiredCapability() {
+        return null;
     }
 }

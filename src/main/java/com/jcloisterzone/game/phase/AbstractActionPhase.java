@@ -11,8 +11,8 @@ import com.jcloisterzone.event.PlayEvent.PlayEventMeta;
 import com.jcloisterzone.feature.*;
 import com.jcloisterzone.figure.*;
 import com.jcloisterzone.game.Capability;
-import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.BarnCapability;
+import com.jcloisterzone.game.capability.FishermenCapability;
 import com.jcloisterzone.game.capability.ObeliskCapability;
 import com.jcloisterzone.game.capability.MonasteriesCapability;
 import com.jcloisterzone.game.capability.PortalCapability;
@@ -57,7 +57,7 @@ public abstract class AbstractActionPhase extends Phase {
             // TODO use interface instead
             places = places.filter(t -> !(t._2 instanceof Castle) && !(t._2 instanceof SoloveiRazboynik) && !(t._2 instanceof Acrobats) && !(t._2 instanceof Circus) && !(t._2 instanceof GamblersLuckShield) && !(t._2 instanceof CourierLetter));
 
-            if (!state.getBooleanRule(Rule.FISHERMEN)) {
+            if (!state.getCapabilities().contains(FishermenCapability.class)) {
                 places = places.filter(t -> !(t._2 instanceof River));
             }
             // towers are handled by Tower capability separately (needs collect towers on all tiles)
@@ -167,11 +167,10 @@ public abstract class AbstractActionPhase extends Phase {
             specialMeepleStructures = allRegularMeepleStructures;
         }
 
-        if (!state.getBooleanRule(Rule.FARMERS)) {
-            regularMeepleStructures = allRegularMeepleStructures.filter(t -> !(t._2 instanceof Field));
-        } else {
-            regularMeepleStructures = allRegularMeepleStructures;
-        }
+        regularMeepleStructures = allRegularMeepleStructures.filter(t -> {
+            Class<? extends Capability<?>> requiredCapability = t._2.getRequiredCapability();
+            return requiredCapability == null || state.getCapabilities().contains(requiredCapability);
+        });
 
         Vector<PlayerAction<?>> actions = availMeeples.map(meeple -> {
             Set<FeaturePointer> locations = getMeepleAvailableStructures(

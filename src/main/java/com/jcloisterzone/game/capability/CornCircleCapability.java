@@ -8,7 +8,6 @@ import com.jcloisterzone.feature.Field;
 import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.feature.Road;
 import com.jcloisterzone.game.Capability;
-import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.io.message.CornCircleRemoveOrDeployMessage.CornCircleOption;
 import io.vavr.collection.Vector;
@@ -52,7 +51,7 @@ public class CornCircleCapability extends Capability<CornCircleOption> {
             	modifier = CORN_CIRCLE_CITY;
             	break;
             case "Field":
-            	if (!state.getBooleanRule(Rule.FARMERS) && !state.getBooleanRule(Rule.FISHERMEN)) {
+            	if (!state.getCapabilities().contains(FieldCapability.class) && !state.getCapabilities().contains(FishermenCapability.class)) {
             		return tile;
 				}
             	modifier = CORN_CIRCLE_FIELD;

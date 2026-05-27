@@ -13,7 +13,6 @@ import com.jcloisterzone.feature.River;
 import com.jcloisterzone.figure.neutral.Donkey;
 import com.jcloisterzone.figure.neutral.Witch;
 import com.jcloisterzone.game.Capability;
-import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.trait.FeatureCompletionBlocker;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
@@ -88,7 +87,7 @@ public class DonkeyCapability extends Capability<Void> implements FeatureComplet
         
         for (Tuple2<FeaturePointer, Completable> t : state.getTileFeatures2(pos, Completable.class)) {
         	if (t._2.isCompleted(state)) {
-        		if (!(t._2 instanceof River) || state.getBooleanRule(Rule.FISHERMEN)) {
+        		if (!(t._2 instanceof River) || state.getCapabilities().contains(FishermenCapability.class)) {
         			completed++;
         		}
             }
@@ -99,7 +98,7 @@ public class DonkeyCapability extends Capability<Void> implements FeatureComplet
 	public boolean isFeatureCompletionBlocked(GameState state, FeaturePointer fp) {
 		Feature f = state.getFeature(fp);
 
-		if (f instanceof Completable c && c.isCompleted(state) && (!(f instanceof River) || state.getBooleanRule(Rule.FISHERMEN))) {
+		if (f instanceof Completable c && c.isCompleted(state) && (!(f instanceof River) || state.getCapabilities().contains(FishermenCapability.class))) {
 			return c.getTilePositions().contains(state.getNeutralFigures().getDonkeyDeployment().getPosition());
 		}
 		return false;

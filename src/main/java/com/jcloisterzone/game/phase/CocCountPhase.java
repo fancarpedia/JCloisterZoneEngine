@@ -11,6 +11,7 @@ import com.jcloisterzone.figure.neutral.Count;
 import com.jcloisterzone.figure.neutral.NeutralFigure;
 import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.CountCapability;
+import com.jcloisterzone.game.capability.FieldCapability;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.io.message.MoveNeutralFigureMessage;
@@ -52,7 +53,7 @@ public class CocCountPhase extends Phase {
         }
 
         List<Location> quarters = Location.QUARTERS.filter(loc -> loc != countFp.getLocation());
-        if (!state.getBooleanRule(Rule.FARMERS)) {
+        if (!state.getCapabilities().contains(FieldCapability.class)) {
             quarters = quarters.remove(Location.QUARTER_MARKET);
         }
         Set<FeaturePointer> options = quarters.map(loc -> new FeaturePointer(quarterPos, Quarter.class, loc)).toSet();

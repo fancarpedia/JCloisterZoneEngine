@@ -11,8 +11,9 @@ import com.jcloisterzone.event.ScoreEvent.ReceivedPoints;
 import com.jcloisterzone.feature.Feature;
 import com.jcloisterzone.feature.Quarter;
 import com.jcloisterzone.figure.*;
-import com.jcloisterzone.game.Rule;
 import com.jcloisterzone.game.capability.CountCapability;
+import com.jcloisterzone.game.capability.FieldCapability;
+import com.jcloisterzone.game.capability.FishermenCapability;
 import com.jcloisterzone.game.state.ActionsState;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.io.message.DeployMeepleMessage;
@@ -67,7 +68,7 @@ public class CocFollowerPhase extends Phase {
             Wagon.class, Mayor.class, Ringmaster.class
         );
         Vector<Meeple> availMeeples = player.getMeeplesFromSupply(state, meepleTypes);
-        boolean marketAllowed = state.getBooleanRule(Rule.FARMERS) || state.getBooleanRule(Rule.FISHERMEN);
+        boolean marketAllowed = state.getCapabilities().contains(FieldCapability.class) || state.getCapabilities().contains(FishermenCapability.class);
         Stream<Tuple2<FeaturePointer, Feature>> quarters = state.getTileFeatures2(quarterPos)
             .filter(t -> t._1.getLocation().isCityOfCarcassonneQuarter() && (marketAllowed || t._1.getLocation() != Location.QUARTER_MARKET));
 
