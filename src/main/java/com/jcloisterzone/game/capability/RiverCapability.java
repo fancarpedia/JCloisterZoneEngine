@@ -33,16 +33,12 @@ public class RiverCapability extends Capability<Void> {
                 pack = pack.mapGroup("river-fork", g -> g.setSuccessiveGroup("river"));
                 pack = pack.deactivateGroup("river");
 
-                TileGroup riverLakes = pack.getGroup("river-lake");
-                int riverLakesCount = riverLakes.getTiles().toList().size();
+                int branches = riverForksLocationsCount - riverForks.getTiles().size() * 2;
+                int ends = pack.getGroupSize("river-lake");
 
-                int createdNewRiverBranches = riverForksLocationsCount - riverForks.getTiles().size()*2;
-                
-                int lakesDifference = createdNewRiverBranches - riverLakesCount;
-                
-                if (lakesDifference != 0) {
-                    Vector<Tile> updatedRiverLakes = adjustRandomTiles(riverLakes.getTiles(), lakesDifference, random);
-                    pack = pack.updateGroup("river-lake", updatedRiverLakes);
+                if (branches != ends) {
+                    Vector<Tile> riverLakes = pack.getGroup("river-lake").getTiles();
+                    pack = pack.updateGroup("river-lake", adjustRandomTiles(riverLakes, branches - ends, random));
                 }
             }
             pack = pack.removeGroup("river-spring"); // remove unused springs
