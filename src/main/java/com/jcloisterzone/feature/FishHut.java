@@ -7,6 +7,7 @@ import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.feature.River;
+import com.jcloisterzone.game.Capability;
 import com.jcloisterzone.game.capability.FishHutsCapability;
 import com.jcloisterzone.game.capability.trait.WagonEligible;
 import com.jcloisterzone.game.state.GameState;
@@ -57,16 +58,17 @@ public class FishHut extends TileFeature implements WagonEligible, Completable, 
     }
 
     @Override
-    public PointsExpression getStructurePoints(GameState state, boolean completed) {
-        if (state.getCapabilities().get(FishHutsCapability.class) != null) {
-        	return null;
-        }
+    public Class<? extends Capability<?>> getRequiredCapability() {
+        return FishHutsCapability.class;
+    }
 
+    @Override
+    public PointsExpression getStructurePoints(GameState state, boolean completed) {
     	if (!completed) {
-    		return null;
+            return new PointsExpression("fish-hut", List.of(new ExprItem("fish-hut", 0)));
     	}
 
-    	List<ExprItem> exprItems =  List.of(new ExprItem("fish-hut", 7));
+    	List<ExprItem> exprItems =  List.of(new ExprItem("fishhut", 7));
 
         Position pos = places.get().getPosition();
         int riverTiles = state
@@ -75,7 +77,7 @@ public class FishHut extends TileFeature implements WagonEligible, Completable, 
         if (riverTiles>0) {
             exprItems = exprItems.append(new ExprItem(riverTiles, "river-tiles", riverTiles * 2));
         }
-        return new PointsExpression("fish-hut", exprItems);
+        return new PointsExpression("fishhut", exprItems);
     }
 
     public Stream<PlacedTile> getRangeTiles(GameState state) {
