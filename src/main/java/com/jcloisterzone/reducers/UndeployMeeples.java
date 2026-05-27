@@ -31,17 +31,27 @@ public class UndeployMeeples implements Reducer {
     /** true if meeple is returned different way than scoring feature */
     private final boolean forced;
     private final ReturnMeepleSource returnMeepleSource;
+    private final Feature featureCausedUndeploy;
 
     public UndeployMeeples(Feature feature, boolean forced) {
         this.feature = feature;
         this.forced = forced;
         this.returnMeepleSource = null;
+        this.featureCausedUndeploy = null;
     }
 
     public UndeployMeeples(Feature feature, boolean forced, ReturnMeepleSource returnMeepleSource) {
         this.feature = feature;
         this.forced = forced;
         this.returnMeepleSource = returnMeepleSource;
+        this.featureCausedUndeploy = null;
+    }
+
+    public UndeployMeeples(Feature feature, boolean forced, ReturnMeepleSource returnMeepleSource, Feature featureCausedUndeploy) {
+        this.feature = feature;
+        this.forced = forced;
+        this.returnMeepleSource = returnMeepleSource;
+        this.featureCausedUndeploy = featureCausedUndeploy;
     }
 
     @Override
