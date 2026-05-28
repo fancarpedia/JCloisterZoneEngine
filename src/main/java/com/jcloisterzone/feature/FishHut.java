@@ -64,20 +64,16 @@ public class FishHut extends TileFeature implements WagonEligible, Completable, 
 
     @Override
     public PointsExpression getStructurePoints(GameState state, boolean completed) {
-    	if (!completed) {
-            return new PointsExpression("fish-hut", List.of(new ExprItem("fish-hut", 0)));
-    	}
-
-    	List<ExprItem> exprItems =  List.of(new ExprItem("fishhut", 7));
+    	PointsExpression points = new PointsExpression("fishhut", new ExprItem("fishhut", (completed ? 7 : 0)));
 
         Position pos = places.get().getPosition();
         int riverTiles = state
         	.getDiagonalTiles(pos)
             .filter(pt -> state.getFeatureMap().get(pt.getPosition()).get().keySet().find(fp -> fp.getFeature().equals(River.class)).isDefined()).length();
         if (riverTiles>0) {
-            exprItems = exprItems.append(new ExprItem(riverTiles, "river-tiles", riverTiles * 2));
+        	points = points.append(new ExprItem(riverTiles, "river-tiles", riverTiles * 2));
         }
-        return new PointsExpression("fishhut", exprItems);
+        return points;
     }
 
     public Stream<PlacedTile> getRangeTiles(GameState state) {
