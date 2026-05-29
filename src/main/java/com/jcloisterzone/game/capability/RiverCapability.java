@@ -9,8 +9,10 @@ import com.jcloisterzone.random.RandomGenerator;
 import com.jcloisterzone.reducers.PlaceTile;
 import io.vavr.Predicates;
 import io.vavr.Tuple2;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import io.vavr.collection.Stream;
 import io.vavr.collection.Vector;
 
@@ -38,7 +40,8 @@ public class RiverCapability extends Capability<Void> {
 
                 if (branches != ends) {
                     Vector<Tile> riverLakes = pack.getGroup("river-lake").getTiles();
-                    pack = pack.updateGroup("river-lake", adjustRandomTiles(riverLakes, branches - ends, random));
+                    final Vector<Tile> trimmed = adjustRandomTiles(riverLakes, branches - ends, random);
+                    pack = pack.mapGroup("river-lake", g -> g.setTiles(trimmed));
                 }
             }
             pack = pack.removeGroup("river-spring"); // remove unused springs
@@ -219,15 +222,30 @@ public class RiverCapability extends Capability<Void> {
     }
     
     private Vector<Tile> adjustRandomTiles(Vector<Tile> tiles, int count, RandomGenerator random) {
+    	
+    	Set<String> protectedIds = HashSet.of(
+    	    "RI.2/I.v" // River II Lake with Volcano
+    	);
+    	
         if (count > 0) {
             return tiles.appendAll(Vector.range(0, count)
                 .map(i -> tiles.get(random.getNextInt(tiles.size()))));
         } else {
-            Vector<Tile> result = tiles;
-            for (int i = 0; i < -count; i++) {
-                result = result.removeAt(random.getNextInt(result.size()));
+        	Vector<Integer> pool = Vector.range(0, tiles.size())
+                .filter(idx -> !protectedIds.contains(tiles.get(idx).getId()));
+            int toRemove = Math.min(-count, pool.size());
+
+            Set<Integer> removeIdx = HashSet.empty();
+            for (int i = 0; i < toRemove; i++) {
+                int p = random.getNextInt(pool.size());
+                removeIdx = removeIdx.add(pool.get(p));
+                pool = pool.removeAt(p);
             }
-            return result;
+            final Set<Integer> finalRemoveIdx = removeIdx;
+
+            return tiles.zipWithIndex()
+                .filter(t -> !finalRemoveIdx.contains(t._2))
+                .map(t -> t._1);
         }
     }
 }
