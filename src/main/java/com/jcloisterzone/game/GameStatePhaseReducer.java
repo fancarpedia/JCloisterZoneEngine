@@ -124,7 +124,13 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
                 }
                 return res;
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new RuntimeException(e.getCause() == null ? e : e.getCause());
+            	Throwable rootCause = e.getCause() == null ? e : e.getCause();
+                String detail = String.format(
+                    "Invalid action in phase %s: %s",
+                    phase.getClass().getSimpleName(),
+                    rootCause.getMessage()
+                );
+                throw new RuntimeException(detail, rootCause);
             }
         }
 
