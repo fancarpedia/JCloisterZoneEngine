@@ -1,6 +1,7 @@
 package com.jcloisterzone.game.phase;
 
 import com.jcloisterzone.Player;
+import com.jcloisterzone.board.Location;
 import com.jcloisterzone.board.Position;
 import com.jcloisterzone.board.pointer.FeaturePointer;
 import com.jcloisterzone.board.pointer.MeeplePointer;
@@ -46,16 +47,24 @@ public class CourierPhase extends Phase {
 
         GameState _state = state;
 
+        Set<Location> restrictedQuarters = HashSet.of(
+      	    Location.QUARTER_CASTLE, 
+       	    Location.QUARTER_MARKET, 
+       	    Location.QUARTER_BLACKSMITH, 
+       	    Location.QUARTER_CATHEDRAL
+       	);
+        
         List<MeepleDeployed> deployedThisTurn = List.ofAll(state.getCurrentTurnPartEvents())
-            .filter(Predicates.instanceOf(MeepleDeployed.class))
-            .map(ev -> (MeepleDeployed) ev)
-        	.filter(ev -> (ev.getMeeple() instanceof Follower));
-
+       	    .filter(Predicates.instanceOf(MeepleDeployed.class))
+       	    .map(ev -> (MeepleDeployed) ev)
+       	    .filter(ev -> (ev.getMeeple() instanceof Follower))
+       	    .filter(ev -> !restrictedQuarters.contains(ev.getLocation()));
+        
         boolean castleCreatedThisTurn = List.ofAll(state.getCurrentTurnPartEvents())
             .exists(Predicates.instanceOf(CastleCreated.class));
 
         // Meeples moved to a Castle this turn and still deployed there
-        List<MeepleDeployed> castleLordEvents = castleCreatedThisTurn
+        List<MeepleDeployed> castleEvents = castleCreatedThisTurn
             ? deployedThisTurn.filter(ev ->
                 ev.getMovedFrom() != null
                 && ((FeaturePointer) ev.getPointer()).getFeature().equals(Castle.class)
@@ -72,7 +81,7 @@ public class CourierPhase extends Phase {
                 // Still at original deployment position
                 if (currentFp.equals(ev.getPointer())) return List.of(ev);
                 // Promoted to castle lord this turn
-                return castleLordEvents.filter(mev -> mev.getMeeple().equals(m)).take(1);
+                return castleEvents.filter(mev -> mev.getMeeple().equals(m)).take(1);
             })
             .headOption()
             .getOrNull();
