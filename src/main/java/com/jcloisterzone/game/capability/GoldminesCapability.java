@@ -65,10 +65,8 @@ public class GoldminesCapability  extends Capability<Map<Position, Integer>> {
 
     private Set<Position> getFeatureClaimPositions(GameState state, Scoreable feature) {
         if (feature instanceof Monastic) {
-            Position cloisterPosition = ((Monastic) feature).getPosition();
-            return state.getAdjacentAndDiagonalTiles(cloisterPosition)
-                .map(PlacedTile::getPosition)
-                .append(cloisterPosition) // and merge also central tile
+        	return ((Monastic) feature).getRangeTiles(state)
+        		.map(PlacedTile::getPosition)
                 .toSet();
         }
         if (feature instanceof Castle) {
