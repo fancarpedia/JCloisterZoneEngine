@@ -341,49 +341,66 @@ public class Engine implements Runnable {
 //                game.undo();
 //                state = game.getState();
             } else {
-	            if (msg instanceof ReplayableMessage) {
-	                if (msg instanceof RandomChangingMessage) {
-	                    RandomChangingMessage rndChangeMsg = (RandomChangingMessage) msg;
-	                    if (rndChangeMsg.getRandom() != null) {
-	                        phaseReducer.getRandomGanerator().setRandom(rndChangeMsg.getRandom());
-	                    }
-	                }
-	                state = phaseReducer.apply(state, msg);
-	
-	                Player newActivePlayer = state.getActivePlayer();
-	                boolean undoAllowed = (
-	                		(!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
-	                        && newActivePlayer != null
-	                        && newActivePlayer.equals(oldActivePlayer)
-	                        && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"))
-	                );
-	                if (undoAllowed) {
-	                    game.markUndo();
-	                } else {
-	                    game.clearUndo();
-	                }
-	
-	                game.replaceState(state);
-	                game.setReplay(game.getReplay().prepend((ReplayableMessage) msg));
-	            } else if (msg instanceof UndoMessage) {
-	                game.undo();
-	                state = game.getState();
-	            } else {
-	                throw new IllegalStateException("Unknown message");
-	            }
-	
-	            gameIsOver = game.getState().getPhase() instanceof GameOverPhase;
-	
-	            if (!bulk || gameIsOver) {
-//	            	log.println("Response");
-//	            	log.println(game);
-	                out.println(gson.toJson(game));
-	            }
-/*	        	try {
-	                Thread.sleep(100); // delay for 2000 ms = 2 seconds
-	            } catch (InterruptedException e) {
-	                e.printStackTrace();
-	            }*/
+                if (msg instanceof ReplayableMessage) {
+                    if (msg instanceof RandomChangingMessage) {
+                        RandomChangingMessage rndChangeMsg = (RandomChangingMessage) msg;
+                        if (rndChangeMsg.getRandom() != null) {
+                            phaseReducer.getRandomGanerator().setRandom(rndChangeMsg.getRandom());
+                        }
+                    }
+                    try {
+                        state = phaseReducer.apply(state, msg);
+                    } catch (Exception e) {
+                        String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+                        
+                        // Log full stack trace
+                        if (log != null) {
+                            e.printStackTrace(log);
+                        }
+                        
+                        // Send error details to stderr for debugging
+                        err.println("#ERROR: " + errorMsg);
+                        
+                        // Exit bulk mode if active
+                        if (bulk) {
+                            bulk = false;
+                        }
+                        
+                        // Send current game state to client
+                        out.println(gson.toJson(game));
+                        
+                        // Stop processing - break out of main loop
+                        gameIsOver = true;
+                        break;
+                    }
+                    
+                    Player newActivePlayer = state.getActivePlayer();
+                    boolean undoAllowed = (
+                            (!(msg instanceof RandomChangingMessage) || ((RandomChangingMessage) msg).getRandom() == null)
+                            && newActivePlayer != null
+                            && newActivePlayer.equals(oldActivePlayer)
+                            && !(msg instanceof MoveNeutralFigureMessage && ((MoveNeutralFigureMessage)msg).getFigureId().contains("dragon"))
+                    );
+                    if (undoAllowed) {
+                        game.markUndo();
+                    } else {
+                        game.clearUndo();
+                    }
+
+                    game.replaceState(state);
+                    game.setReplay(game.getReplay().prepend((ReplayableMessage) msg));
+                } else if (msg instanceof UndoMessage) {
+                    game.undo();
+                    state = game.getState();
+                } else {
+                    throw new IllegalStateException("Unknown message");
+                }
+
+                gameIsOver = game.getState().getPhase() instanceof GameOverPhase;
+
+                if (!bulk || gameIsOver) {
+                    out.println(gson.toJson(game));
+                }
         	}
         }
     }
