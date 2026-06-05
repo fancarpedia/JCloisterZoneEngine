@@ -46,10 +46,12 @@ public interface Monastic extends Completable, FlowersBonusAffected, RangeFeatur
         if (buildings == null) {
             return List.empty();
         }
+        Set<Position> tilePositions = getRangeTiles(state)
+                .map(PlacedTile::getPosition)
+                .toSet();
+
         Position cloisterPos = getPosition();
-        Seq<LittleBuilding> buildingsSeq = buildings.filterKeys(pos ->
-            Math.abs(pos.x - cloisterPos.x) <= 1 && Math.abs(pos.y - cloisterPos.y) <= 1
-        ).values();
+        Seq<LittleBuilding> buildingsSeq = buildings.filterKeys(pos -> tilePositions.contains(pos)).values();
 
         return LittleBuildingsCapability.getBuildingsPoints(state, buildingsSeq);
     }
