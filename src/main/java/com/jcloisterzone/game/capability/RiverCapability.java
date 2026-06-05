@@ -35,9 +35,8 @@ public class RiverCapability extends Capability<Void> {
                 pack = pack.mapGroup("river-fork", g -> g.setSuccessiveGroup("river"));
                 pack = pack.deactivateGroup("river");
 
-                int branches = riverForksLocationsCount - riverForks.getTiles().size() * 2;
+                int branches = riverForksLocationsCount - riverForks.getTiles().size() * 2 + 1;
                 int ends = pack.getGroupSize("river-lake");
-
                 if (branches != ends) {
                     Vector<Tile> riverLakes = pack.getGroup("river-lake").getTiles();
                     final Vector<Tile> trimmed = adjustRandomTiles(riverLakes, branches - ends, random);
