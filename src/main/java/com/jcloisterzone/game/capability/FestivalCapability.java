@@ -50,9 +50,9 @@ public class FestivalCapability extends Capability<Void> {
             .filter(t -> t._1.getPlayer().equals(player));
 
         if ("follower".equals(state.getStringRule(Rule.FESTIVAL_RETURN))) {
-            meeples = meeples.filter(Predicates.instanceOf(Follower.class));
+            meeples = meeples.filter(m -> m._1 instanceof Follower);
         }
-
+        
         Set<MeeplePointer> options = meeples.map(MeeplePointer::new).toSet();
         if (options.isEmpty()) {
             return state;
