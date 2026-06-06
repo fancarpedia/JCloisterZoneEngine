@@ -5,7 +5,14 @@ import io.vavr.collection.Set;
 
 public class BazaarSelectTileAction extends AbstractPlayerAction<BazaarItem> {
 
-    public BazaarSelectTileAction(Set<BazaarItem> options) {
+	boolean noAuction;
+	
+    public BazaarSelectTileAction(Set<BazaarItem> options, boolean noAuction) {
         super(options);
+        this.noAuction = noAuction;
+    }
+    
+    public boolean getNoAuction() {
+    	return noAuction;
     }
 }

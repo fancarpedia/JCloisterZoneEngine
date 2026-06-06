@@ -58,7 +58,9 @@ public class BazaarPhase extends Phase {
 
         state = state.setCapabilityModel(BazaarCapability.class, model);
 
-        BazaarSelectTileAction action = new BazaarSelectTileAction(supply.toLinkedSet());
+        boolean noAuction = state.getBooleanRule(Rule.BAZAAR_NO_AUCTION);
+        
+        BazaarSelectTileAction action = new BazaarSelectTileAction(supply.toLinkedSet(), noAuction);
         state = state.setPlayerActions(
             new ActionsState(player, action, false)
         );
@@ -165,9 +167,11 @@ public class BazaarPhase extends Phase {
             if (!hasTileAssigned(model, player)) {
                 model = model.setTileSelectingPlayer(player);
 
+                boolean noAuction = state.getBooleanRule(Rule.BAZAAR_NO_AUCTION);
+
                 state = state.setCapabilityModel(BazaarCapability.class, model);
                 if (tilesCount > 1) {
-                    BazaarSelectTileAction action = new BazaarSelectTileAction(model.getSupply().toLinkedSet());
+                    BazaarSelectTileAction action = new BazaarSelectTileAction(model.getSupply().toLinkedSet(), noAuction);
                     state = state.setPlayerActions(
                             new ActionsState(player, action, false)
                     );

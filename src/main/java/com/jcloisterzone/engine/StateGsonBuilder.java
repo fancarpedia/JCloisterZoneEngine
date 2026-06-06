@@ -60,7 +60,7 @@ public class StateGsonBuilder {
         builder.registerTypeAdapter(SelectPrisonerToExchangeAction.class, new SelectPrisonerToExchangeActionSerializer());
         builder.registerTypeAdapter(BridgeAction.class, new SelectFeatureActionSerializer());
         builder.registerTypeAdapter(CastleAction.class, new SelectFeatureActionSerializer());
-        builder.registerTypeAdapter(BazaarSelectTileAction.class, new ActionSerializer("BazaarSelectTile"));
+        builder.registerTypeAdapter(BazaarSelectTileAction.class, new BazaarSelectTileActionSerializer());
         builder.registerTypeAdapter(BazaarBidAction.class, new ActionSerializer("BazaarBid"));
         builder.registerTypeAdapter(BazaarSelectBuyOrSellAction.class, new ActionSerializer("BazaarSelectBuyOrSell"));
         builder.registerTypeAdapter(CornCircleSelectDeployOrRemoveAction.class, new CornCircleSelectDeployOrRemoveActionSerializer());
@@ -809,6 +809,16 @@ public class StateGsonBuilder {
                 options.add(opt);
             });
             json.add("options", options);
+            return json;
+        }
+    }
+
+    private class BazaarSelectTileActionSerializer implements JsonSerializer<BazaarSelectTileAction> {
+        @Override
+        public JsonElement serialize(BazaarSelectTileAction action, Type type, JsonSerializationContext context) {
+            JsonObject json = new JsonObject();
+            json.addProperty("type", "BazaarSelectTile");
+            json.addProperty("noAuction", action.getNoAuction());
             return json;
         }
     }
