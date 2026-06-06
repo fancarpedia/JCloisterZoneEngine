@@ -71,7 +71,8 @@ public class Road extends CompletableFeature<Road> implements BuilderExtendable,
         if (isOpen(state)) {
         	return false;
         }
-        if (!marketplaces.isEmpty()) {
+    	MarketplaceCapability marketplaceCap = state.getCapabilities().get(MarketplaceCapability.class);
+        if (marketplaceCap != null && !marketplaces.isEmpty()) {
     		for (FeaturePointer fp: marketplaces) {
     			Feature feature = state.getFeatureMap()
     			    .get(fp.getPosition())
@@ -220,17 +221,15 @@ public class Road extends CompletableFeature<Road> implements BuilderExtendable,
         if (wellsCount>0) {
         	exprItems.add(new ExprItem(wellsCount, "wells", ((inn && completed) ? 2 : 1) * wellsCount ));
         }
-        if (marketplaces.length()>0) {
-        	MarketplaceCapability marketplaceCap = state.getCapabilities().get(MarketplaceCapability.class);
-            if (marketplaceCap != null) {
-            	int counter = 0;
-            	for(FeaturePointer marketplaceFp: marketplaces) {
-            		Integer otherRoadsTiles = marketplaceCap.getMarketplaceOtherRoadsTiles(state, this, marketplaceFp, completed);
-            		if (otherRoadsTiles != null && otherRoadsTiles>0) {
-            			exprItems.add(new ExprItem("marketplace." + counter++, otherRoadsTiles));
-            		}
-            	}
-            }
+    	MarketplaceCapability marketplaceCap = state.getCapabilities().get(MarketplaceCapability.class);
+        if (marketplaceCap != null && !marketplaces.isEmpty()) {
+           	int counter = 0;
+          	for(FeaturePointer marketplaceFp: marketplaces) {
+           		Integer otherRoadsTiles = marketplaceCap.getMarketplaceOtherRoadsTiles(state, this, marketplaceFp, completed);
+           		if (otherRoadsTiles != null && otherRoadsTiles>0) {
+           			exprItems.add(new ExprItem("marketplace." + counter++, otherRoadsTiles));
+           		}
+           	}
         }
         return new PointsExpression(completed ? "road" : "road.incomplete", List.ofAll(exprItems));
     }
