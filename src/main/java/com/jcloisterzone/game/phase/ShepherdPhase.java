@@ -16,6 +16,7 @@ import com.jcloisterzone.game.capability.SheepCapability;
 import com.jcloisterzone.game.capability.SheepCapabilityModel;
 import com.jcloisterzone.game.capability.SheepToken;
 import com.jcloisterzone.game.state.ActionsState;
+import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.io.message.FlockMessage;
@@ -35,10 +36,9 @@ import java.util.function.Function;
 
 public class ShepherdPhase extends Phase {
 
-
-	public ShepherdPhase(RandomGenerator random, Phase defaultNext) {
-		super(random, defaultNext);
-	}
+	public ShepherdPhase(RandomGenerator random, Phase defaultNext, RewindActionContainer rewindActionContainer) {
+        super(random, defaultNext, rewindActionContainer);
+    }
 
 	private Seq<Field> getClosedFieldsWithShepherd(GameState state) {
 		return state.getDeployedMeeples()
@@ -101,6 +101,8 @@ public class ShepherdPhase extends Phase {
     public StepResult handleFlockMessage(GameState state, FlockMessage msg) {
 		SheepCapability cap = state.getCapabilities().get(SheepCapability.class);
 		List<MeeplePointer> unresolvedFlocks = cap.getModel(state).getUnresolvedFlocks();
+
+		state = state.addFlag(Flag.POST_WOOD_ACTION_STARTED);
 
 		MeeplePointer mp = unresolvedFlocks.get();
 		FeaturePointer shepherdFp = mp.asFeaturePointer();

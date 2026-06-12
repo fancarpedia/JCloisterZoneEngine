@@ -16,10 +16,18 @@ public abstract class Phase {
 
     private final RandomGenerator random;
     private Phase defaultNext;
+    private RewindActionContainer rewindActionContainer;
 
     public Phase(RandomGenerator random, Phase defaultNext) {
         this.random = random;
         this.defaultNext = defaultNext;
+        this.rewindActionContainer = null;
+    }
+
+    public Phase(RandomGenerator random, Phase defaultNext, RewindActionContainer rewindActionContainer) {
+        this.random = random;
+        this.defaultNext = defaultNext;
+        this.rewindActionContainer = rewindActionContainer;
     }
 
     public Phase getDefaultNext() {
@@ -64,7 +72,21 @@ public abstract class Phase {
     @PhaseMessageHandler
     public StepResult handlePayRansom(GameState state, PayRansomMessage msg) {
         state = (new PayRansom(msg.getMeepleId())).apply(state);
-        return promote(state);
+        Phase target = null;
+        if (state.hasFlag(Flag.WOOD_ACTION_CONFIRMED)) {
+        	// No Rewind
+        } else if (state.hasFlag(Flag.POST_WOOD_ACTION_STARTED)) {
+        	// No Rewind
+        } else if (state.hasFlag(Flag.PHANTOM_PHASE_DONE)) {
+        	// No Rewind
+        } else if (state.hasFlag(Flag.ACTION_PHASE_DONE)) {
+        	target = rewindActionContainer.getPhantomPhase();
+        } else {
+        	target = rewindActionContainer.getActionPhase();
+        }
+        if (target == null) return promote(state);
+        state = clearActions(state);
+        return next(state, target);
     }
 
     public RandomGenerator getRandom() {

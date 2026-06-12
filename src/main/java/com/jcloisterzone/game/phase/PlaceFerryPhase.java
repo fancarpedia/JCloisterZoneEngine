@@ -12,6 +12,7 @@ import com.jcloisterzone.game.capability.FerriesCapability;
 import com.jcloisterzone.game.capability.FerriesCapability.FerryToken;
 import com.jcloisterzone.game.capability.RussianPromosTrapCapability;
 import com.jcloisterzone.game.state.ActionsState;
+import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.io.message.PlaceTokenMessage;
@@ -21,8 +22,8 @@ import io.vavr.collection.Set;
 
 public class PlaceFerryPhase extends Phase {
 
-    public PlaceFerryPhase(RandomGenerator random, Phase defaultNext) {
-        super(random, defaultNext);
+    public PlaceFerryPhase(RandomGenerator random, Phase defaultNext, RewindActionContainer rewindActionContainer) {
+        super(random, defaultNext, rewindActionContainer);
     }
 
     @Override
@@ -54,6 +55,8 @@ public class PlaceFerryPhase extends Phase {
         if (token != FerryToken.FERRY) {
             throw new IllegalArgumentException();
         }
+
+		state = state.addFlag(Flag.POST_WOOD_ACTION_STARTED);
 
         FeaturePointer ferry = msg.getPointer().asFeaturePointer();
         state = (new PlaceFerry(ferry)).apply(state);

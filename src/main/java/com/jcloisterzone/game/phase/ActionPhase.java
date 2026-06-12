@@ -56,8 +56,14 @@ public class ActionPhase extends AbstractActionPhase {
 
     @Override
     public StepResult enter(GameState state) {
+        if (state.getFlags().contains(Flag.ACTION_PHASE_DONE) || state.getFlags().contains(Flag.POST_WOOD_ACTION_STARTED)) {
+        	// Action Phase already done or phases after already started
+        	// Rewinded phase after Tower Random Pay
+            return next(state);
+        }
+        
         Player player = state.getTurnPlayer();
-
+        
         Vector<Class<? extends Meeple>> meepleTypes = Vector.of(
             SmallFollower.class, BigFollower.class, Phantom.class, Abbot.class,
             Wagon.class, Mayor.class, Builder.class, Pig.class, Shepherd.class,

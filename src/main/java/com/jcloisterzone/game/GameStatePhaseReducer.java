@@ -58,24 +58,41 @@ public class GameStatePhaseReducer implements Function2<GameState, Message, Game
 //        if (setup.contains(RussianPromosTrapCapability.class)) next = new RussianPromosTrapPhase(randomGenerator, next);
         if (setup.contains(CountCapability.class)) next = new CocScoringPhase(randomGenerator, next);
         if (setup.contains(GamblersLuckCapability.class)) next = new GamblersLuckDicePhase(randomGenerator, next);
-        next = new CommitActionPhase(randomGenerator, next);
-        if (setup.contains(CastleCapability.class)) next = new CastlePhase(randomGenerator, next);
+
+        RewindActionContainer rewindActionContainer = new RewindActionContainer();
+
+        next = new CommitActionPhase(randomGenerator, next, rewindActionContainer);
+
+        // Action and Phantom area - when Tower Random Pay with meeple/phantom rewind back
+        // Alert: Each Phase after AcitonPhase/PhantomPhase need to set Flag.POST_WOOD_ACTION_STARTED
+        //        when solving user request. This prevents go back to Action Phase, in case like: Dragon moves already done 1st step
+        //        So Random Paid Phantom can not be placed
+
+        if (setup.contains(CastleCapability.class)) next = new CastlePhase(randomGenerator, next, rewindActionContainer);
         if (setup.contains(DragonCapability.class) && !"after-scoring".equals(setup.getStringRule(Rule.DRAGON_MOVEMENT))) {
-            next = new DragonPhase(randomGenerator, next);
+            next = new DragonPhase(randomGenerator, next, rewindActionContainer);
         }
         if (setup.contains(SheepCapability.class)) {
-            next = new ShepherdPhase(randomGenerator, next);
-            next = new ShepherdPlacementConfirmPhase(randomGenerator, next);
+            next = new ShepherdPhase(randomGenerator, next, rewindActionContainer);
+            next = new ShepherdPlacementConfirmPhase(randomGenerator, next, rewindActionContainer);
         }
         if (setup.contains(FerriesCapability.class)) {
-            next = new ChangeFerriesPhase(randomGenerator, next);
-            next = new PlaceFerryPhase(randomGenerator, next);
+            next = new ChangeFerriesPhase(randomGenerator, next, rewindActionContainer);
+            next = new PlaceFerryPhase(randomGenerator, next, rewindActionContainer);
         }
         if (setup.contains(RussianPromosTrapCapability.class)) next = new RussianPromosTrapPhase(randomGenerator, next);
-        if (setup.contains(TunnelCapability.class)) next = new TunnelPhase(randomGenerator, next);
-        if (setup.contains(PhantomCapability.class)) next = new PhantomPhase(randomGenerator, next);
+        if (setup.contains(TunnelCapability.class)) next = new TunnelPhase(randomGenerator, next, rewindActionContainer);
+
+        Phase phantomPhase = null;
+        if (setup.contains(PhantomCapability.class)) next = phantomPhase = new PhantomPhase(randomGenerator, next);
         if (setup.contains(RussianPromosTrapCapability.class)) next = new RussianPromosTrapPhase(randomGenerator, next);
+        
         next = actionPhase = new ActionPhase(randomGenerator, next);
+        
+        // Set Action/Phantom Phases to possible rewind
+        rewindActionContainer.setActionPhase(actionPhase);
+        rewindActionContainer.setPhantomPhase(phantomPhase);
+
         if (setup.contains(MageAndWitchCapability.class)) next =  new MageAndWitchPhase(randomGenerator, next);
         if (setup.contains(GoldminesCapability.class)) next =  new GoldPiecePhase(randomGenerator, next);
         if (setup.contains(MeteoriteCapability.class)) next =  new TilePlacementConfirmPhase(randomGenerator, next);

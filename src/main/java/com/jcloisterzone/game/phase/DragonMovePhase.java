@@ -11,6 +11,7 @@ import com.jcloisterzone.figure.neutral.NeutralFigure;
 import com.jcloisterzone.game.capability.CountCapability;
 import com.jcloisterzone.game.capability.DragonCapability;
 import com.jcloisterzone.game.state.ActionsState;
+import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.io.message.MoveNeutralFigureMessage;
@@ -40,6 +41,8 @@ public class DragonMovePhase extends Phase {
         if (visited.size() == DragonCapability.DRAGON_MOVES) {
             return next(endDragonMove(state));
         }
+
+        state = state.addFlag(Flag.POST_WOOD_ACTION_STARTED);
 
         Set<Position> availMoves =  getAvailDragonMoves(state, visited);
         if (availMoves.isEmpty()) {

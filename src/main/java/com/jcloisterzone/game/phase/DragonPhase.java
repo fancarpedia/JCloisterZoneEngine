@@ -10,6 +10,11 @@ public class DragonPhase extends Phase {
 
     private DragonMovePhase dragonMovePhase;
 
+    public DragonPhase(RandomGenerator random, Phase defaultNext, RewindActionContainer rewindActionContainer) {
+        super(random, defaultNext, rewindActionContainer);
+        dragonMovePhase = new DragonMovePhase(random, defaultNext);
+    }
+
     public DragonPhase(RandomGenerator random, Phase defaultNext) {
         super(random, defaultNext);
         dragonMovePhase = new DragonMovePhase(random, defaultNext);

@@ -10,8 +10,8 @@ import com.jcloisterzone.random.RandomGenerator;
 
 public class ShepherdPlacementConfirmPhase extends Phase {
     
-	public ShepherdPlacementConfirmPhase(RandomGenerator random, Phase defaultNext) {
-		super(random, defaultNext);
+	public ShepherdPlacementConfirmPhase(RandomGenerator random, Phase defaultNext, RewindActionContainer rewindActionContainer) {
+		super(random, defaultNext, rewindActionContainer);
 	}
 
 	@Override

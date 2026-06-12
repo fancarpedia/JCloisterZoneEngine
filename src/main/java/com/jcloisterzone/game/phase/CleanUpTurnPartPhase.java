@@ -38,6 +38,10 @@ public class CleanUpTurnPartPhase extends Phase {
                 .remove(Flag.PORTAL_USED)
                 .remove(Flag.NO_PHANTOM)
                 .remove(Flag.FLYING_MACHINE_USED)
+                .remove(Flag.ACTION_PHASE_DONE)
+                .remove(Flag.PHANTOM_PHASE_DONE)
+                .remove(Flag.POST_WOOD_ACTION_STARTED)
+                .remove(Flag.WOOD_ACTION_CONFIRMED)
             );
         }
 

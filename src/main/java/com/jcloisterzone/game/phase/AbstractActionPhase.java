@@ -188,6 +188,7 @@ public abstract class AbstractActionPhase extends Phase {
     @PhaseMessageHandler
     public StepResult handlePayRansom(GameState state, PayRansomMessage msg) {
         state = (new PayRansom(msg.getMeepleId())).apply(state);
+        // This is only in Action
         return enter(state); //recompute actions with returned followers
     }
 

@@ -17,6 +17,7 @@ import com.jcloisterzone.figure.neutral.Fairy;
 import com.jcloisterzone.game.capability.CastleCapability;
 import com.jcloisterzone.game.capability.CastleCapability.CastleToken;
 import com.jcloisterzone.game.state.ActionsState;
+import com.jcloisterzone.game.state.Flag;
 import com.jcloisterzone.game.state.GameState;
 import com.jcloisterzone.game.state.PlacedTile;
 import com.jcloisterzone.io.message.PlaceTokenMessage;
@@ -29,8 +30,8 @@ import io.vavr.collection.Set;
 
 public class CastlePhase extends Phase {
 
-    public CastlePhase(RandomGenerator random, Phase defaultNext) {
-        super(random, defaultNext);
+    public CastlePhase(RandomGenerator random, Phase defaultNext, RewindActionContainer rewindActionContainer) {
+        super(random, defaultNext, rewindActionContainer);
     }
 
     private Set<FeaturePointer> getPlayerOptions(GameState state, Player player) {
@@ -81,6 +82,8 @@ public class CastlePhase extends Phase {
         if (msg.getToken() != CastleToken.CASTLE) {
             throw new IllegalArgumentException();
         }
+        state = state.addFlag(Flag.POST_WOOD_ACTION_STARTED);
+
         Player player = state.getActivePlayer();
         City city = (City) state.getFeature((FeaturePointer) msg.getPointer());
         Castle castle = new Castle(city.getPlaces().map(fp -> fp.setFeature(Castle.class)));

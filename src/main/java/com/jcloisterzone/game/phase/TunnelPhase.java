@@ -15,8 +15,8 @@ import io.vavr.collection.Vector;
 
 public class TunnelPhase extends Phase {
 
-    public TunnelPhase(RandomGenerator random, Phase defaultNext) {
-        super(random, defaultNext);
+    public TunnelPhase(RandomGenerator random, Phase defaultNext, RewindActionContainer rewindActionContainer) {
+        super(random, defaultNext, rewindActionContainer);
     }
 
     @Override

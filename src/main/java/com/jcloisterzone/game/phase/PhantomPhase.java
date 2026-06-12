@@ -1,5 +1,6 @@
 package com.jcloisterzone.game.phase;
 
+import com.ibm.icu.impl.number.AffixPatternProvider.Flags;
 import com.jcloisterzone.Player;
 import com.jcloisterzone.action.MeepleAction;
 import com.jcloisterzone.action.PlayerAction;
@@ -25,6 +26,10 @@ public class PhantomPhase extends AbstractActionPhase {
 
     @Override
     public StepResult enter(GameState state) {
+        if (state.getFlags().contains(Flag.PHANTOM_PHASE_DONE) || state.getFlags().contains(Flag.POST_WOOD_ACTION_STARTED)) {
+        	// Phantom Phase already done, rewind after Tower Random Pay
+            return next(state);
+        }
         if (state.getFlags().contains(Flag.NO_PHANTOM)) {
             // The placement of a princess tile with removal of a knight from the city cannot be used as a first
             // "follower move" and be followed by placement of the phantom (e.g. into the now-vacated city).
