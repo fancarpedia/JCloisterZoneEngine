@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<pack>
-    <tile id="R.bi">
-        <bazaar/>
-        <road inn="yes">S</road>
-        <field>NL NR EL ER SL SR WL WR</field>
-    </tile>
-</pack>
