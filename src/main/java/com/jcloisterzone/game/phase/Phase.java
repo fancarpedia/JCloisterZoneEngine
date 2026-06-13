@@ -72,21 +72,24 @@ public abstract class Phase {
     @PhaseMessageHandler
     public StepResult handlePayRansom(GameState state, PayRansomMessage msg) {
         state = (new PayRansom(msg.getMeepleId())).apply(state);
-        Phase target = null;
-        if (state.hasFlag(Flag.WOOD_ACTION_CONFIRMED)) {
-        	// No Rewind
-        } else if (state.hasFlag(Flag.POST_WOOD_ACTION_STARTED)) {
-        	// No Rewind
-        } else if (state.hasFlag(Flag.PHANTOM_PHASE_DONE)) {
-        	// No Rewind
-        } else if (state.hasFlag(Flag.ACTION_PHASE_DONE)) {
-        	target = rewindActionContainer.getPhantomPhase();
-        } else {
-        	target = rewindActionContainer.getActionPhase();
+
+        if (rewindActionContainer != null) {
+            Phase target = null;
+	        if (state.hasFlag(Flag.WOOD_ACTION_CONFIRMED)) {
+	        	// No Rewind
+	        } else if (state.hasFlag(Flag.POST_WOOD_ACTION_STARTED)) {
+	        	// No Rewind
+	        } else if (state.hasFlag(Flag.PHANTOM_PHASE_DONE)) {
+	        	// No Rewind
+	        } else if (state.hasFlag(Flag.ACTION_PHASE_DONE)) {
+	        	target = rewindActionContainer.getPhantomPhase();
+	        } else {
+	        	target = rewindActionContainer.getActionPhase();
+	        }
+	        state = clearActions(state);
+	        if (target != null) return next(state, target);
         }
-        if (target == null) return promote(state);
-        state = clearActions(state);
-        return next(state, target);
+        return promote(state);
     }
 
     public RandomGenerator getRandom() {

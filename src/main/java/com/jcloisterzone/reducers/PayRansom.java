@@ -1,8 +1,11 @@
 package com.jcloisterzone.reducers;
 
 import com.jcloisterzone.Player;
+import com.jcloisterzone.event.ExprItem;
 import com.jcloisterzone.event.PlayEvent;
+import com.jcloisterzone.event.PointsExpression;
 import com.jcloisterzone.event.RansomPaidEvent;
+import com.jcloisterzone.event.ScoreEvent;
 import com.jcloisterzone.figure.Follower;
 import com.jcloisterzone.game.capability.TowerCapability;
 import com.jcloisterzone.game.state.Flag;
@@ -55,14 +58,15 @@ public class PayRansom implements Reducer {
         state = state.mapCapabilityModel(TowerCapability.class, m ->
             m.update(_jailer.getIndex(), l -> l.remove(_follower))
         );
-        state = (new AddPointsSilently(player, -TowerCapability.RANSOM_POINTS)).apply(state);
-        state = (new AddPointsSilently(jailer, TowerCapability.RANSOM_POINTS)).apply(state);
         state = state.addFlag(Flag.RANSOM_PAID);
-        state = state.appendEvent(
-                new RansomPaidEvent(PlayEvent.PlayEventMeta.createWithActivePlayer(state), follower, jailer)
-        );
-        //TODO merge PlayEvent
 
+        List<ScoreEvent.ReceivedPoints> points = List.empty();
+        points = points.append(new ScoreEvent.ReceivedPoints(new PointsExpression("ransompaid.payment", new ExprItem(1, "meeples", -1 * TowerCapability.RANSOM_POINTS)), player, null));
+        points = points.append(new ScoreEvent.ReceivedPoints(new PointsExpression("ransompaid.income", new ExprItem(1, "meeples", TowerCapability.RANSOM_POINTS)), jailer, null));
+        state = (new AddPoints(points, false)).apply(state);
+        state = state.appendEvent(
+            new RansomPaidEvent(PlayEvent.PlayEventMeta.createWithActivePlayer(state), follower, jailer)
+        );
         return state;
     }
 

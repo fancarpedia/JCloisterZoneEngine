@@ -38,11 +38,11 @@ public class DragonMovePhase extends Phase {
     public StepResult enter(GameState state) {
         Vector<Position> visited = getVisitedPositions(state);
 
+        state = state.addFlag(Flag.POST_WOOD_ACTION_STARTED);
+
         if (visited.size() == DragonCapability.DRAGON_MOVES) {
             return next(endDragonMove(state));
         }
-
-        state = state.addFlag(Flag.POST_WOOD_ACTION_STARTED);
 
         Set<Position> availMoves =  getAvailDragonMoves(state, visited);
         if (availMoves.isEmpty()) {
