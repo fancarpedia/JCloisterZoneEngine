@@ -1,0 +1,47 @@
+{
+  "name": "jcloisterzone-engine",
+  "version": "0.1.0",
+  "description": "TypeScript port of the JCloisterZone (Carcassonne) game engine",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/com/jcloisterzone/index.d.ts",
+      "import": "./dist/com/jcloisterzone/index.js"
+    },
+    "./vavr": {
+      "types": "./dist/io/vavr/index.d.ts",
+      "import": "./dist/io/vavr/index.js"
+    }
+  },
+  "bin": {
+    "jcz-engine": "bin/jcz-engine.mjs"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "src/main/ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "engine": "node bin/jcz-engine.mjs",
+    "capture-golden": "node scripts/capture-golden.mjs",
+    "capture-golden:ts": "node scripts/capture-golden-ts.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "port:manifest": "node scripts/port-manifest.mjs"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.13"
+  },
+  "devDependencies": {
+    "@xmldom/xmldom": "^0.8.13",
+    "typescript": "^5.5.0",
+    "vitest": "^0.34.6"
+  }
+}

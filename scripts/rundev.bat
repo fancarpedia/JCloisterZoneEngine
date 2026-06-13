@@ -1,3 +1,3 @@
 @Echo off
 
-java -Dorg.slf4j.simpleLogger.log.AIRanking=debug -ea -jar build\Engine.jar -port 9001
+npm install && npm run build && node bin/jcz-engine.mjs -p 9001
