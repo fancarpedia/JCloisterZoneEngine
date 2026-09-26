@@ -50,6 +50,7 @@ import type { PlayEvent } from "../event/PlayEvent.js";
 import { PlayerTurnEvent } from "../event/PlayerTurnEvent.js";
 import { ScoreEvent } from "../event/ScoreEvent.js";
 import { TileDiscardedEvent } from "../event/TileDiscardedEvent.js";
+import { MeepleAwardedEvent } from "../event/MeepleAwardedEvent.js";
 import { TilePlacedEvent } from "../event/TilePlacedEvent.js";
 import { TokenPlacedEvent } from "../event/TokenPlacedEvent.js";
 import { TokenReceivedEvent } from "../event/TokenReceivedEvent.js";
@@ -740,6 +741,13 @@ export class StateGsonBuilder {
           player: ev.getSecond().getPlayer().getIndex(),
         };
         turnEvents.push({ type: "prisoners-exchange", exchange: [first, {}] });
+      } else if (ev instanceof MeepleAwardedEvent) {
+        turnEvents.push({
+          type: "meeple-awarded",
+          player: ev.getPlayer().getIndex(),
+          meeple: simpleName(ev.getMeeple().constructor as ClassToken),
+          position: this.pos(ev.getPosition()),
+        });
       } else if (ev instanceof CoopGameLostEvent) {
         // Keep Building (coop variant): this player's turn met neither condition — all lose.
         turnEvents.push({ type: "coop-lost", player: ev.getPlayer().getIndex() });

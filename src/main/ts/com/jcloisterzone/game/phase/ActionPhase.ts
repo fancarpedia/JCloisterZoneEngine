@@ -13,6 +13,7 @@ import { Phantom } from "../../figure/Phantom.js";
 import { Pig } from "../../figure/Pig.js";
 import { Ringmaster } from "../../figure/Ringmaster.js";
 import { Shepherd } from "../../figure/Shepherd.js";
+import { MiniFollower } from "../../figure/MiniFollower.js";
 import { SmallFollower } from "../../figure/SmallFollower.js";
 import { Wagon } from "../../figure/Wagon.js";
 import type { Position } from "../../board/Position.js";
@@ -88,7 +89,7 @@ export class ActionPhase extends AbstractActionPhase {
     const player = state.getTurnPlayer()!;
 
     const meepleTypes: Vector<ClassToken<Meeple>> = Vector.ofAll(
-      [SmallFollower, BigFollower, Phantom, Abbot, Wagon, Mayor, Builder, Pig, Shepherd, Ringmaster] as unknown as ClassToken<Meeple>[],
+      [SmallFollower, BigFollower, MiniFollower, Phantom, Abbot, Wagon, Mayor, Builder, Pig, Shepherd, Ringmaster] as unknown as ClassToken<Meeple>[],
     );
 
     const actions = this.prepareMeepleActions(state, meepleTypes);

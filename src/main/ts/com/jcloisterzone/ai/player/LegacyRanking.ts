@@ -14,6 +14,7 @@ import { Field } from "../../feature/Field.js";
 import { Road } from "../../feature/Road.js";
 import { Barn } from "../../figure/Barn.js";
 import type { Follower } from "../../figure/Follower.js";
+import { MiniFollower } from "../../figure/MiniFollower.js";
 import { SmallFollower } from "../../figure/SmallFollower.js";
 import type { PointsExpression } from "../../event/PointsExpression.js";
 import type { Player } from "../../Player.js";
@@ -211,7 +212,11 @@ export class LegacyRanking implements GameStateRanking {
       let inSupply = 0;
       for (const f of player.getFollowers(this.state).filter((x) => x.isInSupply(this.state))) {
         // instanceof can't be used because of Phantom (extends Follower)
-        if ((f as object).constructor === SmallFollower) r += q * 0.15;
+        // A Mini is worth about half a plain follower (power 0.5 vs 1) - weighted roughly
+        // half of SmallFollower 0.15. Untuned beyond that; Mini Meeples are AI-off by
+        // default in the client setup.
+        if ((f as object).constructor === MiniFollower) r += q * 0.08;
+        else if ((f as object).constructor === SmallFollower) r += q * 0.15;
         else r += q * 0.25;
         inSupply += 1;
       }

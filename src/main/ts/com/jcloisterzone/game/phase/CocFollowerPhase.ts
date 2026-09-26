@@ -14,6 +14,7 @@ import { BigFollower } from "../../figure/BigFollower.js";
 import { Mayor } from "../../figure/Mayor.js";
 import { Phantom } from "../../figure/Phantom.js";
 import { Ringmaster } from "../../figure/Ringmaster.js";
+import { MiniFollower } from "../../figure/MiniFollower.js";
 import { SmallFollower } from "../../figure/SmallFollower.js";
 import { Wagon } from "../../figure/Wagon.js";
 import type { DeployMeepleMessage } from "../../io/message/DeployMeepleMessage.js";
@@ -35,6 +36,7 @@ const COUNT_CLS = CountCapability as unknown as ClassToken<Capability<CountCapab
 const MEEPLE_TYPES: Vector<ClassToken<Meeple>> = Vector.of(
   SmallFollower as unknown as ClassToken<Meeple>,
   BigFollower as unknown as ClassToken<Meeple>,
+  MiniFollower as unknown as ClassToken<Meeple>,
   Phantom as unknown as ClassToken<Meeple>,
   Wagon as unknown as ClassToken<Meeple>,
   Mayor as unknown as ClassToken<Meeple>,

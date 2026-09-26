@@ -10,6 +10,7 @@ import { Follower } from "../../figure/Follower.js";
 import type { Meeple } from "../../figure/Meeple.js";
 import { Phantom } from "../../figure/Phantom.js";
 import { Ringmaster } from "../../figure/Ringmaster.js";
+import { MiniFollower } from "../../figure/MiniFollower.js";
 import { SmallFollower } from "../../figure/SmallFollower.js";
 import { MeepleAction } from "../../action/MeepleAction.js";
 import type { PlayerAction } from "../../action/PlayerAction.js";
@@ -93,7 +94,7 @@ export class TowerCapability extends Capability<Arr<List<Follower>>> {
       const followerOptions: Set<FeaturePointer> = HashSet.ofAll(followerFps);
       const availMeeples = player.getMeeplesFromSupply(
         state,
-        Vector.ofAll([SmallFollower, BigFollower, Phantom, Ringmaster] as unknown as ClassToken<Meeple>[]),
+        Vector.ofAll([SmallFollower, BigFollower, MiniFollower, Phantom, Ringmaster] as unknown as ClassToken<Meeple>[]),
       );
       const meepleActions = availMeeples.map(
         (meeple) => new MeepleAction(meeple, followerOptions) as unknown as PlayerAction<unknown>,

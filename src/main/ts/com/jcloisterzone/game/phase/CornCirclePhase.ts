@@ -19,6 +19,7 @@ import { Mayor } from "../../figure/Mayor.js";
 import type { Meeple } from "../../figure/Meeple.js";
 import { Phantom } from "../../figure/Phantom.js";
 import { Ringmaster } from "../../figure/Ringmaster.js";
+import { MiniFollower } from "../../figure/MiniFollower.js";
 import { SmallFollower } from "../../figure/SmallFollower.js";
 import { Wagon } from "../../figure/Wagon.js";
 import { CommitMessage } from "../../io/message/CommitMessage.js";
@@ -99,6 +100,7 @@ export class CornCirclePhase extends Phase {
       let meepleTypes: Vector<ClassToken<Meeple>> = Vector.ofAll([
         SmallFollower,
         BigFollower,
+        MiniFollower,
         Phantom,
         Ringmaster,
       ] as unknown as ClassToken<Meeple>[]);
