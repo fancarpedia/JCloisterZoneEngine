@@ -75,7 +75,107 @@ describe("sets", () => {
     expect(s.size()).toBe(2);
     expect(s.contains(new Pos(1, 1))).toBe(true);
   });
+
+  it("keeps insertion order across add/addAll/ofAll", () => {
+    const s = HashSet.of(3, 1, 2).add(5).add(1).addAll([4, 3, 0]);
+    expect(s.toArray()).toEqual([3, 1, 2, 5, 4, 0]);
+  });
+
+  it("add of an existing element returns the same instance", () => {
+    const s = HashSet.of(new Pos(1, 1));
+    expect(s.add(new Pos(1, 1))).toBe(s);
+    expect(s.addAll([new Pos(1, 1)])).toBe(s);
+  });
+
+  it("addAll dedups within the batch", () => {
+    const s = HashSet.of(new Pos(0, 0)).addAll([new Pos(1, 1), new Pos(1, 1), new Pos(0, 0)]);
+    expect(s.toArray().map(String)).toEqual(["[0,0]", "[1,1]"]);
+  });
+
+  it("add does not leak into the parent set", () => {
+    const a = HashSet.of(new Pos(1, 1));
+    const b = a.add(new Pos(2, 2));
+    const c = a.add(new Pos(3, 3));
+    expect(a.contains(new Pos(2, 2))).toBe(false);
+    expect(a.contains(new Pos(3, 3))).toBe(false);
+    expect(b.contains(new Pos(3, 3))).toBe(false);
+    expect(c.contains(new Pos(2, 2))).toBe(false);
+    expect(b.size()).toBe(2);
+    expect(c.size()).toBe(2);
+  });
+
+  it("handles hash collisions", () => {
+    const x = new Collide("x");
+    const y = new Collide("y");
+    const a = HashSet.of(x);
+    const b = a.add(y);
+    expect(b.size()).toBe(2);
+    expect(b.contains(new Collide("y"))).toBe(true);
+    expect(a.contains(new Collide("y"))).toBe(false);
+    expect(b.addAll([new Collide("z"), new Collide("x")]).size()).toBe(3);
+  });
+
+  it("remove after add", () => {
+    const s = HashSet.of(1, 2).add(3).remove(2);
+    expect(s.toArray()).toEqual([1, 3]);
+    expect(s.contains(2)).toBe(false);
+    expect(s.add(2).toArray()).toEqual([1, 3, 2]);
+  });
+
+  // The hash index must survive add/addAll/ofAll; rebuilding it on every new instance
+  // makes building a set of n elements O(n²) hashCode calls.
+  it("add reuses the hash index (linear hashCode calls)", () => {
+    const n = 200;
+    Counted.calls = 0;
+    let s = HashSet.empty<Counted>();
+    for (let i = 0; i < n; i++) s = s.add(new Counted(i)) as HashSet<Counted>;
+    expect(s.size()).toBe(n);
+    expect(Counted.calls).toBeLessThanOrEqual(3 * n);
+  });
+
+  it("addAll reuses the hash index (linear hashCode calls)", () => {
+    const n = 200;
+    const items = Array.from({ length: n }, (_, i) => new Counted(i));
+    Counted.calls = 0;
+    const s = HashSet.of(new Counted(-1)).addAll(items);
+    expect(s.size()).toBe(n + 1);
+    expect(s.contains(new Counted(n - 1))).toBe(true);
+    expect(Counted.calls).toBeLessThanOrEqual(3 * n);
+  });
+
+  it("ofAll keeps the index it built (linear hashCode calls)", () => {
+    const n = 200;
+    const items = Array.from({ length: n }, (_, i) => new Counted(i));
+    Counted.calls = 0;
+    const s = HashSet.ofAll(items);
+    for (let i = 0; i < n; i++) expect(s.contains(new Counted(i))).toBe(true);
+    expect(Counted.calls).toBeLessThanOrEqual(3 * n);
+  });
 });
+
+/** Every instance hashes to the same bucket. */
+class Collide implements Valued {
+  constructor(readonly id: string) {}
+  equals(o: unknown): boolean {
+    return o instanceof Collide && o.id === this.id;
+  }
+  hashCode(): number {
+    return 42;
+  }
+}
+
+/** Counts hashCode calls to detect index rebuilds. */
+class Counted implements Valued {
+  static calls = 0;
+  constructor(readonly v: number) {}
+  equals(o: unknown): boolean {
+    return o instanceof Counted && o.v === this.v;
+  }
+  hashCode(): number {
+    Counted.calls++;
+    return this.v;
+  }
+}
 
 describe("sequences", () => {
   it("map/filter/fold/distinct", () => {
