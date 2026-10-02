@@ -67,6 +67,84 @@ describe("value-equality maps", () => {
     expect(merged.get("y").get()).toBe(2);
     expect(merged.get("z").get()).toBe(3);
   });
+
+  it("keeps insertion order when replacing a value", () => {
+    const m = LinkedHashMap.empty<string, number>().put("b", 1).put("a", 2).put("b", 3).put("c", 4);
+    expect(m.keysSeq().toArray()).toEqual(["b", "a", "c"]);
+    expect(m.values().toArray()).toEqual([3, 2, 4]);
+  });
+
+  it("put of an equal value returns the same instance", () => {
+    const m = HashMap.empty<Pos, string>().put(new Pos(1, 1), "a");
+    expect(m.put(new Pos(1, 1), "a")).toBe(m);
+  });
+
+  it("put does not leak into the parent map", () => {
+    const a = HashMap.empty<Pos, number>().put(new Pos(1, 1), 1);
+    const b = a.put(new Pos(2, 2), 2);
+    const c = a.put(new Pos(3, 3), 3);
+    const d = a.put(new Pos(1, 1), 9);
+    expect(a.containsKey(new Pos(2, 2))).toBe(false);
+    expect(a.containsKey(new Pos(3, 3))).toBe(false);
+    expect(b.containsKey(new Pos(3, 3))).toBe(false);
+    expect(c.containsKey(new Pos(2, 2))).toBe(false);
+    expect(a.get(new Pos(1, 1)).get()).toBe(1);
+    expect(d.get(new Pos(1, 1)).get()).toBe(9);
+    expect(d.put(new Pos(4, 4), 4).get(new Pos(1, 1)).get()).toBe(9);
+  });
+
+  it("handles hash collisions", () => {
+    const a = HashMap.empty<Collide, number>().put(new Collide("x"), 1);
+    const b = a.put(new Collide("y"), 2).put(new Collide("x"), 3);
+    expect(b.size()).toBe(2);
+    expect(b.get(new Collide("x")).get()).toBe(3);
+    expect(b.get(new Collide("y")).get()).toBe(2);
+    expect(a.get(new Collide("x")).get()).toBe(1);
+    expect(a.containsKey(new Collide("y"))).toBe(false);
+    const c = a.put(new Collide("z"), 4);
+    expect(c.containsKey(new Collide("y"))).toBe(false);
+    expect(b.containsKey(new Collide("z"))).toBe(false);
+    expect(c.put(new Collide("y"), 5).get(new Collide("y")).get()).toBe(5);
+    expect(b.put(new Collide("w"), 6).containsKey(new Collide("z"))).toBe(false);
+  });
+
+  it("remove after put", () => {
+    const m = LinkedHashMap.empty<number, string>().put(1, "a").put(2, "b").put(3, "c").remove(2);
+    expect(m.keysSeq().toArray()).toEqual([1, 3]);
+    expect(m.containsKey(2)).toBe(false);
+    expect(m.get(3).get()).toBe("c");
+    expect(m.put(2, "d").keysSeq().toArray()).toEqual([1, 3, 2]);
+  });
+
+  it("TreeMap finds every key after inserts in the middle", () => {
+    let m: VMap<number, string> = TreeMap.empty<number, string>((a, b) => a - b);
+    for (const k of [5, 1, 9, 3, 7, 10, 0]) m = m.put(k, String(k));
+    m = m.put(3, "x");
+    expect(m.keysSeq().toArray()).toEqual([0, 1, 3, 5, 7, 9, 10]);
+    for (const k of [0, 1, 5, 7, 9, 10]) expect(m.get(k).get()).toBe(String(k));
+    expect(m.get(3).get()).toBe("x");
+  });
+
+  // The hash index must survive put; rebuilding it on every new instance makes building
+  // a map of n entries O(n²) hashCode calls.
+  it("put of new keys reuses the hash index (linear hashCode calls)", () => {
+    const n = 200;
+    Counted.calls = 0;
+    let m: VMap<Counted, number> = HashMap.empty<Counted, number>();
+    for (let i = 0; i < n; i++) m = m.put(new Counted(i), i);
+    expect(m.size()).toBe(n);
+    expect(Counted.calls).toBeLessThanOrEqual(3 * n);
+  });
+
+  it("put of existing keys reuses the hash index (linear hashCode calls)", () => {
+    const n = 200;
+    let m: VMap<Counted, number> = LinkedHashMap.empty<Counted, number>();
+    for (let i = 0; i < n; i++) m = m.put(new Counted(i), i);
+    Counted.calls = 0;
+    for (let i = 0; i < n; i++) m = m.put(new Counted(i), -i);
+    expect(m.get(new Counted(n - 1)).get()).toBe(-(n - 1));
+    expect(Counted.calls).toBeLessThanOrEqual(3 * n);
+  });
 });
 
 describe("sets", () => {
