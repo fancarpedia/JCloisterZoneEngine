@@ -7,6 +7,14 @@ import { HashSet, type Set as VSet } from "./Set.js";
 
 export type Entry<K, V> = Tuple2<K, V>;
 
+/** Hash -> ascending entry positions. Shared by maps whose entries have the same keys at
+ *  every indexed position; a map ignores positions at or past its own size. */
+interface HashIndex {
+  readonly buckets: globalThis.Map<number, number[]>;
+  /** Number of leading positions indexed. */
+  size: number;
+}
+
 /**
  * Persistent map with value-equality keys. Backed by an ordered entries array
  * plus a hash index (bucket -> entry indices) for O(1)-ish lookup. Copy-on-write.
@@ -16,7 +24,7 @@ export type Entry<K, V> = Tuple2<K, V>;
  */
 export abstract class Map<K, V> implements Iterable<Tuple2<K, V>>, Valued {
   protected readonly entries: readonly Tuple2<K, V>[];
-  private index: globalThis.Map<number, number[]> | null = null;
+  private index: HashIndex | null = null;
 
   constructor(entries: readonly Tuple2<K, V>[]) {
     this.entries = entries;
@@ -31,24 +39,26 @@ export abstract class Map<K, V> implements Iterable<Tuple2<K, V>>, Valued {
   ): Tuple2<K, V>[];
   abstract get stringName(): string;
 
-  private getIndex(): globalThis.Map<number, number[]> {
+  private getIndex(): HashIndex {
     if (this.index === null) {
-      const idx = new globalThis.Map<number, number[]>();
+      const buckets = new globalThis.Map<number, number[]>();
       this.entries.forEach((e, i) => {
         const h = hashCode(e._1);
-        const bucket = idx.get(h);
+        const bucket = buckets.get(h);
         if (bucket) bucket.push(i);
-        else idx.set(h, [i]);
+        else buckets.set(h, [i]);
       });
-      this.index = idx;
+      this.index = { buckets, size: this.entries.length };
     }
     return this.index;
   }
 
-  private indexOfKey(key: K): number {
-    const bucket = this.getIndex().get(hashCode(key));
+  private indexOfKey(key: K, h: number = hashCode(key)): number {
+    const bucket = this.getIndex().buckets.get(h);
     if (!bucket) return -1;
+    const n = this.entries.length;
     for (const i of bucket) {
+      if (i >= n) break; // indexed by a longer map that shares the index
       if (equals(this.entries[i]._1, key)) return i;
     }
     return -1;
@@ -102,14 +112,33 @@ export abstract class Map<K, V> implements Iterable<Tuple2<K, V>>, Valued {
       key = keyOrEntry as K;
       val = value as V;
     }
-    const i = this.indexOfKey(key);
+    const h = hashCode(key);
+    const i = this.indexOfKey(key, h);
     if (i >= 0) {
       if (equals(this.entries[i]._2, val)) return this;
       const arr = this.entries.slice();
       arr[i] = new Tuple2(key, val);
-      return this.rebuild(arr);
+      // Same keys at the same positions: share the index.
+      const replaced = this.rebuild(arr);
+      replaced.index = this.index;
+      return replaced;
     }
-    return this.rebuild(this.placeKey(this.entries.slice(), key, val));
+    const arr = this.placeKey(this.entries.slice(), key, val);
+    const result = this.rebuild(arr);
+    // A key appended at the end keeps the other positions, so the new map extends this
+    // index in place, unless another map already extended it past this one's size (the
+    // new map then builds its own lazily). A TreeMap insert in the middle shifts
+    // positions, so its index is lazy too.
+    const index = this.getIndex();
+    const last = arr.length - 1;
+    if (arr[last]._1 === key && index.size === last) {
+      const bucket = index.buckets.get(h);
+      if (bucket) bucket.push(last);
+      else index.buckets.set(h, [last]);
+      index.size++;
+      result.index = index;
+    }
+    return result;
   }
 
   /** put using a merge function when the key already exists. */
