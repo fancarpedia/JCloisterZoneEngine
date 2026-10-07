@@ -242,11 +242,13 @@ class Collide implements Valued {
   }
 }
 
-/** Counts hashCode calls to detect index rebuilds. */
+/** Counts hashCode calls to detect index rebuilds, and equals calls to detect pairwise scans. */
 class Counted implements Valued {
   static calls = 0;
+  static equalsCalls = 0;
   constructor(readonly v: number) {}
   equals(o: unknown): boolean {
+    Counted.equalsCalls++;
     return o instanceof Counted && o.v === this.v;
   }
   hashCode(): number {
@@ -262,6 +264,34 @@ describe("sequences", () => {
     expect(v.filter((x) => x % 2 === 0).toArray()).toEqual([2, 2, 4]);
     expect(v.map((x) => x * 10).toArray()).toEqual([10, 20, 20, 30, 40]);
     expect(v.foldLeft(0, (a, b) => a + b)).toBe(12);
+  });
+
+  it("distinct keeps the first occurrence in order", () => {
+    const a = new Pos(1, 1);
+    const v = Vector.of(new Pos(2, 2), a, new Pos(2, 2), new Pos(1, 1), new Pos(3, 3));
+    const d = v.distinct().toArray();
+    expect(d.map(String)).toEqual(["[2,2]", "[1,1]", "[3,3]"]);
+    expect(d[1]).toBe(a);
+  });
+
+  it("distinct handles hash collisions", () => {
+    const v = List.of(new Collide("a"), new Collide("b"), new Collide("a"), new Collide("c"));
+    expect(v.distinct().toArray().map((c) => c.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("distinctBy keeps the first element for each key", () => {
+    const v = Vector.of("apple", "avocado", "banana", "blueberry", "cherry");
+    expect(v.distinctBy((s) => s[0]).toArray()).toEqual(["apple", "banana", "cherry"]);
+  });
+
+  // Comparing each element with every kept one makes distinct O(n²) equals calls.
+  it("distinct is linear in equals calls", () => {
+    const n = 200;
+    const items = Array.from({ length: 2 * n }, (_, i) => new Counted(i % n));
+    Counted.equalsCalls = 0;
+    const d = Vector.ofAll(items).distinct();
+    expect(d.size()).toBe(n);
+    expect(Counted.equalsCalls).toBeLessThanOrEqual(2 * n);
   });
 
   it("List and Vector are not equal across kinds", () => {
