@@ -147,6 +147,31 @@ function wireLines(jcz: Jcz, paths: string[]): string[] {
 //     deterministic within one JVM but NOT reproducible in TS, so they must be unordered.
 // "owners" is a vavr Set<Player> projection — hash order, compare as multiset.
 const UNORDERED_KEYS = new Set(["places", "points", "features", "options", "positions", "owners"]);
+// Arrays under these keys are always ORDERED, even when their members are objects: the
+// player list and each history entry's event log have a meaningful order in Java too.
+// One exception inside "events": a run of consecutive "points" events comes from features
+// completed by the same move, which Java scores in HashMap order (not reproducible), so
+// each such run is compared as a multiset (see sortScoreRuns).
+const ORDERED_KEYS = new Set(["players", "events"]);
+
+/** Copy of an event list with every run of consecutive "points" events sorted canonically. */
+function sortScoreRuns(events: unknown[]): unknown[] {
+  const out = [...events];
+  const isPoints = (e: unknown) => (e as { type?: unknown } | null)?.type === "points";
+  let i = 0;
+  while (i < out.length) {
+    if (!isPoints(out[i])) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j < out.length && isPoints(out[j])) j++;
+    const run = out.slice(i, j).sort((x, y) => matchKey(x).localeCompare(matchKey(y)));
+    out.splice(i, j - i, ...run);
+    i = j;
+  }
+  return out;
+}
 
 function kindOf(v: unknown): string {
   return v === null ? "null" : Array.isArray(v) ? "array" : typeof v;
@@ -205,6 +230,7 @@ function stripContestedEmpties(v: unknown): void {
  *  hash-iteration order which the TS shim does not reproduce, so only their membership
  *  is compared. Tuple arrays ([x,y], [x,y,loc]) and primitive arrays stay ORDERED. */
 function isUnorderedArray(arr: unknown[], key?: string): boolean {
+  if (key !== undefined && ORDERED_KEYS.has(key)) return false;
   if (key !== undefined && UNORDERED_KEYS.has(key)) return true;
   if (arr.length <= 1) return false;
   // array of objects (feature/point/event/token lists, …)
@@ -254,8 +280,8 @@ function collectDiffs(a: unknown, b: unknown, path: string, key: string | undefi
     return;
   }
   if (ta === "array") {
-    const aa = a as unknown[];
-    const bb = b as unknown[];
+    let aa = a as unknown[];
+    let bb = b as unknown[];
     if (isUnorderedArray(aa, key) || isUnorderedArray(bb, key)) {
       // multiset match by canonical member equality
       const bMatched = new Array(bb.length).fill(false);
@@ -277,6 +303,10 @@ function collectDiffs(a: unknown, b: unknown, path: string, key: string | undefi
       return;
     }
     // ordered comparison
+    if (key === "events") {
+      aa = sortScoreRuns(aa);
+      bb = sortScoreRuns(bb);
+    }
     if (aa.length !== bb.length) {
       out.push(`${path}.length: ${aa.length} (java) vs ${bb.length} (ts)`);
     }
