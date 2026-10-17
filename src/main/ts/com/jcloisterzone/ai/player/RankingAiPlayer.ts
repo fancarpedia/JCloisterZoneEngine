@@ -1,5 +1,6 @@
 import type { GameStatePhaseReducer } from "../../game/GameStatePhaseReducer.js";
 import { PortalCapability } from "../../game/capability/PortalCapability.js";
+import { CommitMessage } from "../../io/message/CommitMessage.js";
 import type { Message } from "../../io/message/Message.js";
 import { PlaceTileMessage } from "../../io/message/PlaceTileMessage.js";
 import type { ReplayableMessage } from "../../io/message/ReplayableMessage.js";
@@ -35,7 +36,10 @@ export abstract class RankingAiPlayer extends AiPlayer {
         for (const msg of this.getPossibleActions(itemState)) {
           const newChain = chain.concat(msg);
           const newState = this.phaseReducer.apply(itemState, msg as unknown as Message);
+          // COMMIT ends the turn part. With the builder the same player goes on, but the next
+          // part starts with a tile draw the search cannot know in advance.
           let end =
+            msg instanceof CommitMessage ||
             newState.getActivePlayer() === null ||
             newState.getActivePlayer()!.getIndex() !== this.me.getIndex() ||
             newState.getTurnPlayer()!.getIndex() !== state.getTurnPlayer()!.getIndex();
