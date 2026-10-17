@@ -1,0 +1,121 @@
+{
+  "appVersion": "6.3.0",
+  "gameId": "mini-3",
+  "name": "",
+  "initialRandom": 0.0,
+  "created": "2026-09-26T00:00:00.000Z",
+  "clock": 0,
+  "test": {
+    "description": "No Mini Meeple for placing an abbey into a hole",
+    "assertions": []
+  },
+  "setup": {
+    "sets": {
+      "basic:1": 1
+    },
+    "tiles": {
+      "BA/L": 30
+    },
+    "elements": {
+      "small-follower": 7,
+      "farmers": true,
+      "mini-follower": 2,
+      "abbey": 1
+    },
+    "rules": {},
+    "timer": null,
+    "start": [
+      {
+        "tile": "BA/L",
+        "x": -1,
+        "y": -1,
+        "rotation": 0
+      },
+      {
+        "tile": "BA/L",
+        "x": -1,
+        "y": 0,
+        "rotation": 0
+      },
+      {
+        "tile": "BA/L",
+        "x": -1,
+        "y": 1,
+        "rotation": 0
+      },
+      {
+        "tile": "BA/L",
+        "x": 0,
+        "y": -1,
+        "rotation": 0
+      },
+      {
+        "tile": "BA/L",
+        "x": 0,
+        "y": 1,
+        "rotation": 0
+      },
+      {
+        "tile": "BA/L",
+        "x": 1,
+        "y": -1,
+        "rotation": 0
+      },
+      {
+        "tile": "BA/L",
+        "x": 1,
+        "y": 0,
+        "rotation": 0
+      },
+      {
+        "tile": "BA/L",
+        "x": 1,
+        "y": 1,
+        "rotation": 0
+      }
+    ],
+    "options": {}
+  },
+  "players": [
+    {
+      "name": "Alice",
+      "slot": 0
+    }
+  ],
+  "gameAnnotations": {
+    "drawOrder": [
+      "BA/L",
+      "BA/L",
+      "BA/L",
+      "BA/L",
+      "BA/L",
+      "BA/L"
+    ]
+  },
+  "replay": [
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "AM/A",
+        "rotation": "R0",
+        "position": [
+          0,
+          0
+        ]
+      },
+      "player": 0
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.0
+      },
+      "player": 0
+    }
+  ]
+}
