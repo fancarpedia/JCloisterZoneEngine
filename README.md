@@ -120,6 +120,7 @@ test/golden tooling touch `node:*`.
 | `npm run build:bundle` | esbuild the engine into **one self-contained file** `bundle/jcz-engine.js` (the release artifact the client downloads). |
 | `npm test`          | Run the Vitest suite (`vitest run`). |
 | `npm run test:watch`| Vitest in watch mode. |
+| `npm run bench`     | Build, then time full seeded games (random policy and `LegacyAiPlayer`) through `reducer.apply`: ms/game, µs/move, games/s, plus move count and scores, which an optimization must not change. Options: `--games N`, `--ai-games N`, `--only random\|ai`, `--dist <dir>`. |
 | `npm run engine`    | Start the engine CLI (`node dist/cli/jcz-engine.js`); add `-p <port>` for socket mode. |
 | `npm run capture-golden` | Replay every `engine-tests/**/*.jcz` through the Java jar and write `*.golden.jsonl`. Requires `JCZ_JAR=<path to Engine.jar>`. |
 | `npm run set-draw-order` | Pin a test's forced tile draw order — see [Forcing a test's tile draw order](#forcing-a-tests-tile-draw-order). |

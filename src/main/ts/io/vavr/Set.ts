@@ -56,12 +56,30 @@ export abstract class Set<T> implements Iterable<T>, Valued {
   }
 
   add(value: T): Set<T> {
-    if (this.contains(value)) return this;
-    return this.rebuild([...this.items, value]);
+    return this.addAll([value]);
   }
+  /** One pass with a single mutable copy of the hash index for the whole batch; the new
+   *  set keeps that index. Bucket arrays are shared with this set, so they are copied on
+   *  write. Returns `this` when nothing is added. */
   addAll(values: Iterable<T>): Set<T> {
-    let result: Set<T> = this;
-    for (const v of values) result = result.add(v);
+    const baseIndex = this.getIndex();
+    let items: T[] | null = null;
+    let index: globalThis.Map<number, number[]> | null = null;
+    for (const v of values) {
+      const h = hashCode(v);
+      const arr = items ?? this.items;
+      const bucket = (index ?? baseIndex).get(h);
+      if (bucket && bucket.some((i) => equals(arr[i], v))) continue;
+      if (items === null || index === null) {
+        items = this.items.slice();
+        index = new globalThis.Map(baseIndex);
+      }
+      index.set(h, bucket ? [...bucket, items.length] : [items.length]);
+      items.push(v);
+    }
+    if (items === null) return this;
+    const result = this.rebuild(items);
+    result.index = index;
     return result;
   }
   union(other: Set<T>): Set<T> {
@@ -192,15 +210,6 @@ export class HashSet<T> extends Set<T> {
     return HashSet.ofAll(items);
   }
   static ofAll<T>(items: Iterable<T>): HashSet<T> {
-    const out: T[] = [];
-    const seen = new HashSet<T>([]);
-    let s: Set<T> = seen;
-    for (const v of items) {
-      if (!s.contains(v)) {
-        s = s.add(v);
-        out.push(v);
-      }
-    }
-    return new HashSet<T>(out);
+    return HashSet.empty<T>().addAll(items) as HashSet<T>;
   }
 }

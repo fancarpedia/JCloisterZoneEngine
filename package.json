@@ -34,6 +34,7 @@
     "capture-golden:ts": "node scripts/capture-golden-ts.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
+    "bench": "npm run build && node scripts/bench.mjs",
     "port:manifest": "node scripts/port-manifest.mjs"
   },
   "engines": {

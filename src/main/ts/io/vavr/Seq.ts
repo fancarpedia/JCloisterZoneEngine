@@ -142,21 +142,25 @@ export abstract class Seq<T> implements Iterable<T>, Valued {
     return this.wrap(out);
   }
   distinct(): Seq<T> {
-    const out: T[] = [];
-    for (const v of this.items) {
-      if (!out.some((x) => equals(x, v))) out.push(v);
-    }
-    return this.wrap(out);
+    return this.distinctBy((v) => v);
   }
+  /** Keeps the first element for each key. Keys are bucketed by hash, so this is
+   *  linear in the length instead of comparing every element with every kept one. */
   distinctBy<K>(keyFn: (v: T) => K): Seq<T> {
-    const seen: K[] = [];
+    const seen = new globalThis.Map<number, K[]>();
     const out: T[] = [];
     for (const v of this.items) {
       const k = keyFn(v);
-      if (!seen.some((x) => equals(x, k))) {
-        seen.push(k);
-        out.push(v);
+      const h = hashCode(k);
+      const bucket = seen.get(h);
+      if (bucket === undefined) {
+        seen.set(h, [k]);
+      } else if (bucket.some((x) => equals(x, k))) {
+        continue;
+      } else {
+        bucket.push(k);
       }
+      out.push(v);
     }
     return this.wrap(out);
   }
