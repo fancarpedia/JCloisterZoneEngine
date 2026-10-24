@@ -28,6 +28,12 @@ export class Flag extends JavaEnum {
   // double turn counts as one turn for the condition).
   static readonly COOP_CONDITION_MET = new Flag("COOP_CONDITION_MET", 11);
 
+  // Mini Meeple (fan expansion): set when a Mini is AWARDED (a regular tile filled a hole). While
+  // it is set the Mini is not offered for deployment, so a Mini earned this turn can only be played
+  // from the next turn on. Cleared at the turn PART end (with PORTAL_USED & co.) — deliberately, so
+  // a Builder double turn counts as a new turn and the Mini becomes playable in its second part.
+  static readonly MINI_MEEPLE_AWARDED = new Flag("MINI_MEEPLE_AWARDED", 12);
+
   private static readonly VALUES: readonly Flag[] = [
     Flag.RANSOM_PAID,
     Flag.BAZAAR_AUCTION,
@@ -41,6 +47,7 @@ export class Flag extends JavaEnum {
     Flag.WOOD_ACTION_CONFIRMED,
     Flag.RIVER_VOLCANO_DOUBLE_TURN,
     Flag.COOP_CONDITION_MET,
+    Flag.MINI_MEEPLE_AWARDED,
   ];
 
   static values(): readonly Flag[] {

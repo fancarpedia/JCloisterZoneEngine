@@ -2,13 +2,13 @@
   "appVersion": "6.3.0",
   "gameId": "mini-1",
   "name": "",
-  "initialRandom": 0.0,
+  "initialRandom": 0,
   "created": "2026-09-26T00:00:00.000Z",
   "clock": 0,
   "test": {
-    "description": "Mini Meeple awarded for filling a hole, deployed on that tile the same turn",
+    "description": "Mini Meeple awarded for filling a hole; NOT deployable in the same turn",
     "assertions": [
-      "Alice has 9 points"
+      "Alice has 0 points"
     ]
   },
   "setup": {
@@ -107,24 +107,14 @@
       "player": 0
     },
     {
-      "type": "DEPLOY_MEEPLE",
-      "payload": {
-        "pointer": {
-          "position": [
-            0,
-            0
-          ],
-          "location": "I",
-          "feature": "Monastery"
-        },
-        "meepleId": "0.mini.1"
-      },
+      "type": "PASS",
+      "payload": {},
       "player": 0
     },
     {
       "type": "COMMIT",
       "payload": {
-        "random": 0.0
+        "random": 0
       },
       "player": 0
     }

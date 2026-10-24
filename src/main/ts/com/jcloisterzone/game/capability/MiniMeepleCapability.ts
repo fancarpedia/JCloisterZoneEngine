@@ -6,6 +6,7 @@ import type { Follower } from "../../figure/Follower.js";
 import { MiniFollower } from "../../figure/MiniFollower.js";
 import type { RandomGenerator } from "../../random/RandomGenerator.js";
 import { Capability } from "../Capability.js";
+import { Flag } from "../state/Flag.js";
 import type { GameState } from "../state/GameState.js";
 import type { PlacedTile } from "../state/PlacedTile.js";
 import { AbbeyCapability } from "./AbbeyCapability.js";
@@ -24,9 +25,12 @@ import { AbbeyCapability } from "./AbbeyCapability.js";
  * player holds is exactly what they have earned — and means an unawarded Mini cannot leak
  * into actions, the state JSON or the AI, because it does not exist yet.
  *
- * Because the award happens inside the PlaceTile reducer, it lands before ActionPhase.enter
- * builds the meeple actions — so a Mini earned by the current placement is already deployable
- * in the same turn, including onto the very tile that earned it.
+ * A Mini may only be played from the NEXT turn on, never in the turn that earned it. The award
+ * happens inside the PlaceTile reducer, i.e. BEFORE ActionPhase.enter builds the meeple actions,
+ * so without a marker the fresh Mini would be immediately deployable. Awarding therefore also sets
+ * Flag.MINI_MEEPLE_AWARDED, which ActionPhase checks to drop MiniFollower from the deployable
+ * types. The flag is cleared at the turn PART end (CleanUpTurnPartPhase), so a Builder double turn
+ * counts as a new turn and the Mini does become playable in its second part.
  *
  * Model: the per-player cap, taken from the `mini-follower` element. How many a player has
  * already been awarded is simply how many Minis they hold, so no per-player counter is kept.
@@ -37,7 +41,7 @@ export class MiniMeepleCapability extends Capability<number> {
   /** Upper bound on the cap (the `mini-follower` element is an integer count). */
   static readonly MAX_MINI_MEEPLES = 9;
   /** Used when the element carries a legacy boolean `true` or anything unparseable. */
-  static readonly DEFAULT_MINI_MEEPLES = 2;
+  static readonly DEFAULT_MINI_MEEPLES = 5;
 
   override onStartGame(state: GameState, _random: RandomGenerator): GameState {
     const raw = state.getElements().get("mini-follower").getOrNull();
@@ -77,6 +81,10 @@ export class MiniMeepleCapability extends Capability<number> {
         all.update(index, mine.append(mini) as Seq<Follower>) as Arr<Seq<Follower>>,
       ),
     );
+
+    // Earned this turn → not deployable until the next turn (see the class comment and
+    // ActionPhase). Cleared at the turn part end, so a Builder double turn unlocks it.
+    state = state.addFlag(Flag.MINI_MEEPLE_AWARDED);
 
     // History entry: which player earned which meeple, and the tile placement that earned it
     // (the client highlights that tile when the entry is hovered).
