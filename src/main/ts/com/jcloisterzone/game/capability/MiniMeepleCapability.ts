@@ -70,7 +70,8 @@ export class MiniMeepleCapability extends Capability<number> {
     const index = player.getIndex();
     const all = state.getPlayers().getFollowers();
     const mine = all.get(index);
-    const owned = mine.filter((f) => f instanceof MiniFollower).size();
+    const myMinis = mine.filter((f) => f instanceof MiniFollower);
+    const owned = myMinis.size();
     if (owned >= cap) return state;
 
     // Mirrors MeepleIdProvider's "<player>.<type>.<n>" ids (0.mini.1, 0.mini.2, ...). The count
@@ -85,11 +86,12 @@ export class MiniMeepleCapability extends Capability<number> {
     // Earned this turn → THIS Mini is not deployable until the next turn (see the class comment
     // and ActionPhase). Cleared at the turn part end, so a Builder double turn unlocks it.
     state = state.addFlag(Flag.MINI_MEEPLE_AWARDED);
-    // ...but a Mini the player ALREADY held is unaffected and stays playable. `owned` is counted
-    // before the new figure is appended, so it is exactly the supply as of the turn's start —
-    // nothing can change a player's Mini count between the turn beginning and this placement.
+    // ...but a Mini the player already had AVAILABLE is unaffected and stays playable. What counts
+    // is the supply, not how many were ever awarded: `isInSupply` excludes Minis already deployed
+    // on the board and ones captured in a tower, neither of which can be played. `myMinis` is
+    // taken before the new figure is appended, so this is the supply as of the turn's start.
     // (A captured Mini bought back later in the turn sets the same flag; see PayRansom.)
-    if (owned > 0) state = state.addFlag(Flag.MINI_IN_SUPPLY);
+    if (myMinis.exists((f) => f.isInSupply(state))) state = state.addFlag(Flag.MINI_IN_SUPPLY);
 
     // History entry: which player earned which meeple, and the tile placement that earned it
     // (the client highlights that tile when the entry is hovered).

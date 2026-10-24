@@ -782,8 +782,14 @@ export class StateGsonBuilder {
     return null;
   }
 
-  /** Serialize one player action (port of the per-action serializers). */
-  private serializeAction(action: PlayerAction<unknown>): Record<string, unknown> {
+  /**
+   * Serialize one player action (port of the per-action serializers).
+   *
+   * Public because the `.jcz` test harness asserts on action items (`Available actions:` in
+   * jcz.test.ts) and must see exactly what the client sees. It needs no Game — only `this.fp`
+   * and `this.pos` — so a bare `new StateGsonBuilder()` is enough to call it.
+   */
+  serializeAction(action: PlayerAction<unknown>): Record<string, unknown> {
     if (action instanceof TilePlacementAction) {
       const byPos = new Map<
         string,

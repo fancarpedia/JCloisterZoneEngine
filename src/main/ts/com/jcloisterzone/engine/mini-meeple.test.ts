@@ -193,6 +193,28 @@ describe("Mini Meeple", () => {
     expect(offeredMeeples(state)).toContain("MiniFollower"); // ...yet Minis remain playable
   });
 
+  it("counts the supply, not the awards — a Mini on the board does not unblock a fresh one", () => {
+    // Cap 2, two holes. Turn 1 earns Mini #1. Turn 2 deploys it on a monastery. Turn 3 fills the
+    // second hole: the player now OWNS two Minis, but #1 is on the board, so the only Mini they
+    // could actually play is the one just awarded — it must stay blocked. Counting owned figures
+    // instead of the supply got this wrong and offered the fresh Mini.
+    const game = new Game({ miniCap: 2, holes: [[0, 0], [4, 0]] });
+
+    game.place(0, 0);
+    game.pass();
+    game.commit();
+
+    game.place(2, 0); // not a hole: awards nothing, so Mini #1 is deployable now
+    let state = game.deployOnMonastery(2, 0, "0.mini.1");
+    expect(minis(state)).toBe(0); // deployed → out of the supply
+    game.commit();
+
+    state = game.place(4, 0);
+    expect(awards(state)).toHaveLength(1);
+    expect(minis(state)).toBe(1); // the fresh award, and nothing else available
+    expect(offeredMeeples(state)).not.toContain("MiniFollower");
+  });
+
   it("records the award in the history, pointing at the tile that earned it", () => {
     const game = new Game({ miniCap: 2, holes: [[0, 0]] });
     const state = game.place(0, 0);

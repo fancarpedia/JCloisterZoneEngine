@@ -1,0 +1,447 @@
+{
+  "appVersion": "6.3.0-beta.6",
+  "gameId": "1",
+  "name": "",
+  "initialRandom": 0.44961432375517574,
+  "created": "2026-10-24T22:55:08.958Z",
+  "clock": 113863,
+  "setup": {
+    "sets": {
+      "basic:1": 1
+    },
+    "elements": {
+      "small-follower": 7,
+      "farmers": true,
+      "mini-follower": 5
+    },
+    "rules": {},
+    "timer": null,
+    "start": [
+      {
+        "tile": "BA/RCr",
+        "x": 0,
+        "y": 0,
+        "rotation": 0
+      }
+    ],
+    "ai": false,
+    "options": {
+      "randomizeSeating": true
+    }
+  },
+  "players": [
+    {
+      "name": "Betty",
+      "slot": 2,
+      "ai": false
+    }
+  ],
+  "chat": [],
+  "replay": [
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/Rr",
+        "rotation": "R270",
+        "position": [
+          -1,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 2779
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 3014
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.48667098090304495
+      },
+      "player": 0,
+      "clock": 3019
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RRR",
+        "rotation": "R0",
+        "position": [
+          1,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 4404
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 4513
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.8429332606639566
+      },
+      "player": 0,
+      "clock": 4518
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R90",
+        "position": [
+          -1,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 5866
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 6000
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.08225235264792485
+      },
+      "player": 0,
+      "clock": 6007
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R90",
+        "position": [
+          1,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 7266
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 7365
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.30909401825315097
+      },
+      "player": 0,
+      "clock": 7374
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/Rr",
+        "rotation": "R180",
+        "position": [
+          -1,
+          2
+        ]
+      },
+      "player": 0,
+      "clock": 11460
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 11741
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.8811891953137381
+      },
+      "player": 0,
+      "clock": 11747
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          0,
+          2
+        ]
+      },
+      "player": 0,
+      "clock": 12942
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 13091
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.05654688216754011
+      },
+      "player": 0,
+      "clock": 13097
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RRR",
+        "rotation": "R180",
+        "position": [
+          1,
+          2
+        ]
+      },
+      "player": 0,
+      "clock": 15330
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 17274
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.979647050215305
+      },
+      "player": 0,
+      "clock": 17283
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/L",
+        "rotation": "R0",
+        "position": [
+          0,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 18811
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 21154
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.34235473121049353
+      },
+      "player": 0,
+      "clock": 21161
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          2,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 23004
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 24313
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.6923638714074367
+      },
+      "player": 0,
+      "clock": 24326
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RRR",
+        "rotation": "R0",
+        "position": [
+          3,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 26400
+    },
+    {
+      "type": "DEPLOY_MEEPLE",
+      "payload": {
+        "pointer": {
+          "position": [
+            3,
+            0
+          ],
+          "location": "E",
+          "feature": "Road"
+        },
+        "meepleId": "0.mini.1"
+      },
+      "player": 0,
+      "clock": 28396
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9347355411462817
+      },
+      "player": 0,
+      "clock": 28600
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R90",
+        "position": [
+          3,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 29886
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 30020
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.1828307438295822
+      },
+      "player": 0,
+      "clock": 30026
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/Rr",
+        "rotation": "R90",
+        "position": [
+          3,
+          2
+        ]
+      },
+      "player": 0,
+      "clock": 31252
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 31346
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.5374273397385185
+      },
+      "player": 0,
+      "clock": 31354
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          2,
+          2
+        ]
+      },
+      "player": 0,
+      "clock": 32642
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 39036
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.44038425008419546
+      },
+      "player": 0,
+      "clock": 39047
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/L",
+        "rotation": "R0",
+        "position": [
+          2,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 40431
+    }
+  ],
+  "gameAnnotations": {
+    "drawOrder": [
+      "BA/Rr",
+      "BA/RRR",
+      "BA/RFr",
+      "BA/RFr",
+      "BA/Rr",
+      "BA/RFr",
+      "BA/RRR",
+      "BA/L",
+      "BA/RFr",
+      "BA/RRR",
+      "BA/RFr",
+      "BA/Rr",
+      "BA/RFr",
+      "BA/L"
+    ]
+  },
+  "test": {
+    "description": "Mini Meeple awarded while the only owned Mini is deployed — not placeable this turn",
+    "assertions": [
+      "Betty has 0 points.",
+      "Phase is ActionPhase",
+      "Turn player is Betty",
+      "Active player is Betty",
+      "Player can pass",
+      "Available actions: Meeple,SmallFollower",
+      "Meeple SmallFollower options: {Monastery,I,[2,1]}; {Field,NL.NR.EL.ER.SL.SR.WL.WR,[2,1]}",
+      "Undo is allowed"
+    ]
+  }
+}

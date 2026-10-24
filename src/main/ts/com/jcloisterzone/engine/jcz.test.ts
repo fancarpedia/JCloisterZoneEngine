@@ -3,6 +3,9 @@ import { join } from "node:path";
 import { DOMParser } from "@xmldom/xmldom";
 import { describe, it, expect } from "vitest";
 import { setDomParserFactory, type XmlDOMParser } from "../XmlUtils.js";
+import type { GameState } from "../game/state/GameState.js";
+import type { PlayerAction } from "../action/PlayerAction.js";
+import { StateGsonBuilder } from "./StateGsonBuilder.js";
 import { GameStateBuilder } from "../game/state/GameStateBuilder.js";
 import { GameStatePhaseReducer } from "../game/GameStatePhaseReducer.js";
 import { GameSetupMessage } from "../io/message/GameSetupMessage.js";
@@ -127,7 +130,7 @@ function buildSetupMessage(jcz: Jcz, xmlContents: string[]): GameSetupMessage {
   return msg;
 }
 
-function runReplay(jcz: Jcz): number[] {
+function runReplay(jcz: Jcz): GameState {
   const xmlContents = loadXmlsForSets(jcz.setup.sets);
   const setupMsg = buildSetupMessage(jcz, xmlContents);
   const setup = createSetupFromMessage(setupMsg);
@@ -153,23 +156,76 @@ function runReplay(jcz: Jcz): number[] {
     state = reducer.apply(state, msg);
   }
 
-  return state.getPlayers().getScore().toArray();
+  return state;
 }
 
-function parseAssertions(assertions: string[], players: Array<{ name: string; slot: number }>): Map<number, number> {
+// The scalar fields that identify WHICH thing an action item is about, in precedence order.
+// One list covers every action type instead of a per-type switch: `Meeple` carries `meeple`,
+// `TilePlacement` a `tileId`, `TowerPiece`/`Tunnel` a `token`, `ReturnMeeple` a `source`, the
+// fairy/dragon/donkey actions a `figureId`, and the rest (Confirm, BazaarBid, ...) none at all.
+// MUST match the client recorder in FanCloisterZone src/renderer/store/game.js.
+const ACTION_QUALIFIERS = ["meeple", "tileId", "token", "source", "figureId"] as const;
+
+/** `Meeple,SmallFollower` / `TilePlacement,BA/L` / `Confirm` — one descriptor per action item. */
+function describeAction(item: Record<string, unknown>): string {
+  const type = String(item.type);
+  for (const key of ACTION_QUALIFIERS) {
+    const v = item[key];
+    if (typeof v === "string" || typeof v === "number") return `${type},${v}`;
+  }
+  return type;
+}
+
+/** The action items offered in `state`, described the same way the client records them. */
+function actionDescriptors(state: GameState): string[] {
+  const actions = state.getPlayerActions();
+  if (actions === null) return [];
+  const gson = new StateGsonBuilder();
+  return actions
+    .getActions()
+    .toArray()
+    .map((a) => describeAction(gson.serializeAction(a as PlayerAction<unknown>)));
+}
+
+/** `Available actions: A; B` — split into descriptors; an empty list or `none` means none. */
+function parseActionList(raw: string): string[] {
+  const body = raw.trim();
+  if (body === "" || body.toLowerCase() === "none") return [];
+  return body
+    .split(";")
+    .map((x) => x.trim())
+    .filter((x) => x !== "");
+}
+
+interface Expectations {
+  /** player index -> expected score */
+  scores: Map<number, number>;
+  /** the exhaustive set of offered action items, or null when the .jcz does not assert it */
+  actions: string[] | null;
+}
+
+function parseAssertions(assertions: string[], players: Array<{ name: string; slot: number }>): Expectations {
   // The engine indexes players (and the score array) by their 0-based position in the
   // players list, NOT by slot — map assertion names to that index.
   const byName = new Map<string, number>();
   players.forEach((p, i) => byName.set(p.name, i));
-  const expected = new Map<number, number>();
+  const scores = new Map<number, number>();
+  let actions: string[] | null = null;
   for (const a of assertions) {
-    const m = /^(.+?) has (-?\d+) points?$/.exec(a.trim());
-    if (!m) continue;
-    const idx = byName.get(m[1]);
-    if (idx === undefined) continue;
-    expected.set(idx, parseInt(m[2], 10));
+    const trimmed = a.trim();
+    const score = /^(.+?) has (-?\d+) points?$/.exec(trimmed);
+    if (score) {
+      const idx = byName.get(score[1]);
+      if (idx !== undefined) scores.set(idx, parseInt(score[2], 10));
+      continue;
+    }
+    // Exhaustive by design: it fails on an EXTRA offered action as well as a missing one,
+    // which is the point — e.g. a Mini Meeple that must not be deployable in the turn it
+    // was awarded would otherwise slip through unnoticed.
+    const acts = /^Available actions?:(.*)$/i.exec(trimmed);
+    if (acts) actions = parseActionList(acts[1]);
   }
-  return expected;
+  return { scores, actions };
 }
 
 const entries = discover();
@@ -192,11 +248,16 @@ for (const [dir, dirEntries] of [...byDir.entries()].sort()) {
         it.skip(`${name} (skipped: missing set XML)`, () => {});
         continue;
       }
+      const expected = parseAssertions(jcz.test?.assertions ?? [], jcz.players);
       if (!jcz.test?.assertions?.length) {
-        // no score assertions in this .jcz (golden-only test) — nothing to check here
-        it.skip(`${name} (skipped: no score assertions)`, () => {});
+        // no assertions at all in this .jcz (golden-only test) — nothing to check here
+        it.skip(`${name} (skipped: no assertions)`, () => {});
         continue;
       }
+      // A fixture whose assertions this harness cannot evaluate still replays below: that alone
+      // catches a replay that throws. The rest of the lines — `Phase is ...`, `Meeple X
+      // options: ...` — are verified by the CLIENT instead (FanCloisterZone
+      // src/renderer/utils/testing.js); only scores and `Available actions:` are checked here.
       if (jcz.replay.some((m) => m.type === "UNDO")) {
         // this score proxy replays straight through the reducer and doesn't model undo
         // history (the Engine/Game does); such replays are covered by state-parity.
@@ -204,10 +265,16 @@ for (const [dir, dirEntries] of [...byDir.entries()].sort()) {
         continue;
       }
       it(name, () => {
-        const scores = runReplay(jcz);
-        const expected = parseAssertions(jcz.test.assertions, jcz.players);
-        for (const [idx, points] of expected) {
+        const state = runReplay(jcz);
+        const scores = state.getPlayers().getScore().toArray();
+        for (const [idx, points] of expected.scores) {
           expect(scores[idx], `${jcz.players[idx]?.name} score`).toBe(points);
+        }
+        if (expected.actions !== null) {
+          // compared as sorted sets, so the assertion does not depend on the order the
+          // engine happens to append actions in
+          const actual = actionDescriptors(state).sort();
+          expect(actual, "available actions").toEqual([...expected.actions].sort());
         }
       });
     }
