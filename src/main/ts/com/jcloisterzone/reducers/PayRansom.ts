@@ -6,6 +6,7 @@ import { ExprItem } from "../event/ExprItem.js";
 import { PointsExpression } from "../event/PointsExpression.js";
 import { ReceivedPoints } from "../event/ScoreEvent.js";
 import type { Follower } from "../figure/Follower.js";
+import { MiniFollower } from "../figure/MiniFollower.js";
 import type { Player } from "../Player.js";
 import type { Capability } from "../game/Capability.js";
 import { TowerCapability } from "../game/capability/TowerCapability.js";
@@ -53,6 +54,11 @@ export class PayRansom implements Reducer {
       >,
     );
     state = state.addFlag(Flag.RANSOM_PAID);
+    // Buying a captured Mini back puts a Mini in the supply that is NOT the one awarded this turn,
+    // so it may be played even in the turn an award happened (see Flag.MINI_IN_SUPPLY).
+    if (followerF instanceof MiniFollower) {
+      state = state.addFlag(Flag.MINI_IN_SUPPLY);
+    }
     let points: List<ReceivedPoints> = List.empty<ReceivedPoints>();
     points = points.append(
       new ReceivedPoints(

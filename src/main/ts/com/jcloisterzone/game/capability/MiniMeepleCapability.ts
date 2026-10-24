@@ -82,9 +82,14 @@ export class MiniMeepleCapability extends Capability<number> {
       ),
     );
 
-    // Earned this turn → not deployable until the next turn (see the class comment and
-    // ActionPhase). Cleared at the turn part end, so a Builder double turn unlocks it.
+    // Earned this turn → THIS Mini is not deployable until the next turn (see the class comment
+    // and ActionPhase). Cleared at the turn part end, so a Builder double turn unlocks it.
     state = state.addFlag(Flag.MINI_MEEPLE_AWARDED);
+    // ...but a Mini the player ALREADY held is unaffected and stays playable. `owned` is counted
+    // before the new figure is appended, so it is exactly the supply as of the turn's start —
+    // nothing can change a player's Mini count between the turn beginning and this placement.
+    // (A captured Mini bought back later in the turn sets the same flag; see PayRansom.)
+    if (owned > 0) state = state.addFlag(Flag.MINI_IN_SUPPLY);
 
     // History entry: which player earned which meeple, and the tile placement that earned it
     // (the client highlights that tile when the entry is hovered).

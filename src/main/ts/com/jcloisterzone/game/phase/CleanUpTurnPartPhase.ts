@@ -44,7 +44,8 @@ export class CleanUpTurnPartPhase extends Phase {
           .remove(Flag.WOOD_ACTION_CONFIRMED)
           // Mini Meeple earned this turn becomes playable from the next turn part on — which
           // deliberately includes the second part of a Builder double turn.
-          .remove(Flag.MINI_MEEPLE_AWARDED),
+          .remove(Flag.MINI_MEEPLE_AWARDED)
+          .remove(Flag.MINI_IN_SUPPLY),
       );
     }
     if (builderTakeAnotherTurn) {

@@ -88,10 +88,13 @@ export class ActionPhase extends AbstractActionPhase {
 
     const player = state.getTurnPlayer()!;
 
-    // A Mini Meeple awarded THIS turn may not be played yet (Flag.MINI_MEEPLE_AWARDED, set by
-    // MiniMeepleCapability and cleared at the turn part end) — drop it from the deployable types.
-    // Any Mini earned earlier stays playable; the flag only blocks the turn of the award.
-    const miniBlocked = state.getFlags().contains(Flag.MINI_MEEPLE_AWARDED);
+    // A Mini Meeple awarded THIS turn may not be played yet — but only the awarded one. If the
+    // player also has a Mini that did not come from this turn's award (they already held one, or
+    // they bought a captured one back from a tower), Minis stay on offer. Both flags are set by
+    // MiniMeepleCapability / PayRansom and cleared at the turn part end.
+    const flags = state.getFlags();
+    const miniBlocked =
+      flags.contains(Flag.MINI_MEEPLE_AWARDED) && !flags.contains(Flag.MINI_IN_SUPPLY);
     const allTypes = [SmallFollower, BigFollower, MiniFollower, Phantom, Abbot, Wagon, Mayor, Builder, Pig, Shepherd, Ringmaster];
     const meepleTypes: Vector<ClassToken<Meeple>> = Vector.ofAll(
       (miniBlocked ? allTypes.filter((t) => t !== MiniFollower) : allTypes) as unknown as ClassToken<Meeple>[],

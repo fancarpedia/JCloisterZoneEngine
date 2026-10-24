@@ -175,6 +175,24 @@ describe("Mini Meeple", () => {
     expect(offeredMeeples(state)).toContain("MiniFollower");
   });
 
+  it("blocks only the awarded Mini — one already in supply stays playable", () => {
+    // Two holes, cap 2. Turn 1 earns Mini #1 (blocked, nothing else in supply). Turn 2 fills the
+    // second hole and earns Mini #2 — but Mini #1 is sitting in the supply untouched, so Minis
+    // must still be offered. This is the case a blanket "awarded this turn" block got wrong.
+    const game = new Game({ miniCap: 2, holes: [[0, 0], [4, 0]] });
+
+    let state = game.place(0, 0);
+    expect(minis(state)).toBe(1);
+    expect(offeredMeeples(state)).not.toContain("MiniFollower"); // only the fresh one → blocked
+    game.pass();
+    game.commit();
+
+    state = game.place(4, 0);
+    expect(minis(state)).toBe(2); // the first is still in supply, plus the new award
+    expect(awards(state)).toHaveLength(1); // an award DID happen this turn
+    expect(offeredMeeples(state)).toContain("MiniFollower"); // ...yet Minis remain playable
+  });
+
   it("records the award in the history, pointing at the tile that earned it", () => {
     const game = new Game({ miniCap: 2, holes: [[0, 0]] });
     const state = game.place(0, 0);
