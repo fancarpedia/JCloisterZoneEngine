@@ -13,7 +13,12 @@ import type { GameState } from "../state/GameState.js";
  *  feature, its owner may voluntarily return it to score (a ReturnMeeple action). */
 export class AbbotCapability extends Capability<void> {
   override onActionPhaseEntered(state: GameState): GameState {
-    let actions = state.getPlayerActions()!;
+    const actions = state.getPlayerActions()!;
+    // Collect every returnable abbot into ONE action with several options. Appending inside the
+    // loop produced a separate "return abbot" item per abbot, so a player holding two or three
+    // showed the same action twice/three times. This matches how Princess / Robber's Son /
+    // Festival build their returns: gather the pointers, append a single ReturnMeepleAction.
+    const options: MeeplePointer[] = [];
     for (const t of state.getDeployedMeeples()) {
       const meeple = t._1;
       if (!(meeple instanceof Abbot) || !meeple.getPlayer().equals(actions.getPlayer())) continue;
@@ -23,15 +28,17 @@ export class AbbotCapability extends Capability<void> {
       if (!(feature instanceof Monastery || feature instanceof Garden)) continue;
       if ((feature as unknown as { isCompleted(s: GameState): boolean }).isCompleted(state)) continue;
 
-      actions = actions.appendAction(
+      options.push(new MeeplePointer(t._2, meeple.getId()));
+    }
+    if (!options.length) return state;
+    return state.setPlayerActions(
+      actions.appendAction(
         new ReturnMeepleAction(
-          HashSet.of(new MeeplePointer(t._2, meeple.getId())),
+          HashSet.ofAll(options),
           ReturnMeepleSource.ABBOT_RETURN,
         ) as unknown as PlayerAction<unknown>,
-      );
-      state = state.setPlayerActions(actions);
-    }
-    return state;
+      ),
+    );
   }
 }
 
