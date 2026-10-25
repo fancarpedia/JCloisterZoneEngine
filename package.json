@@ -26,6 +26,7 @@
     "src/main/ts"
   ],
   "scripts": {
+    "prebuild": "node scripts/gen-version.mjs",
     "build": "tsc -p tsconfig.build.json",
     "build:bundle": "node scripts/gen-version.mjs && npm run build && esbuild dist/cli/jcz-engine.js --bundle --platform=node --target=node16 --format=cjs --outfile=bundle/jcz-engine.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
