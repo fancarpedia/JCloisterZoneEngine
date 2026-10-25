@@ -5,7 +5,7 @@ bundle/
 *.tsbuildinfo
 
 # generated
-PORT_MANIFEST.md
+*.md
 src/main/ts/version.ts
 
 # Java build artifacts (the engine jar is built from the 6.x branch, not committed here)
