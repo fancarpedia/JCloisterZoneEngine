@@ -19,6 +19,7 @@ import { MoveNeutralFigure } from "../../reducers/MoveNeutralFigure.js";
 import { MageAndWitchCapability } from "../capability/MageAndWitchCapability.js";
 import { ActionsState } from "../state/ActionsState.js";
 import type { GameState } from "../state/GameState.js";
+import { Flag } from "../state/Flag.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
 
@@ -83,6 +84,8 @@ export class MageAndWitchPhase extends Phase {
     const fig = state.getNeutralFigures().getById(msg.getFigureId()!);
     if (fig instanceof Mage || fig instanceof Witch) {
       state = new MoveNeutralFigure(fig as NeutralFigure<BoardPointer>, ptr, state.getActivePlayer()).apply(state);
+      // the figure is placed on a feature of the tile as it lies, so the tile may no longer be turned
+      state = state.addFlag(Flag.TILE_ROTATION_DISALLOWED);
       state = this.clearActions(state);
       return this.next(state);
     }

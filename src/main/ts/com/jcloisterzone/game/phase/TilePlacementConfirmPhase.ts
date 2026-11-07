@@ -5,6 +5,7 @@ import { TilePlacementConfirmMessage as TilePlacementConfirmMessageClass } from 
 import type { RandomGenerator } from "../../random/RandomGenerator.js";
 import { MeteoriteCapability } from "../capability/MeteoriteCapability.js";
 import { ActionsState } from "../state/ActionsState.js";
+import { Flag } from "../state/Flag.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
@@ -34,6 +35,9 @@ export class TilePlacementConfirmPhase extends Phase {
     if (state.hasCapability(METEORITE_CLS)) {
       state = (state.getCapabilities().get(METEORITE_CLS) as MeteoriteCapability).confirmedTilePlacement(state);
     }
+    // Confirming commits to the tile as it lies — the meteorite die is rolled against this exact
+    // placement — so it may no longer be turned.
+    state = state.addFlag(Flag.TILE_ROTATION_DISALLOWED);
     state = this.clearActions(state);
     return this.next(state);
   }

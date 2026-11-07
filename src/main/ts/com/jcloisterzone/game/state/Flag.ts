@@ -42,6 +42,13 @@ export class Flag extends JavaEnum {
   static readonly MINI_MEEPLE_AWARDED = new Flag("MINI_MEEPLE_AWARDED", 12);
   static readonly MINI_IN_SUPPLY = new Flag("MINI_IN_SUPPLY", 13);
 
+  // The tile that was placed this turn part may no longer be turned. The client offers "rotate the
+  // placed tile" on small screens (UNDO + the same placement at the next rotation), which is only
+  // sound while nothing has been decided on top of that placement. Set by the steps that commit to
+  // the tile as it lies: a confirmed Meteorite, the first Gold Ingot, a placed Mage or Witch.
+  // Cleared at the turn PART end with PORTAL_USED & co., so the next tile starts rotatable.
+  static readonly TILE_ROTATION_DISALLOWED = new Flag("TILE_ROTATION_DISALLOWED", 14);
+
   private static readonly VALUES: readonly Flag[] = [
     Flag.RANSOM_PAID,
     Flag.BAZAAR_AUCTION,
@@ -57,6 +64,7 @@ export class Flag extends JavaEnum {
     Flag.COOP_CONDITION_MET,
     Flag.MINI_MEEPLE_AWARDED,
     Flag.MINI_IN_SUPPLY,
+    Flag.TILE_ROTATION_DISALLOWED,
   ];
 
   static values(): readonly Flag[] {

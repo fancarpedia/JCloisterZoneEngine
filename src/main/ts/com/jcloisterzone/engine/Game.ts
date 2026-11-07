@@ -31,6 +31,16 @@ export class Game {
     return this.undoHistory.size();
   }
 
+  /** The snapshot a single UNDO would restore, without consuming it. */
+  peekUndo(): UndoHistoryItem | null {
+    return this.undoHistory.isEmpty() ? null : this.undoHistory.head();
+  }
+
+  /** The undo stack, newest first. */
+  getUndoHistory(): UndoHistoryItem[] {
+    return this.undoHistory.toArray();
+  }
+
   undo(): void {
     if (this.undoHistory.isEmpty()) {
       throw new Error("IllegalState: nothing to undo");

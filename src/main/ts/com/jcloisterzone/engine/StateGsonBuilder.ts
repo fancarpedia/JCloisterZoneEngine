@@ -92,6 +92,7 @@ import { TowerPieceAction } from "../action/TowerPieceAction.js";
 import { CaptureFollowerAction } from "../action/CaptureFollowerAction.js";
 import { SelectPrisonerToExchangeAction } from "../action/SelectPrisonerToExchangeAction.js";
 import { Flag } from "../game/state/Flag.js";
+import { tileRotationContext } from "./TileRotation.js";
 import type { GameState } from "../game/state/GameState.js";
 import type { Game } from "./Game.js";
 
@@ -176,8 +177,16 @@ export class StateGsonBuilder {
                 .map((a) => this.serializeAction(a)),
             },
       history: this.playEvents(state),
-      flags: state.hasFlag(Flag.RANSOM_PAID) ? { ransomPaid: true } : {},
+      flags: {
+        ...(state.hasFlag(Flag.RANSOM_PAID) ? { ransomPaid: true } : {}),
+        // the client's "rotate the placed tile" control is hidden while this is set
+        ...(state.hasFlag(Flag.TILE_ROTATION_DISALLOWED) ? { tileRotationDisallowed: true } : {}),
+      },
       undo: { allowed: game.isUndoAllowed(), depth: game.getUndoDepth() },
+      // Present only while the tile already on the board may still be turned. The client needs no
+      // memory of its own for the "rotate the placed tile" action, so the option survives a
+      // reload, a reconnect and a game loaded from a save.
+      tileRotation: this.tileRotation(game),
       bazaar: this.bazaar(state),
       coop: this.coop(state),
     };
@@ -440,6 +449,19 @@ export class StateGsonBuilder {
       else groups.set(name, { count: 1, id: f.getId() });
     }
     for (const [name, g] of groups) into[name] = [g.count, g.id];
+  }
+
+  private tileRotation(game: Game): unknown {
+    const ctx = tileRotationContext(game);
+    if (ctx === null) {
+      return null;
+    }
+    return {
+      position: this.pos(ctx.position),
+      rotation: this.rotationToPrimitive(ctx.rotation),
+      rotations: ctx.rotations.map((r) => this.rotationToPrimitive(r)),
+      tileId: ctx.tileId,
+    };
   }
 
   private placedTiles(state: GameState): unknown[] {

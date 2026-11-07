@@ -45,7 +45,9 @@ export class CleanUpTurnPartPhase extends Phase {
           // Mini Meeple earned this turn becomes playable from the next turn part on — which
           // deliberately includes the second part of a Builder double turn.
           .remove(Flag.MINI_MEEPLE_AWARDED)
-          .remove(Flag.MINI_IN_SUPPLY),
+          .remove(Flag.MINI_IN_SUPPLY)
+          // the next turn part places a new tile, which starts out rotatable again
+          .remove(Flag.TILE_ROTATION_DISALLOWED),
       );
     }
     if (builderTakeAnotherTurn) {

@@ -14,6 +14,7 @@ import type { Capability } from "../Capability.js";
 import { GoldminesCapability, type GoldModel } from "../capability/GoldminesCapability.js";
 import { ActionsState } from "../state/ActionsState.js";
 import type { GameState } from "../state/GameState.js";
+import { Flag } from "../state/Flag.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
 
@@ -70,6 +71,8 @@ export class GoldPiecePhase extends Phase {
       throw new Error("Illegal gold token");
     }
     state = this.placeGoldToken(state, msg.getPointer() as Position);
+    // the gold is placed relative to the tile as it lies, so the tile may no longer be turned
+    state = state.addFlag(Flag.TILE_ROTATION_DISALLOWED);
     state = this.clearActions(state);
     return this.next(state);
   }

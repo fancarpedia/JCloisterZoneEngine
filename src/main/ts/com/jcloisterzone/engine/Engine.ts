@@ -9,10 +9,13 @@ import type { ReplayableMessage } from "../io/message/ReplayableMessage.js";
 import { isInstanceOfRandomChangingMessage } from "../io/message/RandomChangingMessage.js";
 import { AiMessage } from "../io/message/AiMessage.js";
 import { MoveNeutralFigureMessage } from "../io/message/MoveNeutralFigureMessage.js";
+import { PlaceTileMessage } from "../io/message/PlaceTileMessage.js";
 import { LegacyAiPlayer } from "../ai/player/LegacyAiPlayer.js";
 import { Player } from "../Player.js";
 import { createSetupFromMessage } from "./EngineSetup.js";
 import { Game } from "./Game.js";
+import { tileRotationContext, nextRotation } from "./TileRotation.js";
+import { Rotation } from "../board/Rotation.js";
 import { StateGsonBuilder } from "./StateGsonBuilder.js";
 
 /**
@@ -154,6 +157,11 @@ export class Engine {
       return this.bulk ? null : this.serialize();
     }
 
+    // ROTATE_TILE turns the tile that was JUST placed, without taking it off the board first.
+    if (entry.type === "ROTATE_TILE") {
+      return this.handleRotateTile(entry.payload);
+    }
+
     const msg = this.parser.parse(entry);
     const oldActivePlayer = this.state!.getActivePlayer();
 
@@ -223,6 +231,50 @@ export class Engine {
     const result = !this.bulk || gameOver ? this.serialize() : null;
     if (gameOver) this.over = true; // emit the final state once, then ignore further input
     return result;
+  }
+
+  /**
+   * ROTATE_TILE - turn the tile that is already on the board.
+   *
+   * A placed tile cannot be turned forward: its edges are already merged into the feature graph.
+   * So the rotation is replayed instead. `markUndo` snapshots the state BEFORE each message, so
+   * the undo stack still holds the state the tile was laid down from: the rotation re-places the
+   * tile from there at the new angle, having first pushed the current (placed-at-the-old-angle)
+   * state onto the stack. Each rotation therefore costs one undo step of its own - undo walks
+   * back through the angles and only then lifts the tile.
+   *
+   * `rotation` in the payload is optional; without it the tile moves to the next legal angle.
+   * Whether a rotation is allowed at all is decided by tileRotationContext, the same code that
+   * tells the client whether to offer it.
+   */
+  private handleRotateTile(payload: Record<string, unknown>): string | null {
+    const ctx = tileRotationContext(this.game!);
+    if (ctx === null) {
+      return this.error("the placed tile cannot be rotated");
+    }
+    const target = payload.rotation === undefined || payload.rotation === null
+      ? nextRotation(ctx)
+      : Rotation.valueOf(payload.rotation as string);
+    if (!ctx.rotations.some((r) => r.ordinal() === target.ordinal())) {
+      return this.error("that rotation is not legal here");
+    }
+
+    const msg = new PlaceTileMessage(ctx.tileId, target, ctx.position);
+
+    // push the placed-at-the-old-angle state, so one UNDO comes back to it
+    this.game!.markUndo();
+
+    // rebuild from before the placement and lay the tile down again, turned
+    this.state = this.reducer!.apply(ctx.base.getState(), msg);
+    this.game!.replaceState(this.state);
+    this.game!.setReplay(
+      ctx.base.getReplay().prepend(msg as unknown as ReplayableMessage) as List<ReplayableMessage>,
+    );
+    return this.bulk ? null : this.serialize();
+  }
+
+  private error(message: string): string | null {
+    return this.bulk ? null : JSON.stringify({ type: "ERROR", payload: { message } });
   }
 
   private serialize(): string {
