@@ -10,6 +10,7 @@ import { isInstanceOfRandomChangingMessage } from "../io/message/RandomChangingM
 import { AiMessage } from "../io/message/AiMessage.js";
 import { MoveNeutralFigureMessage } from "../io/message/MoveNeutralFigureMessage.js";
 import { PlaceTileMessage } from "../io/message/PlaceTileMessage.js";
+import { PlacePreDrawnMessage } from "../io/message/PlacePreDrawnMessage.js";
 import { LegacyAiPlayer } from "../ai/player/LegacyAiPlayer.js";
 import { Player } from "../Player.js";
 import { createSetupFromMessage } from "./EngineSetup.js";
@@ -259,7 +260,12 @@ export class Engine {
       return this.error("that rotation is not legal here");
     }
 
-    const msg = new PlaceTileMessage(ctx.tileId, target, ctx.position);
+    // Re-place the SAME way it was placed. A pre-draw tile came from the player's secret hand and
+    // is drawn from the pack by id on placement; sending PLACE_TILE instead would take it down a
+    // path that expects the public drawn tile.
+    const msg = ctx.preDrawn
+      ? new PlacePreDrawnMessage(ctx.tileId, target, ctx.position)
+      : new PlaceTileMessage(ctx.tileId, target, ctx.position);
 
     // push the placed-at-the-old-angle state, so one UNDO comes back to it
     this.game!.markUndo();

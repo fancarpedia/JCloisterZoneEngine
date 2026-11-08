@@ -4,9 +4,17 @@ import { TilePlacementAction } from "../action/TilePlacementAction.js";
 import { Flag } from "../game/state/Flag.js";
 import type { UndoHistoryItem } from "../game/UndoHistoryItem.js";
 import { PlaceTileMessage } from "../io/message/PlaceTileMessage.js";
+import { PlacePreDrawnMessage } from "../io/message/PlacePreDrawnMessage.js";
+import type { GameState } from "../game/state/GameState.js";
 import type { Game } from "./Game.js";
 
 /** Everything needed to turn the tile that is already on the board. */
+/** Either way of putting a tile on the board; both carry id, rotation and position. */
+export type PlacementMessage = PlaceTileMessage | PlacePreDrawnMessage;
+
+const isPlacement = (m: unknown): m is PlacementMessage =>
+  m instanceof PlaceTileMessage || m instanceof PlacePreDrawnMessage;
+
 export interface TileRotationContext {
   /** the snapshot the tile was first laid down from - the rotation is replayed from here */
   base: UndoHistoryItem;
@@ -16,6 +24,40 @@ export interface TileRotationContext {
   rotation: Rotation;
   /** every angle legal at this position, in R0, R90, R180, R270 order */
   rotations: Rotation[];
+  /** true when the tile came from a pre-draw hand, so the re-placement must too */
+  preDrawn: boolean;
+}
+
+/**
+ * The angles legal for this tile at this position, seen from the state it was placed from.
+ *
+ * Normally the placement action already lists them. A PRE-DRAW game has no such action: the hand
+ * is secret, so the engine offers an opaque "place from hand" and only works the options out when
+ * the reveal arrives. Do the same here - draw the tile from that state's pack by id and ask.
+ */
+function legalRotations(state: GameState, tileId: string, position: Position): Rotation[] {
+  const action = state.getAction();
+  if (action instanceof TilePlacementAction) {
+    const fromAction = action
+      .getOptions()
+      .toArray()
+      .filter((o) => o.getPosition().equals(position))
+      .map((o) => o.getRotation());
+    if (fromAction.length > 0) {
+      return fromAction;
+    }
+  }
+  try {
+    const t = state.getTilePack()!.drawTile(tileId);
+    return state
+      .setTilePack(t._2)
+      .getTilePlacements(t._1)
+      .filter((o) => o.getPosition().equals(position))
+      .map((o) => o.getRotation())
+      .toArray();
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -38,10 +80,10 @@ export function tileRotationContext(game: Game): TileRotationContext | null {
 
   const replay = game.getReplay();
   const last = replay.isEmpty() ? null : (replay.head() as unknown as object);
-  if (!(last instanceof PlaceTileMessage)) {
+  if (!isPlacement(last)) {
     return null;
   }
-  const placement = last as PlaceTileMessage;
+  const placement = last;
   const position = placement.getPosition();
   const rotation = placement.getRotation();
   const tileId = placement.getTileId();
@@ -53,7 +95,7 @@ export function tileRotationContext(game: Game): TileRotationContext | null {
   // and stop at the one taken before the tile was first laid down.
   const samePlacement = (item: UndoHistoryItem): boolean => {
     const head = item.getReplay().isEmpty() ? null : (item.getReplay().head() as unknown as object);
-    return head instanceof PlaceTileMessage && head.getPosition()!.equals(position);
+    return isPlacement(head) && head.getPosition()!.equals(position);
   };
   const history = game.getUndoHistory();
   let depth = 0;
@@ -65,24 +107,15 @@ export function tileRotationContext(game: Game): TileRotationContext | null {
     return null;
   }
 
-  // The legal angles are the ones the placement action offered for this square; they are known
-  // only in the state the tile was placed from, which is exactly the snapshot found above.
-  const action = base.getState().getAction();
-  if (!(action instanceof TilePlacementAction)) {
-    return null;
-  }
-  const rotations = action
-    .getOptions()
-    .toArray()
-    .filter((o) => o.getPosition().equals(position))
-    .map((o) => o.getRotation())
+  // The legal angles are known only in the state the tile was placed from - the snapshot above.
+  const rotations = legalRotations(base.getState(), tileId, position)
     .filter((r, i, all) => all.findIndex((x) => x.ordinal() === r.ordinal()) === i)
     .sort((a, b) => a.ordinal() - b.ordinal());
   if (rotations.length < 2) {
     return null;
   }
 
-  return { base, position, tileId, rotation, rotations };
+  return { base, position, tileId, rotation, rotations, preDrawn: placement instanceof PlacePreDrawnMessage };
 }
 
 /** The angle a single press of "rotate" moves the tile to, wrapping round. */
