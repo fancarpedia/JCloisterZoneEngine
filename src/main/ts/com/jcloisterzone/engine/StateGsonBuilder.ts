@@ -35,6 +35,7 @@ import { FeaturePointer } from "../board/pointer/FeaturePointer.js";
 import { MeeplePointer } from "../board/pointer/MeeplePointer.js";
 import { ScoreMeeplePositionsPointer } from "../board/pointer/ScoreMeeplePositionsPointer.js";
 import { ScorePositionsFeaturePointer } from "../board/pointer/ScorePositionsFeaturePointer.js";
+import { ScoreSourceFeaturePointer } from "../board/pointer/ScoreSourceFeaturePointer.js";
 import type { BoardPointer } from "../board/pointer/BoardPointer.js";
 import { DoubleTurnEvent } from "../event/DoubleTurnEvent.js";
 import { MeepleDeployed } from "../event/MeepleDeployed.js";
@@ -785,6 +786,14 @@ export class StateGsonBuilder {
       return {
         featurePointer: this.fp(p.asFeaturePointer()),
         positions: p.getPositions().toArray().map((pos) => this.pos(pos)),
+      };
+    }
+    // ScoreSourceFeaturePointer → {featurePointer, source}: the castle plus the feature whose
+    // points it took, so the client can highlight both
+    if (p instanceof ScoreSourceFeaturePointer) {
+      return {
+        featurePointer: this.fp(p.asFeaturePointer()),
+        source: this.fp(p.getSource()),
       };
     }
     // ScoreMeeplePositionsPointer → Gson reflection: {featurePointer, meepleId, positions}

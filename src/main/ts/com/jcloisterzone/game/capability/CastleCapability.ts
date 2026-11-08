@@ -69,7 +69,7 @@ export class CastleCapability extends Capability<void> {
       const vicinity = castle.getVicinity();
       for (const t of scored) {
         if (!vicinity.intersect(t._1.getTilePositions()).isEmpty()) {
-          const reducer = new ScoreCastle(castle, t._2.getFeaturePoints(), false);
+          const reducer = new ScoreCastle(castle, t._2.getFeaturePoints(), false, t._1);
           state = reducer.apply(state);
           state = new UndeployMeeples(castle, false).apply(state);
           round.push(new Tuple2(castle, reducer as unknown as ScoreFeatureReducer));
@@ -87,7 +87,7 @@ export class CastleCapability extends Capability<void> {
         const vicinity = castle.getVicinity();
         for (const t of cpy) {
           if (!vicinity.intersect(t._1.getTilePositions()).isEmpty()) {
-            const reducer = new ScoreCastle(castle, t._2.getFeaturePoints(), false);
+            const reducer = new ScoreCastle(castle, t._2.getFeaturePoints(), false, t._1);
             state = reducer.apply(state);
             state = new UndeployMeeples(castle, false).apply(state);
             round.push(new Tuple2(castle, reducer as unknown as ScoreFeatureReducer));

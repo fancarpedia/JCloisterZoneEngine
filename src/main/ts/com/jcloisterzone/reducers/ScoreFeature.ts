@@ -90,7 +90,7 @@ export abstract class ScoreFeature implements ScoreFeatureReducer {
     return result;
   }
 
-  private getSampleSource(
+  protected getSampleSource(
     state: GameState,
     player: Player,
     bonusPoints: List<ReceivedPoints>,
