@@ -7,6 +7,8 @@ import { Castle } from "../../feature/Castle.js";
 import { City } from "../../feature/City.js";
 import type { Completable } from "../../feature/Completable.js";
 import type { Feature } from "../../feature/Feature.js";
+import type { Scoreable } from "../../feature/Scoreable.js";
+import type { ContestedScoring, ScoringSession } from "../scoring/ContestedScoring.js";
 import { BooleanAllModifier } from "../../feature/modifier/BooleanAllModifier.js";
 import type { RandomGenerator } from "../../random/RandomGenerator.js";
 import { ScoreCastle } from "../../reducers/ScoreCastle.js";
@@ -18,9 +20,12 @@ import type { Token } from "../Token.js";
 import type { GameState } from "../state/GameState.js";
 
 /** Castles (Bridges, Castles &amp; Bazaars). A 2-tile city with a single open edge
- *  may be converted into a castle that later steals the score of the best feature
- *  completed in its vicinity. */
-export class CastleCapability extends Capability<void> {
+ *  may be converted into a castle that later takes the score of a feature completed in its
+ *  vicinity - the first one scored there. When two or more completed features sit beside the
+ *  same castle the turn player chooses which is scored first (ContestedScoring / SCORE_FIRST);
+ *  the model holds that scoring progress while the choice is pending. */
+export class CastleCapability extends Capability<ScoringSession | null> implements ContestedScoring {
+  readonly contestedScoring = true as const;
   /** Marks a city eligible to be a castle base (2-tile, single open edge). */
   static readonly CASTLE_BASE = new BooleanAllModifier("city[castle-base]", new GameElementQuery("castle"));
 
@@ -48,6 +53,28 @@ export class CastleCapability extends Capability<void> {
       .getFeatures(Castle)
       .filter((c) => c.isOccupied(state))
       .filter((c) => !c.getTilePositions().contains(placedThisTurn)) as Stream<Castle>;
+  }
+
+  /**
+   * Contested = completed, not yet scored, and beside an eligible castle that has two or more such
+   * features: the castle takes the points of whichever is scored first, so that order is the turn
+   * player's to decide. A castle with a single candidate decides nothing - it is forced.
+   */
+  contestedFeatures(state: GameState, pending: readonly Completable[]): Completable[] {
+    const castles = [...this.getOccupiedCastles(state)];
+    const near = (castle: Castle, feature: Completable): boolean =>
+      !castle.getVicinity().intersect(feature.getTilePositions()).isEmpty();
+    const contestedCastles = castles.filter((c) => pending.filter((f) => near(c, f)).length >= 2);
+    return pending.filter((f) => contestedCastles.some((c) => near(c, f)));
+  }
+
+  /** The castles these features trigger, plus the chain they start - exactly scoreCastles. */
+  scoreTriggered(
+    state: GameState,
+    scored: VMap<Completable, ScoreFeatureReducer>,
+  ): Tuple2<GameState, VMap<Scoreable, ScoreFeatureReducer>> {
+    const res = this.scoreCastles(state, scored);
+    return new Tuple2(res._1, res._2 as unknown as VMap<Scoreable, ScoreFeatureReducer>);
   }
 
   /** Scores all occupied castles from the best vicinity feature (cascading from

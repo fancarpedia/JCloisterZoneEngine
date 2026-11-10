@@ -77,6 +77,7 @@ import { TilePlacementConfirmAction } from "../action/TilePlacementConfirmAction
 import { TunnelAction } from "../action/TunnelAction.js";
 import { FerriesAction } from "../action/FerriesAction.js";
 import { ScoreAcrobatsAction } from "../action/ScoreAcrobatsAction.js";
+import { ScoreFirstAction } from "../action/ScoreFirstAction.js";
 import { FairyNextToAction } from "../action/FairyNextToAction.js";
 import { FairyOnTileAction } from "../action/FairyOnTileAction.js";
 import { NeutralFigureAction } from "../action/NeutralFigureAction.js";
@@ -1011,6 +1012,14 @@ export class StateGsonBuilder {
     if (action instanceof ScoreAcrobatsAction) {
       return {
         type: "ScoreAcrobats",
+        options: [...action.getOptions()].map((fp) => this.boardPtr(fp)),
+      };
+    }
+    // which contested completed feature the turn player scores first (castles: whichever is
+    // scored first is the one the castle takes)
+    if (action instanceof ScoreFirstAction) {
+      return {
+        type: "ScoreFirst",
         options: [...action.getOptions()].map((fp) => this.boardPtr(fp)),
       };
     }

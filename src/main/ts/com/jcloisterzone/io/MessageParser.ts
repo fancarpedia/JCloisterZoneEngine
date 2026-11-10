@@ -53,6 +53,7 @@ import { PlaceTileMessage } from "./message/PlaceTileMessage.js";
 import { PlaceTokenMessage } from "./message/PlaceTokenMessage.js";
 import { ShepherdPlacementConfirmMessage } from "./message/ShepherdPlacementConfirmMessage.js";
 import { ScoreAcrobatsMessage } from "./message/ScoreAcrobatsMessage.js";
+import { ScoreFirstMessage } from "./message/ScoreFirstMessage.js";
 import { ReturnMeepleMessage } from "./message/ReturnMeepleMessage.js";
 import { TilePlacementConfirmMessage } from "./message/TilePlacementConfirmMessage.js";
 import { ReturnMeepleSource } from "../game/ReturnMeepleSource.js";
@@ -206,6 +207,8 @@ export class MessageParser {
         return new MoveNeutralFigureMessage(p.figureId as string, this.parseBoardPointer(p.to));
       case "SCORE_ACROBATS":
         return new ScoreAcrobatsMessage(this.parseBoardPointer(p.pointer) as FeaturePointer);
+      case "SCORE_FIRST":
+        return new ScoreFirstMessage(this.parseBoardPointer(p.pointer) as FeaturePointer);
       case "PASS":
         return new PassMessage();
       case "AI": {
@@ -291,6 +294,10 @@ export class MessageParser {
     }
     if (msg instanceof ScoreAcrobatsMessage) {
       return { type: "SCORE_ACROBATS", payload: { pointer: this.encodeFp(msg.getPointer()!) } };
+    }
+    // the AI's chosen move is sent back over the wire, so this direction is needed too
+    if (msg instanceof ScoreFirstMessage) {
+      return { type: "SCORE_FIRST", payload: { pointer: this.encodeFp(msg.getPointer()!) } };
     }
     if (msg instanceof PayRansomMessage) {
       return { type: "PAY_RANSOM", payload: { meepleId: msg.getMeepleId() } };

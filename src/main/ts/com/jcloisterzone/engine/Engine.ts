@@ -9,6 +9,7 @@ import type { ReplayableMessage } from "../io/message/ReplayableMessage.js";
 import { isInstanceOfRandomChangingMessage } from "../io/message/RandomChangingMessage.js";
 import { AiMessage } from "../io/message/AiMessage.js";
 import { MoveNeutralFigureMessage } from "../io/message/MoveNeutralFigureMessage.js";
+import { isInstanceOfNonUndoableMessage } from "../io/message/NonUndoableMessage.js";
 import { PlaceTileMessage } from "../io/message/PlaceTileMessage.js";
 import { PlacePreDrawnMessage } from "../io/message/PlacePreDrawnMessage.js";
 import { LegacyAiPlayer } from "../ai/player/LegacyAiPlayer.js";
@@ -212,12 +213,17 @@ export class Engine {
     const newActivePlayer = this.state.getActivePlayer();
     const isDragonMove =
       msg instanceof MoveNeutralFigureMessage && (msg.getFigureId() ?? "").includes("dragon");
+    // A message that declares itself non-undoable (SCORE_FIRST) never leaves an undo point.
+    // This matters even though COMMIT has already emptied the stack by the time scoring runs:
+    // without it SCORE_FIRST (same player, no random) would push a FRESH undo point and the turn
+    // player could retake the choice after seeing what it gave away.
     const undoAllowed =
       (!isRandomChanging || msgRandom === null || msgRandom === undefined) &&
       newActivePlayer !== null &&
       oldActivePlayer !== null &&
       newActivePlayer.equals(oldActivePlayer) &&
-      !isDragonMove;
+      !isDragonMove &&
+      !isInstanceOfNonUndoableMessage(msg);
 
     if (undoAllowed) this.game!.markUndo();
     else this.game!.clearUndo();
