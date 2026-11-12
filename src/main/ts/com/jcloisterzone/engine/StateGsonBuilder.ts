@@ -675,11 +675,13 @@ export class StateGsonBuilder {
             dragonPath.push(this.pos(ev.getTo() as Position));
           }
         } else {
-          // non-dragon neutral move; note Java emits getTo() for BOTH from and to here.
+          // non-dragon neutral move. Java emitted getTo() for BOTH from and to; the TS engine is
+          // authoritative now and sends the real origin (null on a first placement), so the UI can
+          // show where the figure came from (e.g. the courier's previous spot).
           const entry: Record<string, unknown> = {
             type: "neutral-moved",
             figure: ev.getNeutralFigure().getId(),
-            from: this.boardPtr(ev.getTo()),
+            from: this.boardPtr(ev.getFrom()),
             to: this.boardPtr(ev.getTo()),
           };
           // TS-only: the meeple the figure was placed next to (captured at move time), so the UI can

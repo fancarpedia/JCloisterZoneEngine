@@ -1,4 +1,5 @@
 import { HashSet, type Set } from "../../../../io/vavr/Set.js";
+import { List } from "../../../../io/vavr/SeqTypes.js";
 import type { BoardPointer } from "../../board/pointer/BoardPointer.js";
 import type { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
 import { Position } from "../../board/Position.js";
@@ -15,6 +16,9 @@ import { Garden } from "../../feature/Garden.js";
 import { Monastery } from "../../feature/Monastery.js";
 import { River } from "../../feature/River.js";
 import { Road } from "../../feature/Road.js";
+import { isInstanceOfRangeFeature } from "../../feature/RangeFeature.js";
+import { ScorePositionsFeaturePointer } from "../../board/pointer/ScorePositionsFeaturePointer.js";
+import type { Structure } from "../../feature/Structure.js";
 import { YagaHut } from "../../feature/YagaHut.js";
 import { Follower } from "../../figure/Follower.js";
 import type { Meeple } from "../../figure/Meeple.js";
@@ -132,10 +136,22 @@ export class CourierPhase extends Phase {
     for (const [m, fp] of affected) {
       const feature = state.getFeature(fp) as unknown as Completable;
       const expr = feature.getPoints(state);
+      // a range feature (monastery, garden, …) scores the tiles around it: point at them too, as a
+      // regular score of that feature does, so the client highlights the tiles that earned the points
+      const deployment = m.getDeployment(state);
+      const source = isInstanceOfRangeFeature(feature)
+        ? new ScorePositionsFeaturePointer(
+            deployment as FeaturePointer,
+            HashSet.ofAll(feature.getRangeTilesWithFeature(state).map((t) => t.getPosition())),
+          )
+        : deployment;
       const points = new ReceivedPoints(
         new PointsExpression("courier." + expr.getName(), expr.getItems()),
         owner,
-        m.getDeployment(state),
+        source,
+        // every follower on the scored feature, as a regular score event carries them, so the
+        // client can show who was involved (and pulse the ones that have left the board since)
+        List.ofAll((feature as unknown as Structure).getFollowers2(state)),
       );
       state = new AddPoints(points, false).apply(state);
     }
