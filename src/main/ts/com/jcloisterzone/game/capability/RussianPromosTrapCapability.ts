@@ -25,6 +25,7 @@ import { DeployMeeple } from "../../reducers/DeployMeeple.js";
 import { Capability } from "../Capability.js";
 import { ReturnMeepleSource } from "../ReturnMeepleSource.js";
 import type { GameState } from "../state/GameState.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 /** Russian Promos trap features (Vodyanoy + Solovei Razboynik): they expose nearby followers,
  *  re-trapping them after the next placement, and Vodyanoy penalises trapped followers. */
@@ -164,7 +165,9 @@ export class RussianPromosTrapCapability extends Capability<void> {
     exposedFollowers: RussianPromosTrapCapability.ExposedFollower[] = this.findExposedFollowers(state),
   ): GameState {
     for (const exposed of exposedFollowers) {
-      state = new DeployMeeple(exposed.getFollower(), exposed.getTrap()).apply(state);
+      state = new DeployMeeple(exposed.getFollower(), exposed.getTrap())
+        .withCause(PlacementCause.rule("trap"))
+        .apply(state);
     }
     return state;
   }

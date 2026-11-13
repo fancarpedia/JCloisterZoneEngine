@@ -11,6 +11,7 @@ import { MoveNeutralFigure } from "../../reducers/MoveNeutralFigure.js";
 import { Capability } from "../Capability.js";
 import type { GameState } from "../state/GameState.js";
 import type { PlacedTile } from "../state/PlacedTile.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 /** The Dragon (Princess & the Dragon) — a volcano tile summons it; dragon-trigger tiles then
  *  let it walk 6 tiles, eating any meeple it lands on. Model = the path of visited positions. */
@@ -47,7 +48,9 @@ export class DragonCapability extends Capability<Vector<Position>> {
       state = new MoveNeutralFigure(
         state.getNeutralFigures().getDragon() as unknown as NeutralFigure<BoardPointer>,
         pt.getPosition() as unknown as BoardPointer,
-      ).apply(state);
+      )
+        .withCause(PlacementCause.tilePlaced(pt.getPosition()))
+        .apply(state);
     }
     // Shuffle the dragon deck into the pack once the dragon is out — but NOT while the River is
     // still being built. The river enforces its order solely by keeping "default" deactivated until

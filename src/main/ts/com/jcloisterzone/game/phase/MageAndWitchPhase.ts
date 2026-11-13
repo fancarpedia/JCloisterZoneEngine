@@ -22,6 +22,7 @@ import type { GameState } from "../state/GameState.js";
 import { Flag } from "../state/Flag.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 /** After a tile with a mage-trigger is placed (or the mage and witch end up on the
  *  same feature), the player moves the mage and witch onto open roads/cities. */
@@ -63,8 +64,10 @@ export class MageAndWitchPhase extends Phase {
           state.setPlayerActions(new ActionsState(state.getTurnPlayer()!, action as unknown as PlayerAction<unknown>, false)),
         );
       }
-      if (mageFeature !== null) state = new MoveNeutralFigure(mage as NeutralFigure<BoardPointer>, null).apply(state);
-      if (witchFeature !== null) state = new MoveNeutralFigure(witch as NeutralFigure<BoardPointer>, null).apply(state);
+      // no open city/road left to move to: the figure leaves the board
+      const noTarget = PlacementCause.rule("mage-witch-no-target");
+      if (mageFeature !== null) state = new MoveNeutralFigure(mage as NeutralFigure<BoardPointer>, null).withCause(noTarget).apply(state);
+      if (witchFeature !== null) state = new MoveNeutralFigure(witch as NeutralFigure<BoardPointer>, null).withCause(noTarget).apply(state);
       return this.next(state);
     }
 

@@ -24,6 +24,7 @@ import { Flag } from "../state/Flag.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 /** Resolves shepherd flocks after a tile placement (Hills & Sheep). */
 export class ShepherdPhase extends Phase {
@@ -171,7 +172,7 @@ export class ShepherdPhase extends Phase {
         ) as List<ReceivedPoints>;
         scoredIdx.add(player.getIndex());
       }
-      state = new UndeployMeeple(shepherd, false).apply(state);
+      state = new UndeployMeeple(shepherd, false).withCause(PlacementCause.rule("flock-scored")).apply(state);
     }
     state = new AddPoints(receivedPoints, false).apply(state);
 
@@ -183,7 +184,7 @@ export class ShepherdPhase extends Phase {
   private expandFlock(state: GameState, shepherdFp: FeaturePointer): GameState {
     const drawnToken = this.drawTokenFromBag(state);
     state = state.appendEvent(
-      new TokenPlacedEvent(PlayEventMeta.createWithoutPlayer(), drawnToken, shepherdFp),
+      new TokenPlacedEvent(PlayEventMeta.createWithoutPlayer(), drawnToken, shepherdFp, PlacementCause.rule("flock-expanded")),
     );
     const cap = state.getCapabilities().get(SheepCapability)!;
 
@@ -191,7 +192,7 @@ export class ShepherdPhase extends Phase {
       const field = state.getFeature(shepherdFp) as Field;
       const shepherdsOnField = this.getShepherdsOnField(state, field);
       for (const m of shepherdsOnField.keySet()) {
-        state = new UndeployMeeple(m, true).apply(state);
+        state = new UndeployMeeple(m, true).withCause(PlacementCause.rule("wolf")).apply(state);
       }
       state = cap.updateModel(state, (model) => {
         let placedTokens = model.getPlacedTokens();

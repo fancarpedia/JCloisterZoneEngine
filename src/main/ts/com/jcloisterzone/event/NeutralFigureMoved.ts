@@ -1,6 +1,7 @@
 import type { BoardPointer } from "../board/pointer/BoardPointer.js";
 import type { Meeple } from "../figure/Meeple.js";
 import type { NeutralFigure } from "../figure/neutral/NeutralFigure.js";
+import type { PlacementCause } from "./PlacementCause.js";
 import { PlayEvent, type PlayEventMeta } from "./PlayEvent.js";
 
 /** A neutral figure (fairy/dragon/...) moved from one pointer to another. */
@@ -15,6 +16,7 @@ export class NeutralFigureMoved extends PlayEvent {
     // the meeple the figure was placed next to, captured now (while it is on the board) so the UI can
     // still show it after it is removed — without the client having to parse/guess its type. TS-only.
     private readonly hostMeeple: Meeple | null = null,
+    private readonly cause: PlacementCause | null = null,
   ) {
     super(metadata);
   }
@@ -30,5 +32,10 @@ export class NeutralFigureMoved extends PlayEvent {
   }
   getHostMeeple(): Meeple | null {
     return this.hostMeeple;
+  }
+
+  /** What triggered this when no player chose it directly (TS-only). */
+  getCause(): PlacementCause | null {
+    return this.cause;
   }
 }

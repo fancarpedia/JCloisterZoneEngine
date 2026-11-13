@@ -9,10 +9,19 @@ import { Pig } from "../figure/Pig.js";
 import type { ReturnMeepleSource } from "../game/ReturnMeepleSource.js";
 import type { GameState } from "../game/state/GameState.js";
 import type { Reducer } from "./Reducer.js";
+import type { PlacementCause } from "../event/PlacementCause.js";
 
 /** Base reducer for undeploying meeples (returns to supply) + lonely-special cleanup. */
 export abstract class AbstractUndeploy implements Reducer {
   abstract apply(state: GameState): GameState;
+
+  protected cause: PlacementCause | null = null;
+
+  /** What triggered this (un)deploy when no player chose it (see PlacementCause). */
+  withCause(cause: PlacementCause | null): this {
+    this.cause = cause;
+    return this;
+  }
 
   protected undeploy(
     state: GameState,
@@ -24,7 +33,7 @@ export abstract class AbstractUndeploy implements Reducer {
   ): GameState {
     const deployedMeeples = state.getDeployedMeeples();
     state = state.setDeployedMeeples(deployedMeeples.remove(meeple) as typeof deployedMeeples);
-    state = state.appendEvent(new MeepleReturned(meta, meeple, source, forced, returnMeepleSource));
+    state = state.appendEvent(new MeepleReturned(meta, meeple, source, forced, returnMeepleSource, this.cause));
     return state;
   }
 

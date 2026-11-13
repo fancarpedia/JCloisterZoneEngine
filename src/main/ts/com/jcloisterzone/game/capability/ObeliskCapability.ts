@@ -21,6 +21,7 @@ import { UndeployMeeple } from "../../reducers/UndeployMeeple.js";
 import { Capability } from "../Capability.js";
 import type { ScoreFeatureReducer } from "../ScoreFeatureReducer.js";
 import type { GameState } from "../state/GameState.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const TILES_REQUIRED = 16;
 
@@ -92,7 +93,7 @@ export class ObeliskCapability extends Capability<FeaturePointer | null> {
         state = new AddPoints(bonus, true, isFinal).apply(state);
 
         if (!isFinal) {
-          state = new UndeployMeeple(obelisk, false).apply(state);
+          state = new UndeployMeeple(obelisk, false).withCause(PlacementCause.rule("obelisk-scored")).apply(state);
         }
       }
     }

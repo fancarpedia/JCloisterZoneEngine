@@ -13,6 +13,7 @@ import { Capability } from "../Capability.js";
 import type { XmlElement } from "../../XmlUtils.js";
 import type { GameState } from "../state/GameState.js";
 import { CountCapabilityModel } from "./CountCapabilityModel.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 /** Count of Carcassonne — the City of Carcassonne (CO/7) start tile with four districts,
  *  plus the neutral Count figure that gates district scoring and re-deployment. */
@@ -35,7 +36,9 @@ export class CountCapability extends Capability<CountCapabilityModel> {
     state = new MoveNeutralFigure(
       count as unknown as NeutralFigure<BoardPointer>,
       new FeaturePointer(quarterPosition!, Quarter as never, Location.QUARTER_CASTLE),
-    ).apply(state);
+    )
+      .withCause(PlacementCause.rule("game-start"))
+      .apply(state);
     return state;
   }
 

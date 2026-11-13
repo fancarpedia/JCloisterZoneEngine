@@ -17,6 +17,7 @@ import { UndeployMeeple } from "../../reducers/UndeployMeeple.js";
 import { Capability } from "../Capability.js";
 import type { ScoreFeatureReducer } from "../ScoreFeatureReducer.js";
 import type { GameState } from "../state/GameState.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const TILES_REQUIRED = 9;
 
@@ -62,7 +63,7 @@ export class WindmillCapability extends Capability<void> {
         }
         state = new AddPoints(bonus, true, isFinal).apply(state);
 
-        if (!isFinal) state = new UndeployMeeple(windmill, false).apply(state);
+        if (!isFinal) state = new UndeployMeeple(windmill, false).withCause(PlacementCause.rule("windmill-scored")).apply(state);
       }
     }
     return state;

@@ -9,6 +9,7 @@ import { BigTopCapability } from "../capability/BigTopCapability.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const BIGTOP_CLS = BigTopCapability as unknown as ClassToken<BigTopCapability>;
 
@@ -38,10 +39,13 @@ export class BigTopPhase extends Phase {
     if (currentPos !== null) {
       const unusedTokens = capability.getUnusedTokens(state);
       const token = unusedTokens[this.getRandom().getNextInt(unusedTokens.length)];
-      state = capability.scoreBigTop(state, currentPos, token, false);
+      // the big top leaves an animal token where it stood as it moves on to the new circus
+      state = capability.scoreBigTop(state, currentPos, token, false, PlacementCause.figureMoved(bigtop.getId(), pos as unknown as BoardPointer));
     }
 
-    state = new MoveNeutralFigure(bigtop as unknown as NeutralFigure<BoardPointer>, pos as unknown as BoardPointer).apply(state);
+    state = new MoveNeutralFigure(bigtop as unknown as NeutralFigure<BoardPointer>, pos as unknown as BoardPointer)
+      .withCause(PlacementCause.tilePlaced(pos))
+      .apply(state);
     return state;
   }
 }

@@ -17,6 +17,7 @@ import { AddPoints } from "../../reducers/AddPoints.js";
 import { Capability } from "../Capability.js";
 import { AnimalToken } from "./AnimalToken.js";
 import type { GameState } from "../state/GameState.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 /** Big Top (Under the Big Top): the Big Top neutral figure walks from circus to circus, and
  *  whenever it leaves one it scores all followers adjacent to (and on) that tile by a random
@@ -42,15 +43,21 @@ export class BigTopCapability extends Capability<number> {
     if (pos !== null) {
       const tokens = this.getUnusedTokens(state);
       const idx = state.getPhase()!.getRandom().getNextInt(tokens.length);
-      return this.scoreBigTop(state, pos, tokens[idx], true);
+      return this.scoreBigTop(state, pos, tokens[idx], true, PlacementCause.rule("final-scoring"));
     }
     return state;
   }
 
-  scoreBigTop(state: GameState, pos: Position, token: AnimalToken, _isFinal: boolean): GameState {
+  scoreBigTop(
+    state: GameState,
+    pos: Position,
+    token: AnimalToken,
+    _isFinal: boolean,
+    cause: PlacementCause | null = null,
+  ): GameState {
     // record the token even if nobody scores from it
     state = state.appendEvent(
-      new TokenPlacedEvent(PlayEventMeta.createWithoutPlayer(), token, pos as unknown as BoardPointer),
+      new TokenPlacedEvent(PlayEventMeta.createWithoutPlayer(), token, pos as unknown as BoardPointer, cause),
     );
 
     let positions: Set<Position> = HashSet.empty<Position>();

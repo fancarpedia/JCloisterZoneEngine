@@ -31,6 +31,7 @@ import type { ActionPhase } from "./ActionPhase.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
 import type { TilePhase } from "./TilePhase.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const BAZAAR_CAP_CLS = BazaarCapability as unknown as ClassToken<BazaarCapabilityModel>;
 const BUILDER_CLS = BuilderCapability as unknown as ClassToken<BuilderState>;
@@ -208,6 +209,8 @@ export class TileFromSupplyPhase extends AbstractAbbeyPhase {
               PlayEventMeta.createWithPlayer(player),
               BridgeCapability.BridgeToken.BRIDGE,
               mandatoryBridge,
+              // the tile could only be placed with this bridge
+              PlacementCause.tilePlaced(pos),
             ),
           );
         }

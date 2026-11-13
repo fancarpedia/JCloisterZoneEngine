@@ -29,6 +29,7 @@ import { ActionsState } from "../state/ActionsState.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const BRIDGE_CLS = BridgeCapability as unknown as ClassToken<Capability<Set<FeaturePointer>>>;
 const BAZAAR_CAP_CLS = BazaarCapability as unknown as ClassToken<Capability<BazaarCapabilityModel>>;
@@ -136,6 +137,8 @@ export class TilePhase extends Phase {
           PlayEventMeta.createWithPlayer(player),
           BridgeCapability.BridgeToken.BRIDGE,
           mandatoryBridge,
+          // the tile could only be placed with this bridge
+          PlacementCause.tilePlaced(pos),
         ),
       );
     }

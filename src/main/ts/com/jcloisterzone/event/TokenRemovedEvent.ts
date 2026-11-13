@@ -1,5 +1,6 @@
 import type { BoardPointer } from "../board/pointer/BoardPointer.js";
 import type { Token } from "../game/Token.js";
+import type { PlacementCause } from "./PlacementCause.js";
 import { PlayEvent, type PlayEventMeta } from "./PlayEvent.js";
 
 /** A supply token was removed from the board (e.g. a meteorite destroys a gold piece). */
@@ -12,6 +13,7 @@ export class TokenRemovedEvent extends PlayEvent {
     private readonly pointer: BoardPointer,
     private readonly count: number,
     private readonly forced: boolean,
+    private readonly cause: PlacementCause | null = null,
   ) {
     super(metadata);
   }
@@ -27,5 +29,10 @@ export class TokenRemovedEvent extends PlayEvent {
   }
   getForced(): boolean {
     return this.forced;
+  }
+
+  /** What triggered this when no player chose it directly (TS-only). */
+  getCause(): PlacementCause | null {
+    return this.cause;
   }
 }

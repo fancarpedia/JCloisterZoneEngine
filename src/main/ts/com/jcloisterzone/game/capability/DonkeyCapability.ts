@@ -19,6 +19,7 @@ import { DonkeyAction } from "../../action/DonkeyAction.js";
 import type { PlayerAction } from "../../action/PlayerAction.js";
 import { Capability } from "../Capability.js";
 import type { GameState } from "../state/GameState.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 
 /** Donkey (Village Life) — a neutral figure that blocks completion of the feature(s)
@@ -29,7 +30,9 @@ export class DonkeyCapability extends Capability<void> {
     return new MoveNeutralFigure(
       state.getNeutralFigures().getDonkey() as unknown as NeutralFigure<BoardPointer>,
       new Position(0, 0),
-    ).apply(state);
+    )
+      .withCause(PlacementCause.rule("game-start"))
+      .apply(state);
   }
 
   override isTilePlacementAllowed(state: GameState, tile: Tile, placement: PlacementOption): boolean {

@@ -14,6 +14,7 @@ import { MoveNeutralFigure } from "../../reducers/MoveNeutralFigure.js";
 import { Capability } from "../Capability.js";
 import type { GameState } from "../state/GameState.js";
 import type { PlacedTile } from "../state/PlacedTile.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 /** The Courier (fan expansion) — a courier-letter tile summons the neutral courier; each turn
  *  the courier walks to a follower deployed in its row/column and scores that follower's
@@ -48,7 +49,9 @@ export class CourierCapability extends Capability<void> {
       state = new MoveNeutralFigure(
         state.getNeutralFigures().getCourier() as unknown as NeutralFigure<BoardPointer>,
         fp.setPosition(pt.getPosition()),
-      ).apply(state);
+      )
+        .withCause(PlacementCause.tilePlaced(pt.getPosition()))
+        .apply(state);
     }
     return state;
   }

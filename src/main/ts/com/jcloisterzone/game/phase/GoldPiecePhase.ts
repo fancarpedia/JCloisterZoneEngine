@@ -17,6 +17,7 @@ import type { GameState } from "../state/GameState.js";
 import { Flag } from "../state/Flag.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const GOLD_CLS = GoldminesCapability as unknown as ClassToken<Capability<GoldModel>>;
 
@@ -29,7 +30,7 @@ export class GoldPiecePhase extends Phase {
     super(random, defaultNext);
   }
 
-  private placeGoldToken(state: GameState, pos: Position): GameState {
+  private placeGoldToken(state: GameState, pos: Position, cause: PlacementCause | null = null): GameState {
     state = state.mapCapabilityModel<GoldModel>(GOLD_CLS, (placedGold: VMap<Position, number>) =>
       placedGold.put(pos, placedGold.get(pos).getOrElse(0) + 1),
     );
@@ -38,6 +39,7 @@ export class GoldPiecePhase extends Phase {
         PlayEventMeta.createWithoutPlayer(),
         GoldminesCapability.GoldToken.GOLD,
         pos as unknown as BoardPointer,
+        cause,
       ),
     );
   }
@@ -46,13 +48,15 @@ export class GoldPiecePhase extends Phase {
     const placedTile = state.getLastPlaced()!;
     if (placedTile.getTile().hasModifier(GoldminesCapability.GOLDMINE)) {
       const pos = placedTile.getPosition();
-      state = this.placeGoldToken(state, pos);
+      // the gold mine tile itself always gets a piece, and the only neighbour too when there is no choice
+      const goldmine = PlacementCause.tilePlaced(pos);
+      state = this.placeGoldToken(state, pos, goldmine);
       const options: Position[] = state
         .getAdjacentAndDiagonalTiles(pos)
         .map((pt) => pt.getPosition())
         .toArray();
       if (options.length === 1) {
-        state = this.placeGoldToken(state, options[0]);
+        state = this.placeGoldToken(state, options[0], goldmine);
       } else if (options.length > 1) {
         const set: Set<Position> = HashSet.ofAll(options);
         const action = new GoldPieceAction(set);

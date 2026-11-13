@@ -23,6 +23,7 @@ import { Capability } from "../Capability.js";
 import type { ScoreFeatureReducer } from "../ScoreFeatureReducer.js";
 import type { Token } from "../Token.js";
 import type { GameState } from "../state/GameState.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 export type GoldModel = VMap<Position, number>;
 
@@ -142,6 +143,7 @@ export class GoldminesCapability extends Capability<GoldModel> {
             pos,
             count,
             true,
+            PlacementCause.rule("meteorite"),
           ),
         );
       }

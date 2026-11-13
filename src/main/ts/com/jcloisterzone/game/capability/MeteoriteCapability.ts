@@ -16,6 +16,7 @@ import { Capability } from "../Capability.js";
 import { Rule } from "../Rule.js";
 import { isInstanceOfMeteoriteProtected } from "./trait/MeteoriteProtected.js";
 import type { GameState } from "../state/GameState.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const P = (x: number, y: number) => new Position(x, y);
 
@@ -104,7 +105,7 @@ export class MeteoriteCapability extends Capability<void> {
         }
       }
       if (undeploy) {
-        state = new UndeployMeeple(m, true).apply(state);
+        state = new UndeployMeeple(m, true).withCause(PlacementCause.rule("meteorite")).apply(state);
       }
     }
 

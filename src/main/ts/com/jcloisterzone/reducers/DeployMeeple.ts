@@ -7,6 +7,7 @@ import { KeepBuildingCapability } from "../game/capability/KeepBuildingCapabilit
 import { Flag } from "../game/state/Flag.js";
 import type { GameState } from "../game/state/GameState.js";
 import { AbstractUndeploy } from "./AbstractUndeploy.js";
+import type { PlacementCause } from "../event/PlacementCause.js";
 
 /** Deploys a meeple onto a feature pointer. */
 export class DeployMeeple extends AbstractUndeploy {
@@ -45,7 +46,7 @@ export class DeployMeeple extends AbstractUndeploy {
     const movedFrom = deployedMeeples.get(this.meeple).getOrNull();
     state = state.setDeployedMeeples(deployedMeeples.put(this.meeple, this.fp) as typeof deployedMeeples);
     state = state.appendEvent(
-      new MeepleDeployed(PlayEventMeta.createWithActivePlayer(state), this.meeple, this.fp, movedFrom),
+      new MeepleDeployed(PlayEventMeta.createWithActivePlayer(state), this.meeple, this.fp, movedFrom, this.cause),
     );
 
     if (movedFrom !== null && this.meeple instanceof Follower) {

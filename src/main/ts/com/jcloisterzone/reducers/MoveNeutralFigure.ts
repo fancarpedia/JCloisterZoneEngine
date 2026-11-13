@@ -7,6 +7,7 @@ import type { Meeple } from "../figure/Meeple.js";
 import type { NeutralFigure } from "../figure/neutral/NeutralFigure.js";
 import type { GameState } from "../game/state/GameState.js";
 import type { Reducer } from "./Reducer.js";
+import type { PlacementCause } from "../event/PlacementCause.js";
 
 /** Moves a neutral figure to a pointer (or removes it when pointer is null). */
 export class MoveNeutralFigure implements Reducer {
@@ -15,6 +16,14 @@ export class MoveNeutralFigure implements Reducer {
     private readonly pointer: BoardPointer | null,
     private readonly triggeringPlayer: Player | null = null,
   ) {}
+
+  private cause: PlacementCause | null = null;
+
+  /** What triggered this move when no player chose it (see PlacementCause). */
+  withCause(cause: PlacementCause | null): this {
+    this.cause = cause;
+    return this;
+  }
 
   apply(state: GameState): GameState {
     let nfState = state.getNeutralFigures();
@@ -51,6 +60,7 @@ export class MoveNeutralFigure implements Reducer {
         from,
         this.pointer,
         hostMeeple,
+        this.cause,
       ),
     );
     return state;

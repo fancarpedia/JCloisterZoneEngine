@@ -29,6 +29,7 @@ import { MoveNeutralFigure } from "../../reducers/MoveNeutralFigure.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 
 /** The Courier walks to a follower deployed in its row/column this turn and scores that
@@ -104,7 +105,9 @@ export class CourierPhase extends Phase {
     state = new MoveNeutralFigure(
       state.getNeutralFigures().getCourier() as unknown as NeutralFigure<BoardPointer>,
       meepleForCourier.getPointer(),
-    ).apply(state);
+    )
+      .withCause(PlacementCause.meepleDeployed(meepleForCourier.getPointer(), meepleForCourier.getMeeple()))
+      .apply(state);
 
     const pos = targetFp.getPosition();
     const courierFeature = state.getFeature(targetFp);

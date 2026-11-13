@@ -23,6 +23,7 @@ import { ActionsState } from "../state/ActionsState.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const COUNT_CLS = CountCapability as unknown as ClassToken<Capability<CountCapabilityModel>>;
 
@@ -53,7 +54,9 @@ export class CocCountPhase extends Phase {
         count as unknown as NeutralFigure<BoardPointer>,
         new FeaturePointer(quarterPos, Quarter as never, nextQuarter),
         player,
-      ).apply(state);
+      )
+        .withCause(PlacementCause.rule("count-clockwise"))
+        .apply(state);
       return this.next(state);
     }
 
@@ -68,7 +71,9 @@ export class CocCountPhase extends Phase {
         count as unknown as NeutralFigure<BoardPointer>,
         new FeaturePointer(quarterPos, Quarter as never, cocDeployment.getLocation()!),
         player,
-      ).apply(state);
+      )
+        .withCause(PlacementCause.meepleDeployed(cocDeployment.getPointer(), cocDeployment.getMeeple()))
+        .apply(state);
       return this.next(state);
     }
 

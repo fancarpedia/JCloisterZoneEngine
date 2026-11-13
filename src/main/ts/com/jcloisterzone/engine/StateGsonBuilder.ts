@@ -48,6 +48,7 @@ import { TileAuctionedEvent } from "../event/TileAuctionedEvent.js";
 import { NeutralFigureMoved } from "../event/NeutralFigureMoved.js";
 import { NeutralFigureReturned } from "../event/NeutralFigureReturned.js";
 import type { PlayEvent } from "../event/PlayEvent.js";
+import type { PlacementCause } from "../event/PlacementCause.js";
 import { PlayerTurnEvent } from "../event/PlayerTurnEvent.js";
 import { ScoreEvent } from "../event/ScoreEvent.js";
 import { TileDiscardedEvent } from "../event/TileDiscardedEvent.js";
@@ -626,17 +627,20 @@ export class StateGsonBuilder {
           to: this.boardPtr(ev.getPointer()),
         };
         if (ev.getMovedFrom() !== null) data.from = this.boardPtr(ev.getMovedFrom());
+        this.putCause(data, ev.getCause());
         turnEvents.push(data);
       } else if (ev instanceof MeepleReturned) {
         if (ev.isForced()) {
-          turnEvents.push({
+          const data: Record<string, unknown> = {
             type: "meeple-returned",
             meeple: simpleName(ev.getMeeple().constructor as ClassToken),
             player: ev.getMeeple().getPlayer().getIndex(),
             source: ev.getReturnMeepleSource() === null ? null : String(ev.getReturnMeepleSource()),
             forced: ev.isForced(),
             from: this.boardPtr(ev.getFrom()),
-          });
+          };
+          this.putCause(data, ev.getCause());
+          turnEvents.push(data);
         }
       } else if (ev instanceof TokenReceivedEvent) {
         const data: Record<string, unknown> = {
@@ -654,11 +658,13 @@ export class StateGsonBuilder {
         }
         turnEvents.push(data);
       } else if (ev instanceof TokenPlacedEvent) {
-        turnEvents.push({
+        const data: Record<string, unknown> = {
           type: "token-placed",
           token: ev.getToken().name(),
           to: this.boardPtr(ev.getPointer()),
-        });
+        };
+        this.putCause(data, ev.getCause());
+        turnEvents.push(data);
       } else if (ev instanceof NeutralFigureMoved) {
         if (volcanoTile) {
           // a volcano tile summons the dragon — that move is not part of a dragon path
@@ -693,6 +699,7 @@ export class StateGsonBuilder {
               player: host.getPlayer().getIndex(),
             };
           }
+          this.putCause(entry, ev.getCause());
           turnEvents.push(entry);
         }
       } else if (ev instanceof FlierRollEvent) {
@@ -738,13 +745,15 @@ export class StateGsonBuilder {
           positions: [this.pos(edge.getP1()), this.pos(edge.getP2())],
         });
       } else if (ev instanceof TokenRemovedEvent) {
-        turnEvents.push({
+        const data: Record<string, unknown> = {
           type: "token-removed",
           token: ev.getToken().name(),
           count: ev.getCount(),
           forced: ev.getForced(),
           from: this.boardPtr(ev.getPointer()),
-        });
+        };
+        this.putCause(data, ev.getCause());
+        turnEvents.push(data);
       } else if (ev instanceof FollowerCaptured) {
         turnEvents.push({
           type: "meeple-captured",
@@ -780,6 +789,34 @@ export class StateGsonBuilder {
       }
     }
     return events;
+  }
+
+  /** TS-only: what triggered a place/move/return no player chose directly (see PlacementCause).
+   *  Written only when present; stripped in the parity test. */
+  private putCause(entry: Record<string, unknown>, cause: PlacementCause | null): void {
+    if (cause === null) return;
+    switch (cause.type) {
+      case "tile-placed":
+        entry.cause = { type: cause.type, position: this.pos(cause.position) };
+        break;
+      case "meeple-deployed":
+        entry.cause = {
+          type: cause.type,
+          pointer: this.boardPtr(cause.pointer),
+          meeple: {
+            id: cause.meeple.getId(),
+            type: simpleName(cause.meeple.constructor as ClassToken),
+            player: cause.meeple.getPlayer().getIndex(),
+          },
+        };
+        break;
+      case "figure-moved":
+        entry.cause = { type: cause.type, figure: cause.figureId, pointer: this.boardPtr(cause.pointer) };
+        break;
+      case "rule":
+        entry.cause = { type: cause.type, name: cause.name };
+        break;
+    }
   }
 
   private boardPtr(p: BoardPointer | null): unknown {

@@ -19,6 +19,7 @@ import { Flag } from "../state/Flag.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 
 const DRAGON_CLS = DragonCapability as unknown as ClassToken<Capability<Vector<Position>>>;
 
@@ -112,7 +113,9 @@ export class DragonMovePhase extends Phase {
       const m = t._1;
       const fp = t._2;
       if (pos.equals(fp.getPosition()) && m.canBeEatenByDragon(state)) {
-        state = new UndeployMeeple(m, true).apply(state);
+        state = new UndeployMeeple(m, true)
+          .withCause(PlacementCause.figureMoved(fig.getId(), pos as unknown as BoardPointer))
+          .apply(state);
       }
     }
 
