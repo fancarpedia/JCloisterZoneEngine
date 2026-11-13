@@ -86,13 +86,33 @@ export class MageAndWitchPhase extends Phase {
     const ptr = msg.getTo() as FeaturePointer | null;
     const fig = state.getNeutralFigures().getById(msg.getFigureId()!);
     if (fig instanceof Mage || fig instanceof Witch) {
-      state = new MoveNeutralFigure(fig as NeutralFigure<BoardPointer>, ptr, state.getActivePlayer()).apply(state);
+      // the player chooses where, but the game made them move it: the magician tile, or the two
+      // figures meeting on one feature (read before the move changes that)
+      const cause = this.triggerCause(state);
+      state = new MoveNeutralFigure(fig as NeutralFigure<BoardPointer>, ptr, state.getActivePlayer())
+        .withCause(cause)
+        .apply(state);
       // the figure is placed on a feature of the tile as it lies, so the tile may no longer be turned
       state = state.addFlag(Flag.TILE_ROTATION_DISALLOWED);
       state = this.clearActions(state);
       return this.next(state);
     }
     throw new Error("Illegal neutral figure move");
+  }
+
+  /** Why the mage and witch must be (re)placed this turn: a tile with the magician symbol was
+   *  placed, or the features holding the mage and the witch got connected into one. */
+  private triggerCause(state: GameState): PlacementCause | null {
+    const placed = state.getLastPlaced()!;
+    if (placed.getTile().hasModifier(MageAndWitchCapability.MAGE_TRIGGER)) {
+      return PlacementCause.tilePlaced(placed.getPosition());
+    }
+    const ns = state.getNeutralFigures();
+    const mageFeature = ns.getMage()!.getFeature(state);
+    if (mageFeature !== null && mageFeature === ns.getWitch()!.getFeature(state)) {
+      return PlacementCause.rule("mage-witch-joined");
+    }
+    return null;
   }
 
   protected override messageHandlers(): Map<Function, PhaseHandler> {

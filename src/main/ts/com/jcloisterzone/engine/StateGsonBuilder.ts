@@ -630,7 +630,9 @@ export class StateGsonBuilder {
         this.putCause(data, ev.getCause());
         turnEvents.push(data);
       } else if (ev instanceof MeepleReturned) {
-        if (ev.isForced()) {
+        // forced returns always; a scoring return only when the game itself caused it (flock or
+        // windmill/obelisk/… scored), so the history tells why that meeple left
+        if (ev.isForced() || ev.getCause() !== null) {
           const data: Record<string, unknown> = {
             type: "meeple-returned",
             meeple: simpleName(ev.getMeeple().constructor as ClassToken),
@@ -667,8 +669,20 @@ export class StateGsonBuilder {
         turnEvents.push(data);
       } else if (ev instanceof NeutralFigureMoved) {
         if (volcanoTile) {
-          // a volcano tile summons the dragon — that move is not part of a dragon path
+          // a volcano tile summons the dragon — that move is not part of a dragon path. It is shown
+          // as a plain neutral move carrying its cause (the volcano tile placed), so the history
+          // tells why the dragon appeared there.
           volcanoTile = false;
+          if (ev.getCause() !== null) {
+            const entry: Record<string, unknown> = {
+              type: "neutral-moved",
+              figure: ev.getNeutralFigure().getId(),
+              from: this.boardPtr(ev.getFrom()),
+              to: this.boardPtr(ev.getTo()),
+            };
+            this.putCause(entry, ev.getCause());
+            turnEvents.push(entry);
+          }
         } else if (ev.getNeutralFigure() instanceof Dragon) {
           if (dragonPath === null) {
             dragonPath = [this.pos(ev.getFrom() as Position), this.pos(ev.getTo() as Position)];

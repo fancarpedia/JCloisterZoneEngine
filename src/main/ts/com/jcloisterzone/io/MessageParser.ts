@@ -204,7 +204,11 @@ export class MessageParser {
         return m;
       }
       case "MOVE_NEUTRAL_FIGURE":
-        return new MoveNeutralFigureMessage(p.figureId as string, this.parseBoardPointer(p.to));
+        // to: null removes the figure from the board (e.g. the mage or witch the player gives up)
+        return new MoveNeutralFigureMessage(
+          p.figureId as string,
+          p.to === null || p.to === undefined ? null : this.parseBoardPointer(p.to),
+        );
       case "SCORE_ACROBATS":
         return new ScoreAcrobatsMessage(this.parseBoardPointer(p.pointer) as FeaturePointer);
       case "SCORE_FIRST":
@@ -280,7 +284,10 @@ export class MessageParser {
     if (msg instanceof MoveNeutralFigureMessage) {
       return {
         type: "MOVE_NEUTRAL_FIGURE",
-        payload: { figureId: msg.getFigureId(), to: this.encodeBoardPointer(msg.getTo()!) },
+        payload: {
+          figureId: msg.getFigureId(),
+          to: msg.getTo() === null ? null : this.encodeBoardPointer(msg.getTo()!),
+        },
       };
     }
     if (msg instanceof ReturnMeepleMessage) {

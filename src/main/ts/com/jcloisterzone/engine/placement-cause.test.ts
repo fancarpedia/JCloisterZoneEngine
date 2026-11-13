@@ -84,3 +84,46 @@ describe("other automatic placements name their cause", () => {
     for (const e of fairy) expect(e.cause).toBeUndefined();
   });
 });
+
+describe("caused events that used to be left out of the history are written", () => {
+  const events = allDirs.flatMap(finalEvents);
+
+  it("the dragon summoned onto a volcano, caused by that tile", () => {
+    const summoned = events.filter(e => e.type === "neutral-moved" && e.figure?.startsWith("dragon"));
+    expect(summoned.length).toBeGreaterThan(0);
+    for (const e of summoned) expect(e.cause?.type).toBe("tile-placed");
+  });
+
+  it("scoring returns the game caused (flock, windmill, obelisk, Děčínský Sněžník)", () => {
+    const names = new Set(
+      events
+        .filter(e => e.type === "meeple-returned" && (e as { forced?: boolean }).forced === false)
+        .map(e => (e.cause as { name: string }).name),
+    );
+    for (const n of ["flock-scored", "windmill-scored", "obelisk-scored", "decinsky-sneznik-scored"]) {
+      expect(names.has(n), n).toBe(true);
+    }
+  });
+});
+
+describe("the mage and witch name why the player had to place them", () => {
+  it("a tile with the magician symbol was placed", () => {
+    const placed = finalEvents("mage-and-witch").filter(
+      e => e.type === "neutral-moved" && /^(mage|witch)/.test(e.figure || "") && e.to,
+    );
+    expect(placed.length).toBeGreaterThan(0);
+    for (const e of placed) expect(e.cause?.type, JSON.stringify(e)).toBe("tile-placed");
+  });
+});
+
+describe("removing the mage or witch after their features joined", () => {
+  it("is accepted with to: null and names the joined features as its cause", () => {
+    const removed = finalEvents("mage-and-witch").filter(
+      e => e.type === "neutral-moved" && /^(mage|witch)/.test(e.figure || "") && !e.to,
+    );
+    expect(removed.length).toBeGreaterThan(0);
+    for (const e of removed) {
+      expect(e.cause, JSON.stringify(e)).toEqual({ type: "rule", name: "mage-witch-joined" });
+    }
+  });
+});
