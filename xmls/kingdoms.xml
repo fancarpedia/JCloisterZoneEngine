@@ -38,7 +38,7 @@
   <sets>
     <!-- supply="true": these tiles go into players' supplies (each player the palace of their
          colour), never into the draw pile. The setup's Tiles view lists them read-only. -->
-    <tile-set id="kingdoms" supply="true">
+    <tile-set id="kingdoms" supply="true" element="city-palace">
       <ref count="1" tile="Kingdoms/CityPalaceRed" />
       <ref count="1" tile="Kingdoms/CityPalaceBlue" />
       <ref count="1" tile="Kingdoms/CityPalaceYellow" />

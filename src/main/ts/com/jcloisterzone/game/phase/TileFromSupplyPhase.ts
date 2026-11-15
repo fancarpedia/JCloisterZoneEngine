@@ -209,7 +209,7 @@ export class TileFromSupplyPhase extends AbstractAbbeyPhase {
       state = state.mapPlayers((ps) =>
         ps.addTokenCount(player.getIndex(), AbbeyCapability.AbbeyToken.ABBEY_TILE, -1),
       );
-      state = new PlaceTile(AbbeyCapability.ABBEY_TILE, msg.getPosition()!, msg.getRotation()!).apply(state);
+      state = new PlaceTile(AbbeyCapability.getAbbeyTile(state), msg.getPosition()!, msg.getRotation()!).apply(state);
     } else {
       const supplyTiles = state.getTilesInPlayerSupply(state.getTurnPlayer()!);
       if (!supplyTiles.isEmpty()) {

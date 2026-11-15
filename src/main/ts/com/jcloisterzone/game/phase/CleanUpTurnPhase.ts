@@ -5,14 +5,14 @@ import { PlayEventMeta } from "../../event/PlayEvent.js";
 import type { RandomGenerator } from "../../random/RandomGenerator.js";
 import { SetNextPlayer } from "../../reducers/SetNextPlayer.js";
 import type { Capability } from "../Capability.js";
-import { AbbeyCapability } from "../capability/AbbeyCapability.js";
+import { AbbeyCapability, type AbbeyModel } from "../capability/AbbeyCapability.js";
 import { KeepBuildingCapability } from "../capability/KeepBuildingCapability.js";
 import { Flag } from "../state/Flag.js";
 import type { GameState } from "../state/GameState.js";
 import { Phase } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
 
-const ABBEY_CLS = AbbeyCapability as unknown as ClassToken<Capability<number>>;
+const ABBEY_CLS = AbbeyCapability as unknown as ClassToken<Capability<AbbeyModel>>;
 const KEEP_BUILDING_CLS = KeepBuildingCapability as unknown as ClassToken<Capability<number | null>>;
 
 /** Real end of turn: clean up and switch to the next player. */
@@ -56,7 +56,7 @@ export class CleanUpTurnPhase extends Phase {
     // NB: checked BEFORE the coop loss — the abbey end-game only starts once the pack is
     // empty (the coop win is already secured); its abbey-or-pass turns are exempt.
     if (state.hasCapability(ABBEY_CLS)) {
-      const endPlayerIdx = state.getCapabilityModel<number>(ABBEY_CLS);
+      const endPlayerIdx = state.getCapabilityModel<AbbeyModel>(ABBEY_CLS)?.endPlayer;
       if (endPlayerIdx !== null && endPlayerIdx !== undefined) {
         return this.next(state, this.abbeyEndGamePhase!);
       }

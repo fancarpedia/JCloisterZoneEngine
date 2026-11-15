@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 /** Elements whose tiles live in an XML no set refers to (supply-only tiles). */
-const ELEMENT_XMLS = { "city-palace": "kingdoms.xml" };
+const ELEMENT_XMLS = { "city-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
 
 /** Absolute paths of the set XMLs a game needs, or null if any is missing. `elements` adds the
  *  XMLs of supply-only tiles (Kingdoms' City Palaces are never in a tile-set). */

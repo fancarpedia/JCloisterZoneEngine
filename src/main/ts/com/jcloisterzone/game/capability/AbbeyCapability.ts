@@ -1,38 +1,46 @@
-import { HashMap, type Map as VMap } from "../../../../io/vavr/Map.js";
-import { HashSet } from "../../../../io/vavr/Set.js";
-import { List } from "../../../../io/vavr/SeqTypes.js";
 import { JavaEnum } from "../../../../lang/JavaEnum.js";
-import { Location } from "../../board/Location.js";
-import { Position } from "../../board/Position.js";
-import { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
-import { Tile } from "../../board/Tile.js";
-import { AbbeyEdge } from "../../feature/AbbeyEdge.js";
-import type { Feature } from "../../feature/Feature.js";
-import { Monastery } from "../../feature/Monastery.js";
+import type { Tile } from "../../board/Tile.js";
 import type { RandomGenerator } from "../../random/RandomGenerator.js";
 import { Capability } from "../Capability.js";
 import type { Token } from "../Token.js";
 import type { GameState } from "../state/GameState.js";
 
-/** Abbey & Mayor — the abbey tile each player may place in a hole. Model: the
- *  player index during the final abbey-placement turn. */
-export class AbbeyCapability extends Capability<number> {
+/** Abbey state: the abbey tile (defined in abbey_and_mayor.xml, a supply tile — never drawn) and,
+ *  during the final abbey-placement round, the index of the player that round ends on. */
+export class AbbeyModel {
+  constructor(
+    readonly tile: Tile | null,
+    readonly endPlayer: number | null,
+  ) {}
+
+  setEndPlayer(endPlayer: number | null): AbbeyModel {
+    return new AbbeyModel(this.tile, endPlayer);
+  }
+}
+
+/** Abbey & Mayor — the abbey tile each player may place in a hole. The tile itself comes from the
+ *  tile XML (`AM/A`: a monastery with an abbey edge on every side, in a `supply="true"` set). */
+export class AbbeyCapability extends Capability<AbbeyModel> {
   static readonly ABBEY_TILE_ID = "AM/A";
   /** Max abbey tiles a player may start with (the `abbey` element is an integer count). */
   static readonly MAX_ABBEY_TILES = 9;
 
-  /** The (unplaced) abbey tile: a monastery surrounded by abbey edges. */
-  static readonly ABBEY_TILE: Tile = (() => {
-    let features: VMap<FeaturePointer, Feature> = HashMap.of<FeaturePointer, Feature>(
-      new FeaturePointer(Position.ZERO, Monastery, Location.I),
-      new Monastery(HashMap.empty()),
-    );
-    for (const side of Location.SIDES) {
-      const fp = new FeaturePointer(Position.ZERO, AbbeyEdge, side);
-      features = features.put(fp, new AbbeyEdge(List.of(fp)));
+  override getSupplyTileIds(): readonly string[] {
+    return [AbbeyCapability.ABBEY_TILE_ID];
+  }
+
+  override initSupplyTiles(state: GameState, tiles: ReadonlyMap<string, Tile>): GameState {
+    return this.setModel(state, new AbbeyModel(tiles.get(AbbeyCapability.ABBEY_TILE_ID) ?? null, null));
+  }
+
+  /** The abbey tile of this game. Throws when the loaded XML doesn't define `AM/A`. */
+  static getAbbeyTile(state: GameState): Tile {
+    const model = state.getCapabilityModel<AbbeyModel>(AbbeyCapability as never);
+    if (!model || !model.tile) {
+      throw new Error(`The abbey tile ${AbbeyCapability.ABBEY_TILE_ID} is not defined in the loaded tile XML (abbey_and_mayor.xml)`);
     }
-    return new Tile("AM/A", features, HashSet.empty());
-  })();
+    return model.tile;
+  }
 
   override onStartGame(state: GameState, _random: RandomGenerator): GameState {
     // The `abbey` element is an integer count (1..9) of abbey tiles each player gets.
