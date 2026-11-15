@@ -789,7 +789,17 @@ export class StateGsonBuilder {
           type: simpleName(ev.getSecond().constructor as ClassToken),
           player: ev.getSecond().getPlayer().getIndex(),
         };
-        turnEvents.push({ type: "prisoners-exchange", exchange: [first, {}] });
+        // `followers`: BOTH followers freed by the exchange, each back to its owner (the client
+        // shows them behind prison bars). `exchange` is kept as it was for older clients.
+        const freed = (f: Follower) => ({
+          type: simpleName(f.constructor as ClassToken),
+          player: f.getPlayer().getIndex(),
+        });
+        turnEvents.push({
+          type: "prisoners-exchange",
+          exchange: [first, {}],
+          followers: [freed(ev.getFirst()), freed(ev.getSecond())],
+        });
       } else if (ev instanceof MeepleAwardedEvent) {
         turnEvents.push({
           type: "meeple-awarded",
