@@ -1,0 +1,232 @@
+import { List } from "../../../../io/vavr/SeqTypes.js";
+import { JavaEnum } from "../../../../lang/JavaEnum.js";
+import { Location } from "../../board/Location.js";
+import type { PlacementOption } from "../../board/PlacementOption.js";
+import type { Position } from "../../board/Position.js";
+import type { Tile } from "../../board/Tile.js";
+import type { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
+import { ScoreKingdomPointer } from "../../board/pointer/ScoreKingdomPointer.js";
+import { ExprItem } from "../../event/ExprItem.js";
+import { PointsExpression } from "../../event/PointsExpression.js";
+import { ReceivedPoints } from "../../event/ScoreEvent.js";
+import { Castle } from "../../feature/Castle.js";
+import { City } from "../../feature/City.js";
+import type { Feature } from "../../feature/Feature.js";
+import { Field } from "../../feature/Field.js";
+import { AddPoints } from "../../reducers/AddPoints.js";
+import { Capability } from "../Capability.js";
+import type { Token } from "../Token.js";
+import type { GameState } from "../state/GameState.js";
+import type { PlacedTile } from "../state/PlacedTile.js";
+
+/** A placed City Palace: where, and whose. */
+export interface PlacedCityPalace {
+  readonly position: Position;
+  readonly owner: number;
+}
+
+/** Kingdoms state: each player's palace tile (their colour) and the palaces on the board. */
+export class CityPalaceModel {
+  constructor(
+    /** by player index; null when the colour's tile is not defined in the loaded XML */
+    readonly tiles: readonly (Tile | null)[],
+    readonly palaces: readonly PlacedCityPalace[],
+  ) {}
+
+  getTile(playerIndex: number): Tile | null {
+    return this.tiles[playerIndex] ?? null;
+  }
+
+  addPalace(palace: PlacedCityPalace): CityPalaceModel {
+    return new CityPalaceModel(this.tiles, [...this.palaces, palace]);
+  }
+}
+
+/**
+ * Kingdoms (fan expansion by Luke Tubbs (Astargoth) and Giles Smith).
+ *
+ * Each player has City Palace tile(s) of their own colour in supply (the `city-palace` element
+ * is the count). Instead of drawing, a player may place one — only joining a city that holds
+ * one of their followers. The palace is just part of that city (like Darmstadtium); the city
+ * becomes a capital; a COMPLETED capital is a kingdom. At the end every kingdom scores, per player
+ * owning a palace in it, 3 points for every city touching a field that touches the capital
+ * (those cities completed or not, the capital itself and the City of Carcassonne included,
+ * castles not). An unfinished capital scores no kingdom. Farmers are not required.
+ */
+export class CityPalaceCapability extends Capability<CityPalaceModel> {
+  static readonly TILE_PREFIX = "Kingdoms/CityPalace";
+  /** Max palace tiles a player may start with. */
+  static readonly MAX_TILES = 9;
+  static readonly POINTS_PER_CITY = 3;
+
+  /** Slot (= the client's player colour, see player-colors.scss) → palace colour. */
+  static readonly SLOT_COLORS: readonly string[] = [
+    "Red", "Blue", "Yellow", "Green", "Orange", "Purple", "Pink", "White", "Black",
+    // art exists for these too; no client slot uses them yet
+    "Gray", "Beige", "Brown",
+  ];
+
+  static tileIdForSlot(slot: number): string {
+    const color = CityPalaceCapability.SLOT_COLORS[slot] ?? CityPalaceCapability.SLOT_COLORS[0];
+    return CityPalaceCapability.TILE_PREFIX + color;
+  }
+
+  static isCityPalace(tile: Tile): boolean {
+    return tile.getId().startsWith(CityPalaceCapability.TILE_PREFIX);
+  }
+
+  override getSupplyTileIds(): readonly string[] {
+    return CityPalaceCapability.SLOT_COLORS.map((c) => CityPalaceCapability.TILE_PREFIX + c);
+  }
+
+  override initSupplyTiles(
+    state: GameState,
+    tiles: ReadonlyMap<string, Tile>,
+    playerSlots: readonly number[],
+  ): GameState {
+    const own = playerSlots.map((slot) => tiles.get(CityPalaceCapability.tileIdForSlot(slot)) ?? null);
+    return this.setModel(state, new CityPalaceModel(own, []));
+  }
+
+  override onStartGame(state: GameState): GameState {
+    // the `city-palace` element is the count of palaces per player; a boolean `true` = 1
+    const raw = state.getElements().get("city-palace").getOrNull();
+    let count = typeof raw === "number" ? raw : Number(raw);
+    if (!Number.isInteger(count) || count < 1) count = 1;
+    if (count > CityPalaceCapability.MAX_TILES) count = CityPalaceCapability.MAX_TILES;
+    const model = this.getModel(state);
+    // a player whose colour has no palace tile (XML not loaded) gets none
+    return state.mapPlayers((ps) => {
+      for (let i = 0; i < ps.getPlayers().size(); i++) {
+        ps = ps.setTokenCount(i, CityPalaceCapability.CityPalaceToken.CITY_PALACE, model?.getTile(i) ? count : 0);
+      }
+      return ps;
+    });
+  }
+
+  /** The turn player's palace tile, when they still hold one. */
+  static getAvailableTile(state: GameState): Tile | null {
+    const player = state.getTurnPlayer();
+    if (player === null) return null;
+    const idx = player.getIndex();
+    const tokens = state.getPlayers().getPlayerTokenCount(idx, CityPalaceCapability.CityPalaceToken.CITY_PALACE);
+    if (tokens <= 0) return null;
+    const model = state.getCapabilityModel<CityPalaceModel>(CityPalaceCapability as never);
+    return model?.getTile(idx) ?? null;
+  }
+
+  /** Only joining a city occupied by the active player's follower (normal edge rules apply too). */
+  override isTilePlacementAllowed(state: GameState, tile: Tile, placement: PlacementOption): boolean {
+    if (!CityPalaceCapability.isCityPalace(tile)) return true;
+    const player = state.getTurnPlayer();
+    if (player === null) return false;
+    const pos = placement.getPosition();
+    for (const side of Location.SIDES) {
+      const adj = pos.add(side);
+      if (state.getPlacedTile(adj) === null) continue;
+      const f = state.getFeaturePartOf(adj, side.rev());
+      if (f instanceof City && f.isOccupiedBy(state, player)) return true;
+    }
+    return false;
+  }
+
+  override onTilePlaced(state: GameState, placedTile: PlacedTile): GameState {
+    if (!CityPalaceCapability.isCityPalace(placedTile.getTile())) return state;
+    const owner = state.getTurnPlayer()!.getIndex();
+    return this.updateModel(state, (m) => m.addPalace({ position: placedTile.getPosition(), owner }));
+  }
+
+  override onFinalScoring(state: GameState): GameState {
+    const model = this.getModel(state);
+    if (!model || model.palaces.length === 0) return state;
+
+    const keys = new Map<Feature, string>();
+    const keyOf = (f: Feature): string => {
+      let k = keys.get(f);
+      if (k === undefined) {
+        k = f
+          .getPlaces()
+          .toArray()
+          .map((fp) => fp.toString())
+          .sort()
+          .join("|");
+        keys.set(f, k);
+      }
+      return k;
+    };
+
+    // one kingdom per (capital city, owner) — extra palaces of the same player in that city add nothing
+    const kingdoms = new Map<string, { capital: City; owner: number; position: Position }>();
+    for (const p of model.palaces) {
+      const capital = state.getFeaturePartOf(p.position, Location.N);
+      if (!(capital instanceof City)) continue;
+      // only a completed capital is a kingdom
+      if (!capital.isCompleted(state)) continue;
+      const k = keyOf(capital) + "#" + p.owner;
+      if (!kingdoms.has(k)) kingdoms.set(k, { capital, owner: p.owner, position: p.position });
+    }
+
+    const fields = state.getFeatures(Field).toArray() as Field[];
+    for (const { capital, owner, position } of kingdoms.values()) {
+      const capitalKey = keyOf(capital);
+      const touched: Field[] = [];
+      const cities = new Map<string, FeaturePointer>();
+      let coc = false;
+      for (const field of fields) {
+        const adjoining = field
+          .getAdjoiningCities()
+          .toArray()
+          .map((fp) => state.getFeaturePartOf(fp.getPosition(), fp.getLocation()!))
+          .filter((f): f is Feature => f !== null);
+        if (!adjoining.some((f) => keyOf(f) === capitalKey)) continue;
+        touched.push(field);
+        for (const f of adjoining) {
+          // every city counts, completed or not — castles don't
+          if (f instanceof City && !(f instanceof Castle)) {
+            const k = keyOf(f);
+            if (!cities.has(k)) cities.set(k, f.getPlaces().head());
+          }
+        }
+        if (field.isAdjoiningCityOfCarcassonne()) coc = true;
+      }
+      const count = cities.size + (coc ? 1 : 0);
+      if (count === 0) continue;
+
+      const items: ExprItem[] = [];
+      if (cities.size > 0) {
+        items.push(new ExprItem(cities.size, "cities", cities.size * CityPalaceCapability.POINTS_PER_CITY));
+      }
+      if (coc) items.push(new ExprItem("coc", CityPalaceCapability.POINTS_PER_CITY));
+      const capitalPtr =
+        capital
+          .getPlaces()
+          .find((fp) => fp.getPosition().equals(position))
+          .getOrNull() ?? capital.getPlaces().head();
+      const source = new ScoreKingdomPointer(
+        capitalPtr,
+        touched.map((f) => f.getPlaces().head()),
+        [...cities.values()],
+        coc,
+      );
+      state = new AddPoints(
+        new ReceivedPoints(new PointsExpression("kingdom", List.ofAll(items)), state.getPlayers().getPlayer(owner), source),
+        true,
+        true,
+      ).apply(state);
+    }
+    return state;
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace CityPalaceCapability {
+  export class CityPalaceToken extends JavaEnum implements Token {
+    static readonly CITY_PALACE = new CityPalaceToken("CITY_PALACE", 0);
+    private static readonly VALUES: readonly CityPalaceToken[] = [CityPalaceToken.CITY_PALACE];
+    static values(): readonly CityPalaceToken[] {
+      return CityPalaceToken.VALUES;
+    }
+  }
+}
+
+Capability.register(CityPalaceCapability);

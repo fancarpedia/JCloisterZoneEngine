@@ -36,6 +36,12 @@ export class TilePackBuilder {
 
   private readonly usedIds = new Set<string>(); // assertion only
   private readonly tiles = new Map<string, Tile[]>();
+  /** Supply-only tiles requested by capabilities (Capability.getSupplyTileIds) — never drawn. */
+  private readonly supplyTiles = new Map<string, Tile>();
+
+  getSupplyTiles(): ReadonlyMap<string, Tile> {
+    return this.supplyTiles;
+  }
 
   setGameState(state: GameState): void {
     this.state = state;
@@ -90,6 +96,8 @@ export class TilePackBuilder {
   createTilePack(definitions: string[]): TilePack {
     const tilesCount = new Map<string, number>();
     const removedTiles = new Set<string>();
+    // tiles of selected `<tile-set supply="true">` sets: built as supply tiles, never drawn
+    const supplySetTiles = new Set<string>();
     const modifiers: FeatureModifier<unknown>[] = [];
 
     // --- pass 1: modifiers + tile-set refs ---
@@ -126,7 +134,13 @@ export class TilePackBuilder {
       elementStream(element.getElementsByTagName("tile-set")).forEach((tileSetElement) => {
         const tileSetId = tileSetElement.getAttribute("id");
         const setCount = this.tileSets.getOrElse(tileSetId, 0);
-        if (setCount > 0) {
+        if (setCount > 0 && tileSetElement.getAttribute("supply") === "true") {
+          // a supply set (e.g. Kingdoms' City Palaces) puts its tiles into players' supplies, which
+          // its capability does — it contributes nothing to the draw pack
+          elementStream(tileSetElement.getElementsByTagName("ref")).forEach((refElement) => {
+            supplySetTiles.add(refElement.getAttribute("tile"));
+          });
+        } else if (setCount > 0) {
           elementStream(tileSetElement.getElementsByTagName("ref")).forEach((refElement) => {
             const tileId = refElement.getAttribute("tile");
             const tileCount = parseInt(refElement.getAttribute("count"), 10);
@@ -142,11 +156,21 @@ export class TilePackBuilder {
 
     this.tileBuilder.setExternalModifiers(modifiers);
 
+    const supplyIds = new Set<string>(supplySetTiles);
+    for (const cap of this.state.getCapabilities().toSeq()) {
+      for (const id of cap.getSupplyTileIds()) supplyIds.add(id);
+    }
+
     // --- pass 2: tiles ---
     for (const content of definitions) {
       const element = parseDocument(content).documentElement;
       elementStream(element.getElementsByTagName("tile")).forEach((tileElement) => {
         const tileId = tileElement.getAttribute("id");
+        if (supplyIds.has(tileId)) {
+          // a supply-only tile: built once, kept out of the draw pack
+          if (!this.supplyTiles.has(tileId)) this.supplyTiles.set(tileId, this.createTile(tileId, tileElement));
+          return;
+        }
         let count = tilesCount.get(tileId) ?? 0;
         if (count === 0 || removedTiles.has(tileId)) {
           return;

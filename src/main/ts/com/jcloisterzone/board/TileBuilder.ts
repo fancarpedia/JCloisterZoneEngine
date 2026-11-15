@@ -56,6 +56,7 @@ export class TileBuilder {
     City.PRINCESS,
     City.BESIEGED,
     City.DARMSTADTIUM,
+    City.CITY_PALACE,
     City.POINTS_MODIFIER,
     City.GAMBLERS_LUCK_SHIELDS as unknown as AnyMod,
   ];

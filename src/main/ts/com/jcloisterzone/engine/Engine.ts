@@ -138,6 +138,7 @@ export class Engine {
     builder.setGameAnnotations(annotations && Object.keys(annotations).length > 0 ? annotations : null);
     const tileOverrides = setupMsg.getTiles();
     builder.setTileOverrides(tileOverrides && Object.keys(tileOverrides).length > 0 ? tileOverrides : null);
+    builder.setPlayerSlots(setupMsg.getPlayerSlots());
 
     let state = builder.createInitialState();
     const firstPhase = this.reducer.getFirstPhase();

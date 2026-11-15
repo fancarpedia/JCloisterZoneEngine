@@ -117,6 +117,7 @@ export class MessageParser {
     msg.rules = (payload.rules as Record<string, unknown>) ?? {};
     msg.timer = (payload.timer as Record<string, unknown> | null) ?? null;
     msg.players = (payload.players as number) ?? 0;
+    msg.playerSlots = Array.isArray(payload.playerSlots) ? (payload.playerSlots as number[]) : null;
     msg.initialRandom = (payload.initialRandom as number) ?? 0;
     msg.gameAnnotations = (payload.gameAnnotations as Record<string, unknown>) ?? {};
     const start = (payload.start as Array<{ tile: string; x: number; y: number; rotation: number }>) ?? [];
