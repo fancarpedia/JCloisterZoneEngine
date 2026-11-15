@@ -16,6 +16,9 @@ export class GameSetupMessage extends AbstractMessage implements Message {
   rules: Record<string, unknown> = {};
   timer: Record<string, unknown> | null = null;
   players = 0;
+  /** Optional: each player's slot (= colour) by player index. Kingdoms hands each player the
+   *  City Palace of their colour. Absent ⇒ slot = player index. */
+  playerSlots: number[] | null = null;
   start: GameSetupMessage.PlacedTileItem[] = [];
   gameAnnotations: Record<string, unknown> = {};
   initialRandom = 0;
@@ -37,6 +40,9 @@ export class GameSetupMessage extends AbstractMessage implements Message {
   }
   getPlayers(): number {
     return this.players;
+  }
+  getPlayerSlots(): number[] | null {
+    return this.playerSlots;
   }
   getStart(): GameSetupMessage.PlacedTileItem[] {
     return this.start;

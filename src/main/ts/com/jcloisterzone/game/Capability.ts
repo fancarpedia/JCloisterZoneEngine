@@ -53,6 +53,19 @@ export abstract class Capability<T> {
     return null;
   }
 
+  /** Tile ids this capability needs built from the loaded tile-definition XML although no
+   *  tile-set draws them — supply-only tiles (Kingdoms' City Palaces). */
+  getSupplyTileIds(): readonly string[] {
+    return [];
+  }
+
+  /** Receives the supply-only tiles asked for by {@link getSupplyTileIds} (only those found in
+   *  the loaded XML) and each player's slot — the player's colour — by player index. Runs
+   *  before {@link onStartGame}. */
+  initSupplyTiles(state: GameState, tiles: ReadonlyMap<string, Tile>, playerSlots: readonly number[]): GameState {
+    return state;
+  }
+
   onStartGame(state: GameState, random: RandomGenerator): GameState {
     return state;
   }

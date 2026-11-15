@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Kingdoms — fan expansion by Luke Tubbs (Astargoth) and Giles Smith (Carcassonne Central).
+
+  One City Palace tile per player colour. The palaces are never drawn: the `kingdoms` tile-set
+  is a supply set, CityPalaceCapability builds them as supply tiles and gives each player the palace of
+  their own colour (by slot). A palace is just part of the city (like Darmstadtium).
+-->
+<defs>
+  <!-- Selecting Kingdoms in the setup's Tiles tab (fan expansions) turns on the `city-palace`
+       element (one palace per player by default; the count is set in the Figures tab). Its
+       tile-set is a supply set: the palaces go to the players, never into the draw pile. -->
+  <expansion id="KINGDOMS">
+    <title>Kingdoms</title>
+    <sets>
+      <ref tile-set="kingdoms" />
+    </sets>
+    <implies element="city-palace" />
+    <icon>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 22V10h2V7h2v3h2V5H7V3h2v1h2V2h2v2h2V3h2v2h-1v5h2V7h2v3h2v12h-8v-5a2 2 0 0 0-4 0v5Z"/></svg>
+    </icon>
+  </expansion>
+
+  <tiles>
+    <tile id="Kingdoms/CityPalaceRed"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceBlue"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceYellow"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceGreen"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceOrange"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalacePurple"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalacePink"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceWhite"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceBlack"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceGray"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceBeige"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/CityPalaceBrown"><city city-palace="true">N W S E</city></tile>
+  </tiles>
+  <sets>
+    <!-- supply="true": these tiles go into players' supplies (each player the palace of their
+         colour), never into the draw pile. The setup's Tiles view lists them read-only. -->
+    <tile-set id="kingdoms" supply="true">
+      <ref count="1" tile="Kingdoms/CityPalaceRed" />
+      <ref count="1" tile="Kingdoms/CityPalaceBlue" />
+      <ref count="1" tile="Kingdoms/CityPalaceYellow" />
+      <ref count="1" tile="Kingdoms/CityPalaceGreen" />
+      <ref count="1" tile="Kingdoms/CityPalaceOrange" />
+      <ref count="1" tile="Kingdoms/CityPalacePurple" />
+      <ref count="1" tile="Kingdoms/CityPalacePink" />
+      <ref count="1" tile="Kingdoms/CityPalaceWhite" />
+      <ref count="1" tile="Kingdoms/CityPalaceBlack" />
+      <ref count="1" tile="Kingdoms/CityPalaceGray" />
+      <ref count="1" tile="Kingdoms/CityPalaceBeige" />
+      <ref count="1" tile="Kingdoms/CityPalaceBrown" />
+    </tile-set>
+  </sets>
+</defs>

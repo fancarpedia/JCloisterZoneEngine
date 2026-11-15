@@ -76,6 +76,7 @@ import { BuilderCapability } from "../game/capability/BuilderCapability.js";
 import { FamiliesCapability } from "../game/capability/FamiliesCapability.js";
 import { KeepBuildingCapability } from "../game/capability/KeepBuildingCapability.js";
 import { MiniMeepleCapability } from "../game/capability/MiniMeepleCapability.js";
+import { CityPalaceCapability } from "../game/capability/CityPalaceCapability.js";
 import { TowerCapability } from "../game/capability/TowerCapability.js";
 import { TradeGoodsCapability } from "../game/capability/TradeGoodsCapability.js";
 import { TunnelCapability } from "../game/capability/TunnelCapability.js";
@@ -167,6 +168,7 @@ const CAPABILITIES: Array<[string, CapClass]> = [
   ["families", FamiliesCapability as unknown as CapClass],
   ["keep-building", KeepBuildingCapability as unknown as CapClass],
   ["mini-follower", MiniMeepleCapability as unknown as CapClass],
+  ["city-palace", CityPalaceCapability as unknown as CapClass],
   // TODO(capabilities): the many unported expansion capabilities.
 ];
 

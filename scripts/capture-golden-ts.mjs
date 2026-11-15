@@ -52,7 +52,7 @@ function runTs(jcz, xmlPaths) {
 function capture(jczPath) {
   const jcz = JSON.parse(readFileSync(jczPath, "utf8"));
   if (jcz.setup?.addons) delete jcz.setup.addons; // save-version metadata the engine ignores
-  const xmlPaths = resolveXmlPaths(jcz.setup.sets, XMLS_DIR);
+  const xmlPaths = resolveXmlPaths(jcz.setup.sets, XMLS_DIR, jcz.setup.elements);
   const rel = jczPath.slice(TESTS_ROOT.length + 1);
   if (!xmlPaths) {
     process.stdout.write(`SKIPPED ${rel} (missing set XML)\n`);
