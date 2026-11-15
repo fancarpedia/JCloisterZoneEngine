@@ -8,7 +8,7 @@
   "setup": {
     "sets": {
       "basic:1": 1,
-      "under-the-big-top:1": 1,
+      "under-the-big-top-c1": 1,
       "the-courier": 1
     },
     "elements": {
@@ -84,7 +84,7 @@
     {
       "type": "PLACE_TILE",
       "payload": {
-        "tileId": "BT/rfrf.ac",
+        "tileId": "ubtc1/rfrf.ac.1",
         "rotation": "R90",
         "position": [
           2,
@@ -159,7 +159,7 @@
   "gameAnnotations": {
     "drawOrder": [
       "the-courier/rfrf.m",
-      "BT/rfrf.ac"
+      "ubtc1/rfrf.ac.1"
     ]
   },
   "test": {
