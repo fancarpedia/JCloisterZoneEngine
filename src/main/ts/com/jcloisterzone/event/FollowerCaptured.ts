@@ -10,6 +10,8 @@ export class FollowerCaptured extends PlayEvent {
     metadata: PlayEventMeta,
     private readonly follower: Follower,
     private readonly from: FeaturePointer,
+    /** the tower whose piece captured it (its Tower feature pointer); null when not known */
+    private readonly tower: FeaturePointer | null = null,
   ) {
     super(metadata);
   }
@@ -19,5 +21,8 @@ export class FollowerCaptured extends PlayEvent {
   }
   getFrom(): FeaturePointer {
     return this.from;
+  }
+  getTower(): FeaturePointer | null {
+    return this.tower;
   }
 }

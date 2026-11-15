@@ -774,6 +774,8 @@ export class StateGsonBuilder {
           meeple: simpleName(ev.getFollower().constructor as ClassToken),
           player: ev.getFollower().getPlayer().getIndex(),
           from: this.boardPtr(ev.getFrom()),
+          // the tower that captured it (whose piece was placed), so the client can point at it
+          ...(ev.getTower() ? { tower: this.boardPtr(ev.getTower()!) } : {}),
         });
       } else if (ev instanceof RansomPaidEvent) {
         turnEvents.push({

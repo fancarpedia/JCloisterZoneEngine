@@ -1,7 +1,7 @@
 import { HashSet, type Set } from "../../../../io/vavr/Set.js";
 import type { ClassToken } from "../../../../lang/Class.js";
 import type { Arr, List } from "../../../../io/vavr/SeqTypes.js";
-import type { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
+import { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
 import { MeeplePointer } from "../../board/pointer/MeeplePointer.js";
 import { Castle } from "../../feature/Castle.js";
 import { Tower } from "../../feature/Tower.js";
@@ -10,7 +10,7 @@ import type { Player } from "../../Player.js";
 import { CaptureFollowerAction } from "../../action/CaptureFollowerAction.js";
 import { SelectPrisonerToExchangeAction } from "../../action/SelectPrisonerToExchangeAction.js";
 import type { PlayerAction } from "../../action/PlayerAction.js";
-import type { TokenPlacedEvent } from "../../event/TokenPlacedEvent.js";
+import { TokenPlacedEvent } from "../../event/TokenPlacedEvent.js";
 import type { CaptureFollowerMessage } from "../../io/message/CaptureFollowerMessage.js";
 import { CaptureFollowerMessage as CaptureFollowerMessageClass } from "../../io/message/CaptureFollowerMessage.js";
 import type { ExchangeFollowerChoiceMessage } from "../../io/message/ExchangeFollowerChoiceMessage.js";
@@ -77,7 +77,14 @@ export class TowerCapturePhase extends Phase {
       .map((t) => t._1)
       .getOrNull() as Follower | null;
     if (meeple === null) throw new Error("Pointer doesn't match any meeple");
-    state = new CaptureMeeple(meeple).apply(state);
+    // the tower that captures: the one whose piece was just placed (the event that led here)
+    const towerPlaced = state
+      .getEvents()
+      .reverse()
+      .find((e) => e instanceof TokenPlacedEvent && e.getPointer() instanceof FeaturePointer)
+      .getOrNull() as TokenPlacedEvent | null;
+    const tower = towerPlaced ? (towerPlaced.getPointer() as FeaturePointer) : null;
+    state = new CaptureMeeple(meeple, tower).apply(state);
 
     // skip exchange when the player's OWN follower was captured
     if (!player.equals(meeple.getPlayer())) {

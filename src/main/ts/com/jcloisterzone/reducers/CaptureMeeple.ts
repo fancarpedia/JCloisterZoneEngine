@@ -17,7 +17,8 @@ const TOWER_CLS = TowerCapability as unknown as ClassToken<Capability<Arr<List<F
 /** Capture a follower into a tower's prison: the capturing player jails an opponent's
  *  follower (own followers just return to supply). */
 export class CaptureMeeple extends UndeployMeeple {
-  constructor(follower: Follower) {
+  /** @param tower the tower whose piece makes the capture (recorded on the event) */
+  constructor(follower: Follower, private readonly tower: FeaturePointer | null = null) {
     super(follower, true);
   }
 
@@ -40,7 +41,7 @@ export class CaptureMeeple extends UndeployMeeple {
     state = state.mapCapabilityModel<Arr<List<Follower>>>(TOWER_CLS, (model) =>
       model.update(p.getIndex(), model.get(p.getIndex()).append(follower) as List<Follower>) as Arr<List<Follower>>,
     );
-    state = state.appendEvent(new FollowerCaptured(meta, follower, source));
+    state = state.appendEvent(new FollowerCaptured(meta, follower, source, this.tower));
     return state;
   }
 }
