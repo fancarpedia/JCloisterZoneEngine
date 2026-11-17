@@ -3,7 +3,7 @@
 // Each player holds City Palace tile(s) of their own colour (by slot). Instead of drawing they may
 // place one, but only joining a city that holds one of their followers. A COMPLETED capital is a
 // kingdom: at the end it scores, once per player owning a palace in it, 3 points per city touching
-// a field that touches the capital — those cities completed or not, the capital itself included.
+// a field that touches the capital — only COMPLETED cities, the capital itself included.
 // An unfinished capital scores nothing.
 //
 // Board (preplaced, no meeples), BA/C = city on one edge, field everywhere else:
@@ -28,8 +28,8 @@ setDomParserFactory(() => new DOMParser() as unknown as XmlDOMParser);
 const REPO = process.cwd();
 const BASIC_XML = readFileSync(resolve(join(REPO, "xmls", "basic.xml")), "utf8");
 const KINGDOMS_XML = readFileSync(resolve(join(REPO, "xmls", "kingdoms.xml")), "utf8");
-const tileSet = (count: number): string => `<?xml version="1.0" encoding="utf-8"?>
-<defs><sets><tile-set id="one"><ref count="${count}" tile="BA/C" /></tile-set></sets></defs>`;
+const tileSet = (count: number, extra = ""): string => `<?xml version="1.0" encoding="utf-8"?>
+<defs><sets><tile-set id="one"><ref count="${count}" tile="BA/C" />${extra}</tile-set></sets></defs>`;
 
 type Start = Array<{ tile: string; x: number; y: number; rotation: number }>;
 const DEFAULT_START: Start = [
@@ -59,13 +59,18 @@ class Game {
       kingdomsSet?: boolean;
       /** preplaced BA/C tiles; the pack holds these + 2 (turn 1 and the last one) */
       start?: Start;
+      /** extra BA/C drawn besides turn 1 and the last one */
+      extraDraws?: number;
+      /** a BA/CFc.1 (city W–E) in the pack, and the forced order the tiles are drawn in */
+      cityBridge?: boolean;
+      drawOrder?: string[];
     } = {},
   ) {
     const start = opts.start ?? DEFAULT_START;
     (this.engine as unknown as { tileDefinitions: string[] }).tileDefinitions = [
       BASIC_XML,
       KINGDOMS_XML,
-      tileSet(start.length + 2),
+      tileSet(start.length + 2 + (opts.extraDraws ?? 0), opts.cityBridge ? '<ref count="1" tile="BA/CFc.1" />' : ""),
     ];
     this.setup = this.send({
       type: "GAME_SETUP",
@@ -73,7 +78,7 @@ class Game {
         initialRandom: 0.5,
         players: opts.players ?? 1,
         ...(opts.playerSlots ? { playerSlots: opts.playerSlots } : {}),
-        gameAnnotations: {},
+        gameAnnotations: opts.drawOrder ? { drawOrder: opts.drawOrder } : {},
         // the client selects the (empty) `kingdoms` tile-set with the expansion
         sets: { one: 1, ...(opts.kingdomsSet ? { kingdoms: 1 } : {}) },
         elements: {
@@ -248,7 +253,7 @@ describe("Kingdoms — City Palace", () => {
     { tile: "BA/C", x: 2, y: 0, rotation: 0 },
   ];
 
-  it("a completed capital scores its kingdom — every city touching its fields", () => {
+  it("a completed capital scores its kingdom — every COMPLETED city touching its fields", () => {
     const game = new Game({ start: CLOSING });
     game.place(1, 0, "BA/C", "R270");
     game.deployOnCity(1, 0, "W", "0.small.1");
@@ -260,37 +265,64 @@ describe("Kingdoms — City Palace", () => {
     expect(scores).toHaveLength(1);
     const [k] = scores;
     expect(k.player).toBe(0);
-    // the field of (1,0)+(2,0)+(3,0) touches the capital and the (incomplete) cities of (2,0) and
-    // (3,0); the other three fields touch only the capital
-    expect(k.items).toEqual([{ count: 3, name: "cities", points: 9 }]);
+    // the field of (1,0)+(2,0)+(3,0) also touches the cities of (2,0) and (3,0), but they are
+    // unfinished and don't count; the other three fields touch only the capital
+    expect(k.items).toEqual([{ count: 1, name: "cities", points: 3 }]);
     expect(k.ptr.fields).toHaveLength(4);
-    expect(k.ptr.cities).toHaveLength(3);
+    expect(k.ptr.cities).toHaveLength(1);
   });
 
-  it("scores once per player, however many of their palaces the capital holds", () => {
-    // two palace spots side by side, (0,0) and (1,0), closed by one-edge cities all around; the
-    // follower comes on turn 1 at (0,1); (3,0) takes the last tile
-    const game = new Game({
+  // Two palace spots, (0,0) and (2,0), each closed by one-edge cities except towards the gap (1,0).
+  // Turn 1 puts a follower next to (0,0), turn 3 one next to (2,0); a BA/CFc.1 (city W–E) drawn
+  // last fills the gap and joins both capitals into one completed city.
+  const TWO_CAPITALS: Start = [
+    { tile: "BA/C", x: 0, y: -1, rotation: 180 },
+    { tile: "BA/C", x: -1, y: 0, rotation: 90 },
+    { tile: "BA/C", x: -1, y: 1, rotation: 0 }, // only makes (0,1) reachable
+    { tile: "BA/C", x: 2, y: -1, rotation: 180 },
+    { tile: "BA/C", x: 3, y: 0, rotation: 270 },
+    { tile: "BA/C", x: 3, y: 1, rotation: 0 }, // only makes (2,1) reachable
+  ];
+
+  const twoCapitals = (): Game =>
+    new Game({
       palaces: 2,
-      start: [
-        { tile: "BA/C", x: 0, y: -1, rotation: 180 },
-        { tile: "BA/C", x: -1, y: 0, rotation: 90 },
-        { tile: "BA/C", x: 1, y: -1, rotation: 180 },
-        { tile: "BA/C", x: 2, y: 0, rotation: 270 },
-        { tile: "BA/C", x: 1, y: 1, rotation: 0 },
-      ],
+      start: TWO_CAPITALS,
+      cityBridge: true,
+      drawOrder: ["BA/C", "BA/C", "BA/CFc.1"],
     });
+
+  it("is never placed into a city that already holds a palace", () => {
+    const game = twoCapitals();
     game.place(0, 1, "BA/C");
     game.deployOnCity(0, 1, "N", "0.small.1");
     game.commit();
-    game.placePalace(0, 0); // capital still open towards (1,0)
-    game.placePalace(1, 0); // the second palace closes it
-    const state = game.finish(3, 0);
+    const state = game.placePalace(0, 0); // capital A, still open towards (1,0)
+    // the only city with the player's follower is now capital A: its open side (1,0) is refused,
+    // so no palace is offered at all
+    expect(palaceItem(state)).toBeUndefined();
+    expect(state.phase).toBe("TilePhase");
+    expect(tokens(state).CITY_PALACE.count).toBe(1); // still in hand
+  });
+
+  it("capitals joined later score once per player", () => {
+    const game = twoCapitals();
+    game.place(0, 1, "BA/C");
+    game.deployOnCity(0, 1, "N", "0.small.1");
+    game.commit();
+    game.placePalace(0, 0); // capital A
+    game.place(2, 1, "BA/C");
+    game.deployOnCity(2, 1, "N", "0.small.2");
+    game.commit();
+    const before = game.placePalace(2, 0); // capital B — a separate city, so it is allowed
+    expect(tokens(before).CITY_PALACE?.count ?? 0).toBe(0);
+    // the last tile, a city W–E, joins A and B into one completed city with two palaces
+    const state = game.endTurn(game.place(1, 0, "BA/CFc.1"));
+    expect(state.phase).toBe("GameOverPhase");
 
     const scores = kingdomScores(state);
     expect(scores).toHaveLength(1);
-    // capital + the city of (3,0), reached through the field of (2,0)
-    expect(scores[0].items).toEqual([{ count: 2, name: "cities", points: 6 }]);
+    expect(scores[0].player).toBe(0);
   });
 
   it("does nothing without the element", () => {

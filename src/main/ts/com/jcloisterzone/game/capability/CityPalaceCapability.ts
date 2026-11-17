@@ -47,10 +47,10 @@ export class CityPalaceModel {
  *
  * Each player has City Palace tile(s) of their own colour in supply (the `city-palace` element
  * is the count). Instead of drawing, a player may place one — only joining a city that holds
- * one of their followers. The palace is just part of that city (like Darmstadtium); the city
+ * one of their followers and no palace yet (capitals may merge later through ordinary tiles). The palace is just part of that city (like Darmstadtium); the city
  * becomes a capital; a COMPLETED capital is a kingdom. At the end every kingdom scores, per player
  * owning a palace in it, 3 points for every city touching a field that touches the capital
- * (those cities completed or not, the capital itself and the City of Carcassonne included,
+ * (only COMPLETED cities, the capital itself and the City of Carcassonne included,
  * castles not). An unfinished capital scores no kingdom. Farmers are not required.
  */
 export class CityPalaceCapability extends Capability<CityPalaceModel> {
@@ -115,19 +115,25 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
     return model?.getTile(idx) ?? null;
   }
 
-  /** Only joining a city occupied by the active player's follower (normal edge rules apply too). */
+  /** Only joining a city occupied by the active player's follower, and never a city that already
+   *  holds a palace (anyone's) — two capitals may still be joined later by ordinary tiles. The
+   *  normal edge rules apply too. */
   override isTilePlacementAllowed(state: GameState, tile: Tile, placement: PlacementOption): boolean {
     if (!CityPalaceCapability.isCityPalace(tile)) return true;
     const player = state.getTurnPlayer();
     if (player === null) return false;
     const pos = placement.getPosition();
+    let ownFollower = false;
     for (const side of Location.SIDES) {
       const adj = pos.add(side);
       if (state.getPlacedTile(adj) === null) continue;
       const f = state.getFeaturePartOf(adj, side.rev());
-      if (f instanceof City && f.isOccupiedBy(state, player)) return true;
+      if (!(f instanceof City)) continue;
+      // the palace would join this city — not allowed when it is already a capital
+      if (f.hasModifier(state, City.CITY_PALACE)) return false;
+      if (f.isOccupiedBy(state, player)) ownFollower = true;
     }
-    return false;
+    return ownFollower;
   }
 
   override onTilePlaced(state: GameState, placedTile: PlacedTile): GameState {
@@ -181,8 +187,8 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
         if (!adjoining.some((f) => keyOf(f) === capitalKey)) continue;
         touched.push(field);
         for (const f of adjoining) {
-          // every city counts, completed or not — castles don't
-          if (f instanceof City && !(f instanceof Castle)) {
+          // only COMPLETED cities count (the capital always is, by now) — castles don't
+          if (f instanceof City && !(f instanceof Castle) && f.isCompleted(state)) {
             const k = keyOf(f);
             if (!cities.has(k)) cities.set(k, f.getPlaces().head());
           }
