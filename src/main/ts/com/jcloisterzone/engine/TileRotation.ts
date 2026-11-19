@@ -40,14 +40,27 @@ function legalRotations(state: GameState, tileId: string, position: Position): R
   // abbey, a Kingdom Palace, hand tiles…), so look through all of them and match the tile id —
   // taking just the first action, by position only, read another tile's angles (e.g. the abbey's
   // four for a palace that fits only one way).
-  const actions = state.getPlayerActions()?.getActions().toArray() ?? [];
-  for (const action of actions) {
-    if (!(action instanceof TilePlacementAction) || action.getTile().getId() !== tileId) continue;
-    const fromAction = action
+  const actions = (state.getPlayerActions()?.getActions().toArray() ?? []).filter(
+    (a): a is TilePlacementAction => a instanceof TilePlacementAction,
+  );
+  const anglesAt = (action: TilePlacementAction): Rotation[] =>
+    action
       .getOptions()
       .toArray()
       .filter((o) => o.getPosition().equals(position))
       .map((o) => o.getRotation());
+  for (const action of actions) {
+    if (action.getTile().getId() !== tileId) continue;
+    const fromAction = anglesAt(action);
+    if (fromAction.length > 0) {
+      return fromAction;
+    }
+  }
+  // No action names this tile id: a plain drawn-tile placement, whose message id the engine does
+  // not use (TilePhase places the drawn tile) — old replays still carry renamed ids such as
+  // `under-the-big-top-c1/…` for `ubtc1/…`. There is then just the one placement action.
+  if (actions.length === 1) {
+    const fromAction = anglesAt(actions[0]!);
     if (fromAction.length > 0) {
       return fromAction;
     }
