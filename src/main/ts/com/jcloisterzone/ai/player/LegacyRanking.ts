@@ -196,7 +196,10 @@ export class LegacyRanking implements GameStateRanking {
       (sr as unknown as { apply(s: GameState): GameState }).apply(this.state);
       this.occupiedFields.push(sr);
       for (const player of sr.getOwners()) {
-        let q = -0.99;
+        // own prospective farm points count FOR me, an opponent's AGAINST me (like every other
+        // feature via ptsforPlayer). Java had the sign inverted (-0.99 for me), so the AI rated
+        // its own farmers as a loss and never placed one.
+        let q = 0.99;
         if (player.getIndex() !== this.me.getIndex()) q = -q;
         const fq = sr.getFeaturePointsForPlayer(player)!.getPoints();
         r += q * fq;
