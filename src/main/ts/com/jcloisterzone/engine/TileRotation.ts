@@ -36,8 +36,13 @@ export interface TileRotationContext {
  * the reveal arrives. Do the same here - draw the tile from that state's pack by id and ask.
  */
 function legalRotations(state: GameState, tileId: string, position: Position): Rotation[] {
-  const action = state.getAction();
-  if (action instanceof TilePlacementAction) {
+  // The placement action that offered THIS tile. Tile From Supply offers several at once (the
+  // abbey, a Kingdom Palace, hand tiles…), so look through all of them and match the tile id —
+  // taking just the first action, by position only, read another tile's angles (e.g. the abbey's
+  // four for a palace that fits only one way).
+  const actions = state.getPlayerActions()?.getActions().toArray() ?? [];
+  for (const action of actions) {
+    if (!(action instanceof TilePlacementAction) || action.getTile().getId() !== tileId) continue;
     const fromAction = action
       .getOptions()
       .toArray()
