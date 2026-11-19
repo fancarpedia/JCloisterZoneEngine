@@ -1,12 +1,13 @@
 import type { HashMap } from "../../../../io/vavr/Map.js";
 import { List, Vector } from "../../../../io/vavr/SeqTypes.js";
+import { Tuple2 } from "../../../../io/vavr/Tuple.js";
 import { HashSet, type Set } from "../../../../io/vavr/Set.js";
 import { Position } from "../../board/Position.js";
 import type { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
 import { ScoreMeeplePositionsPointer } from "../../board/pointer/ScoreMeeplePositionsPointer.js";
 import { ExprItem } from "../../event/ExprItem.js";
 import { PointsExpression } from "../../event/PointsExpression.js";
-import { ReceivedPoints } from "../../event/ScoreEvent.js";
+import { ReceivedPoints, type ScoredMeeple } from "../../event/ScoreEvent.js";
 import { Field } from "../../feature/Field.js";
 import type { Scoreable } from "../../feature/Scoreable.js";
 import { DecinskySneznik } from "../../figure/DecinskySneznik.js";
@@ -17,7 +18,6 @@ import { UndeployMeeple } from "../../reducers/UndeployMeeple.js";
 import { Capability } from "../Capability.js";
 import type { ScoreFeatureReducer } from "../ScoreFeatureReducer.js";
 import type { GameState } from "../state/GameState.js";
-import { PlacementCause } from "../../event/PlacementCause.js";
 
 const TILES_REQUIRED = 5;
 
@@ -58,9 +58,13 @@ export class DecinskySneznikCapability extends Capability<void> {
           isFinal ? "decinsky-sneznik.incomplete" : "decinsky-sneznik",
           new ExprItem(tiles.length, "tiles", points),
         );
-        const src = new ScoreMeeplePositionsPointer(fig.getDeployment(state)!, fig.getId(), positions);
-        // main points use isFinal=false (Java's 2-arg AddPoints) → grouped under the turn
-        state = new AddPoints(new ReceivedPoints(expr, fig.getPlayer(), src), false).apply(state);
+        const deployment = fig.getDeployment(state)!;
+        const src = new ScoreMeeplePositionsPointer(deployment, fig.getId(), positions);
+        // like a follower on a scored feature: the points carry the figure where it stood (the
+        // history shows it there, its return needs no event of its own); final scoring is flagged
+        // final so it lands in the final-scoring block
+        const scored = List.of(new Tuple2(fig, deployment)) as unknown as List<ScoredMeeple>;
+        state = new AddPoints(new ReceivedPoints(expr, fig.getPlayer(), src, scored), false, isFinal).apply(state);
 
         let bonus: List<ReceivedPoints> = List.empty<ReceivedPoints>();
         for (const cap of state.getCapabilities().toSeq()) {
@@ -68,7 +72,7 @@ export class DecinskySneznikCapability extends Capability<void> {
         }
         state = new AddPoints(bonus, true, isFinal).apply(state);
 
-        if (!isFinal) state = new UndeployMeeple(fig, false).withCause(PlacementCause.rule("decinsky-sneznik-scored")).apply(state);
+        if (!isFinal) state = new UndeployMeeple(fig, false).apply(state);
       }
     }
     return state;

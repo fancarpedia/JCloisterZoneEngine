@@ -1,7 +1,7 @@
 import type { HashMap } from "../../../../io/vavr/Map.js";
 import { List } from "../../../../io/vavr/SeqTypes.js";
 import { HashSet, type Set } from "../../../../io/vavr/Set.js";
-import type { Tuple2 } from "../../../../io/vavr/Tuple.js";
+import { Tuple2 } from "../../../../io/vavr/Tuple.js";
 import { Corner } from "../../board/Corner.js";
 import { Location } from "../../board/Location.js";
 import { Position } from "../../board/Position.js";
@@ -9,7 +9,7 @@ import { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
 import { ScoreMeeplePositionsPointer } from "../../board/pointer/ScoreMeeplePositionsPointer.js";
 import { ExprItem } from "../../event/ExprItem.js";
 import { PointsExpression } from "../../event/PointsExpression.js";
-import { ReceivedPoints } from "../../event/ScoreEvent.js";
+import { ReceivedPoints, type ScoredMeeple } from "../../event/ScoreEvent.js";
 import { Field } from "../../feature/Field.js";
 import type { Feature } from "../../feature/Feature.js";
 import type { Scoreable } from "../../feature/Scoreable.js";
@@ -21,7 +21,6 @@ import { UndeployMeeple } from "../../reducers/UndeployMeeple.js";
 import { Capability } from "../Capability.js";
 import type { ScoreFeatureReducer } from "../ScoreFeatureReducer.js";
 import type { GameState } from "../state/GameState.js";
-import { PlacementCause } from "../../event/PlacementCause.js";
 
 const TILES_REQUIRED = 16;
 
@@ -78,13 +77,13 @@ export class ObeliskCapability extends Capability<FeaturePointer | null> {
           isFinal ? "obelisk.incomplete" : "obelisk",
           new ExprItem(tiles.length, "tiles", tiles.length),
         );
-        const source = new ScoreMeeplePositionsPointer(
-          obelisk.getDeployment(state)!,
-          obelisk.getId(),
-          positions,
-        );
-        // main points use isFinal=false (Java's 2-arg AddPoints) → grouped under the turn
-        state = new AddPoints(new ReceivedPoints(expr, obelisk.getPlayer(), source), false).apply(state);
+        const deployment = obelisk.getDeployment(state)!;
+        const source = new ScoreMeeplePositionsPointer(deployment, obelisk.getId(), positions);
+        // like a follower on a scored feature: the points carry the obelisk where it stood (the
+        // history shows it there, its return needs no event of its own); final scoring is flagged
+        // final so it lands in the final-scoring block
+        const scored = List.of(new Tuple2(obelisk, deployment)) as unknown as List<ScoredMeeple>;
+        state = new AddPoints(new ReceivedPoints(expr, obelisk.getPlayer(), source, scored), false, isFinal).apply(state);
 
         let bonus: List<ReceivedPoints> = List.empty<ReceivedPoints>();
         for (const cap of state.getCapabilities().toSeq()) {
@@ -93,7 +92,7 @@ export class ObeliskCapability extends Capability<FeaturePointer | null> {
         state = new AddPoints(bonus, true, isFinal).apply(state);
 
         if (!isFinal) {
-          state = new UndeployMeeple(obelisk, false).withCause(PlacementCause.rule("obelisk-scored")).apply(state);
+          state = new UndeployMeeple(obelisk, false).apply(state);
         }
       }
     }

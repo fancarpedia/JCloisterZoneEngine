@@ -7,7 +7,7 @@ import { MeeplePointer } from "../../board/pointer/MeeplePointer.js";
 import { ExprItem } from "../../event/ExprItem.js";
 import { PlayEventMeta } from "../../event/PlayEvent.js";
 import { PointsExpression } from "../../event/PointsExpression.js";
-import { ReceivedPoints } from "../../event/ScoreEvent.js";
+import { ReceivedPoints, type ScoredMeeple } from "../../event/ScoreEvent.js";
 import { TokenPlacedEvent } from "../../event/TokenPlacedEvent.js";
 import { Field } from "../../feature/Field.js";
 import type { Meeple } from "../../figure/Meeple.js";
@@ -161,18 +161,29 @@ export class ShepherdPhase extends Phase {
     });
     const expr = new PointsExpression("flock", List.ofAll(exprItems));
 
+    // Like followers on a scored feature: each player's points carry their shepherds where they
+    // stood (the history shows them there), and the shepherds return without an event of their own.
+    const shepherds = shepherdsOnField.toArray().map((t) => (t as Tuple2<Meeple, FeaturePointer>)._1 as Shepherd);
+    const scoredBy = (playerIdx: number): List<ScoredMeeple> =>
+      List.ofAll(
+        shepherds
+          .filter((s) => s.getPlayer().getIndex() === playerIdx)
+          .map((s) => new Tuple2(s, s.getDeployment(state)!)),
+      ) as unknown as List<ScoredMeeple>;
+
     let receivedPoints: List<ReceivedPoints> = List.empty<ReceivedPoints>();
     const scoredIdx = new Set<number>();
-    for (const t of shepherdsOnField) {
-      const shepherd = (t as Tuple2<Meeple, FeaturePointer>)._1 as Shepherd;
+    for (const shepherd of shepherds) {
       const player = shepherd.getPlayer();
       if (!scoredIdx.has(player.getIndex())) {
         receivedPoints = receivedPoints.append(
-          new ReceivedPoints(expr, player, shepherd.getDeployment(state)),
+          new ReceivedPoints(expr, player, shepherd.getDeployment(state), scoredBy(player.getIndex())),
         ) as List<ReceivedPoints>;
         scoredIdx.add(player.getIndex());
       }
-      state = new UndeployMeeple(shepherd, false).withCause(PlacementCause.rule("flock-scored")).apply(state);
+    }
+    for (const shepherd of shepherds) {
+      state = new UndeployMeeple(shepherd, false).apply(state);
     }
     state = new AddPoints(receivedPoints, false).apply(state);
 

@@ -6,7 +6,8 @@ import type { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
 import { ScoreMeeplePositionsPointer } from "../../board/pointer/ScoreMeeplePositionsPointer.js";
 import { ExprItem } from "../../event/ExprItem.js";
 import { PointsExpression } from "../../event/PointsExpression.js";
-import { ReceivedPoints } from "../../event/ScoreEvent.js";
+import { ReceivedPoints, type ScoredMeeple } from "../../event/ScoreEvent.js";
+import { Tuple2 } from "../../../../io/vavr/Tuple.js";
 import { Field } from "../../feature/Field.js";
 import type { Scoreable } from "../../feature/Scoreable.js";
 import { Windmill } from "../../figure/Windmill.js";
@@ -17,7 +18,6 @@ import { UndeployMeeple } from "../../reducers/UndeployMeeple.js";
 import { Capability } from "../Capability.js";
 import type { ScoreFeatureReducer } from "../ScoreFeatureReducer.js";
 import type { GameState } from "../state/GameState.js";
-import { PlacementCause } from "../../event/PlacementCause.js";
 
 const TILES_REQUIRED = 9;
 
@@ -53,9 +53,14 @@ export class WindmillCapability extends Capability<void> {
           isFinal ? "windmill.incomplete" : "windmill",
           new ExprItem(tiles.length, "tiles", tiles.length),
         );
-        const src = new ScoreMeeplePositionsPointer(windmill.getDeployment(state)!, windmill.getId(), positions);
-        // main points use isFinal=false (Java's 2-arg AddPoints) → grouped under the turn
-        state = new AddPoints(new ReceivedPoints(expr, windmill.getPlayer(), src), false).apply(state);
+        const deployment = windmill.getDeployment(state)!;
+        const src = new ScoreMeeplePositionsPointer(deployment, windmill.getId(), positions);
+        // Like a follower on a scored feature: the points carry the windmill where it stood, so the
+        // history shows it on the scoring (its return then needs no event of its own). Final
+        // scoring flags the event final, so it lands in the final-scoring block with its flower
+        // bonus — not in the last turn's history.
+        const scored = List.of(new Tuple2(windmill, deployment)) as unknown as List<ScoredMeeple>;
+        state = new AddPoints(new ReceivedPoints(expr, windmill.getPlayer(), src, scored), false, isFinal).apply(state);
 
         let bonus: List<ReceivedPoints> = List.empty<ReceivedPoints>();
         for (const cap of state.getCapabilities().toSeq()) {
@@ -63,7 +68,9 @@ export class WindmillCapability extends Capability<void> {
         }
         state = new AddPoints(bonus, true, isFinal).apply(state);
 
-        if (!isFinal) state = new UndeployMeeple(windmill, false).withCause(PlacementCause.rule("windmill-scored")).apply(state);
+        // a plain scoring return (no cause), as for followers on a completed feature: the history
+        // shows the windmill on the points instead of a separate "returned" event
+        if (!isFinal) state = new UndeployMeeple(windmill, false).apply(state);
       }
     }
     return state;

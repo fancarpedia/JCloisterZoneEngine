@@ -94,16 +94,37 @@ describe("caused events that used to be left out of the history are written", ()
     for (const e of summoned) expect(e.cause?.type).toBe("tile-placed");
   });
 
-  it("scoring returns the game caused (flock, windmill, obelisk, Děčínský Sněžník)", () => {
-    const names = new Set(
-      events
-        .filter(e => e.type === "meeple-returned" && (e as { forced?: boolean }).forced === false)
-        .map(e => (e.cause as { name: string }).name),
+  it("no scoring return carries a *-scored rule cause", () => {
+    const scoredCauses = events.filter(
+      e => e.type === "meeple-returned" && /-scored$/.test((e.cause as { name?: string } | undefined)?.name ?? ""),
     );
-    for (const n of ["flock-scored", "windmill-scored", "obelisk-scored", "decinsky-sneznik-scored"]) {
-      expect(names.has(n), n).toBe(true);
-    }
+    expect(scoredCauses).toEqual([]);
   });
+
+  // a scored windmill / obelisk / Děčínský Sněžník / flock returns like a follower on a scored
+  // feature: shown on its points (the figure where it stood), with no returned event of its own
+  for (const [points, figure] of [
+    ["windmill", "Windmill"],
+    ["obelisk", "Obelisk"],
+    ["decinsky-sneznik", "DecinskySneznik"],
+    ["flock", "Shepherd"],
+  ] as const) {
+    it(`a scored ${figure} is shown on its ${points} points, no own event`, () => {
+      const returned = events.filter(
+        e => e.type === "meeple-returned" && (e as { meeple?: string }).meeple === figure && !(e as { forced?: boolean }).forced,
+      );
+      expect(returned).toEqual([]);
+      const scored = events
+        .filter(e => e.type === "points")
+        .flatMap(e => (e as unknown as { points: Array<{ name: string; meeples?: Array<{ type: string }> }> }).points)
+        .filter(p => p.name === points);
+      expect(scored.length).toBeGreaterThan(0);
+      for (const p of scored) {
+        expect(p.meeples?.length).toBeGreaterThan(0);
+        for (const m of p.meeples!) expect(m.type).toBe(figure);
+      }
+    });
+  }
 });
 
 describe("the mage and witch name why the player had to place them", () => {
