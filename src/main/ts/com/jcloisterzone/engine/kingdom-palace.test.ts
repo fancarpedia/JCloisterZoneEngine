@@ -1,6 +1,6 @@
-// Kingdoms (fan expansion) — City Palaces.
+// Kingdoms (fan expansion) — Kingdom Palaces.
 //
-// Each player holds City Palace tile(s) of their own colour (by slot). Instead of drawing they may
+// Each player holds Kingdom Palace tile(s) of their own colour (by slot). Instead of drawing they may
 // place one, but only joining a city that holds one of their followers. A COMPLETED capital is a
 // kingdom: at the end it scores, once per player owning a palace in it, 3 points per city touching
 // a field that touches the capital — only COMPLETED cities, the capital itself included.
@@ -64,6 +64,8 @@ class Game {
       /** a BA/CFc.1 (city W–E) in the pack, and the forced order the tiles are drawn in */
       cityBridge?: boolean;
       drawOrder?: string[];
+      /** Bridges, Castles & Bazaars castles */
+      castles?: boolean;
     } = {},
   ) {
     const start = opts.start ?? DEFAULT_START;
@@ -83,7 +85,8 @@ class Game {
         sets: { one: 1, ...(opts.kingdomsSet ? { kingdoms: 1 } : {}) },
         elements: {
           "small-follower": 7,
-          ...(opts.palaces === null ? {} : { "city-palace": opts.palaces ?? 1 }),
+          ...(opts.palaces === null ? {} : { "kingdom-palace": opts.palaces ?? 1 }),
+          ...(opts.castles ? { castle: 3 } : {}),
         },
         rules: {},
         start,
@@ -127,7 +130,7 @@ class Game {
   }
 
   /** Places a palace and ends the turn without deploying. */
-  placePalace(x: number, y: number, tileId = "Kingdoms/CityPalaceRed"): State {
+  placePalace(x: number, y: number, tileId = "Kingdoms/KingdomPalaceRed"): State {
     return this.endTurn(this.place(x, y, tileId));
   }
 
@@ -161,17 +164,17 @@ function kingdomScores(state: State): PointsEntry[] {
     .filter((p) => p.name === "kingdom");
 }
 
-describe("Kingdoms — City Palace", () => {
+describe("Kingdoms — Kingdom Palace", () => {
   it("gives each player the palace of their slot's colour, as many as the element says", () => {
     const game = new Game({ players: 2, playerSlots: [3, 0], palaces: 2 });
-    expect(tokens(game.setup, 0).CITY_PALACE).toEqual({ count: 2, tile: "Kingdoms/CityPalaceGreen" });
-    expect(tokens(game.setup, 1).CITY_PALACE).toEqual({ count: 2, tile: "Kingdoms/CityPalaceRed" });
+    expect(tokens(game.setup, 0).KINGDOM_PALACE).toEqual({ count: 2, tile: "Kingdoms/KingdomPalaceGreen" });
+    expect(tokens(game.setup, 1).KINGDOM_PALACE).toEqual({ count: 2, tile: "Kingdoms/KingdomPalaceRed" });
   });
 
   it("falls back to slot = player index without playerSlots", () => {
     const game = new Game({ players: 2 });
-    expect(tokens(game.setup, 0).CITY_PALACE.tile).toBe("Kingdoms/CityPalaceRed");
-    expect(tokens(game.setup, 1).CITY_PALACE.tile).toBe("Kingdoms/CityPalaceBlue");
+    expect(tokens(game.setup, 0).KINGDOM_PALACE.tile).toBe("Kingdoms/KingdomPalaceRed");
+    expect(tokens(game.setup, 1).KINGDOM_PALACE.tile).toBe("Kingdoms/KingdomPalaceBlue");
   });
 
   it("is never drawn — the palaces are not in the tile pack", () => {
@@ -183,7 +186,7 @@ describe("Kingdoms — City Palace", () => {
   it("the Kingdoms expansion's tile-set is empty — selecting it adds no tile to the pack", () => {
     const game = new Game({ kingdomsSet: true });
     expect((game.setup.tilePack as { size: number }).size).toBe(1);
-    expect(tokens(game.setup).CITY_PALACE.count).toBe(1);
+    expect(tokens(game.setup).KINGDOM_PALACE.count).toBe(1);
   });
 
   it("is not offered while no city holds the player's follower", () => {
@@ -196,7 +199,7 @@ describe("Kingdoms — City Palace", () => {
     const game = new Game();
     const state = game.occupyCity();
     const item = palaceItem(state)!;
-    expect(item.tileId).toBe("Kingdoms/CityPalaceRed");
+    expect(item.tileId).toBe("Kingdoms/KingdomPalaceRed");
     // (1,-1) joins the occupied city; (0,-1) would join only the two empty cities
     expect(item.options!.map((o) => o.position)).toEqual([[1, -1]]);
     expect((state.action as { canPass: boolean }).canPass).toBe(true);
@@ -209,19 +212,19 @@ describe("Kingdoms — City Palace", () => {
     expect(game.commit().phase).toBe("TilePhase");
     const state = game.finish();
     expect(state.phase).toBe("GameOverPhase");
-    expect(tokens(state).CITY_PALACE.count).toBe(1);
+    expect(tokens(state).KINGDOM_PALACE.count).toBe(1);
     expect(kingdomScores(state)).toHaveLength(0);
   });
 
   it("placing it uses up the token and is followed by the action phase", () => {
     const game = new Game();
     game.occupyCity();
-    const state = game.place(1, -1, "Kingdoms/CityPalaceRed");
+    const state = game.place(1, -1, "Kingdoms/KingdomPalaceRed");
     // the action phase ran (here with nothing to deploy: the capital is already occupied)
     expect(state.phase).toMatch(/ActionPhase$/);
-    expect(tokens(state).CITY_PALACE?.count ?? 0).toBe(0); // an exhausted token leaves the map
+    expect(tokens(state).KINGDOM_PALACE?.count ?? 0).toBe(0); // an exhausted token leaves the map
     const placed = (state.placedTiles as Array<{ id: string; position: [number, number] }>).find(
-      (t) => t.id === "Kingdoms/CityPalaceRed",
+      (t) => t.id === "Kingdoms/KingdomPalaceRed",
     );
     expect(placed?.position).toEqual([1, -1]);
   });
@@ -229,7 +232,7 @@ describe("Kingdoms — City Palace", () => {
   it("rejects a placement that joins no city of the player", () => {
     const game = new Game();
     game.occupyCity();
-    expect(() => game.place(0, -1, "Kingdoms/CityPalaceRed")).toThrow();
+    expect(() => game.place(0, -1, "Kingdoms/KingdomPalaceRed")).toThrow();
   });
 
   it("an unfinished capital scores no kingdom", () => {
@@ -292,6 +295,35 @@ describe("Kingdoms — City Palace", () => {
       drawOrder: ["BA/C", "BA/C", "BA/CFc.1"],
     });
 
+  it("a castle touching the capital's fields counts as one city", () => {
+    // CLOSING board; turn 3 closes the 2-tile city of (2,0) with (2,-1) and turns it into a castle.
+    // The field of (1,0)+(2,0) touches both the capital and that castle.
+    const game = new Game({ start: CLOSING, castles: true, extraDraws: 1 });
+    game.place(1, 0, "BA/C", "R270");
+    game.deployOnCity(1, 0, "W", "0.small.1");
+    game.commit();
+    game.placePalace(0, 0); // completes the capital
+    game.place(2, -1, "BA/C", "R180"); // city S onto (2,0)'s city N: a completed 2-tile city
+    game.deployOnCity(2, -1, "S", "0.small.2");
+    let state = game.send({
+      type: "PLACE_TOKEN",
+      payload: { token: "CASTLE", pointer: { position: [2, -1], location: "S", feature: "City" } },
+      player: 0,
+    });
+    expect((state.features as Array<{ type: string }>).some((f) => f.type === "Castle")).toBe(true);
+    state = game.endTurn(state);
+    state = game.finish(3, 0);
+
+    const scores = kingdomScores(state);
+    expect(scores).toHaveLength(1);
+    expect(scores[0].items).toEqual([
+      { count: 1, name: "cities", points: 3 },
+      { count: 1, name: "castles", points: 3 },
+    ]);
+    expect(scores[0].points).toBe(6);
+    expect(scores[0].ptr.cities).toHaveLength(2);
+  });
+
   it("is never placed into a city that already holds a palace", () => {
     const game = twoCapitals();
     game.place(0, 1, "BA/C");
@@ -302,7 +334,7 @@ describe("Kingdoms — City Palace", () => {
     // so no palace is offered at all
     expect(palaceItem(state)).toBeUndefined();
     expect(state.phase).toBe("TilePhase");
-    expect(tokens(state).CITY_PALACE.count).toBe(1); // still in hand
+    expect(tokens(state).KINGDOM_PALACE.count).toBe(1); // still in hand
   });
 
   it("capitals joined later score once per player", () => {
@@ -315,7 +347,7 @@ describe("Kingdoms — City Palace", () => {
     game.deployOnCity(2, 1, "N", "0.small.2");
     game.commit();
     const before = game.placePalace(2, 0); // capital B — a separate city, so it is allowed
-    expect(tokens(before).CITY_PALACE?.count ?? 0).toBe(0);
+    expect(tokens(before).KINGDOM_PALACE?.count ?? 0).toBe(0);
     // the last tile, a city W–E, joins A and B into one completed city with two palaces
     const state = game.endTurn(game.place(1, 0, "BA/CFc.1"));
     expect(state.phase).toBe("GameOverPhase");
@@ -327,6 +359,6 @@ describe("Kingdoms — City Palace", () => {
 
   it("does nothing without the element", () => {
     const game = new Game({ palaces: null });
-    expect(tokens(game.setup).CITY_PALACE).toBeUndefined();
+    expect(tokens(game.setup).KINGDOM_PALACE).toBeUndefined();
   });
 });

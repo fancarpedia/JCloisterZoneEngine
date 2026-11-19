@@ -19,42 +19,42 @@ import type { Token } from "../Token.js";
 import type { GameState } from "../state/GameState.js";
 import type { PlacedTile } from "../state/PlacedTile.js";
 
-/** A placed City Palace: where, and whose. */
-export interface PlacedCityPalace {
+/** A placed Kingdom Palace: where, and whose. */
+export interface PlacedKingdomPalace {
   readonly position: Position;
   readonly owner: number;
 }
 
 /** Kingdoms state: each player's palace tile (their colour) and the palaces on the board. */
-export class CityPalaceModel {
+export class KingdomPalaceModel {
   constructor(
     /** by player index; null when the colour's tile is not defined in the loaded XML */
     readonly tiles: readonly (Tile | null)[],
-    readonly palaces: readonly PlacedCityPalace[],
+    readonly palaces: readonly PlacedKingdomPalace[],
   ) {}
 
   getTile(playerIndex: number): Tile | null {
     return this.tiles[playerIndex] ?? null;
   }
 
-  addPalace(palace: PlacedCityPalace): CityPalaceModel {
-    return new CityPalaceModel(this.tiles, [...this.palaces, palace]);
+  addPalace(palace: PlacedKingdomPalace): KingdomPalaceModel {
+    return new KingdomPalaceModel(this.tiles, [...this.palaces, palace]);
   }
 }
 
 /**
  * Kingdoms (fan expansion by Luke Tubbs (Astargoth) and Giles Smith).
  *
- * Each player has City Palace tile(s) of their own colour in supply (the `city-palace` element
+ * Each player has Kingdom Palace tile(s) of their own colour in supply (the `kingdom-palace` element
  * is the count). Instead of drawing, a player may place one — only joining a city that holds
  * one of their followers and no palace yet (capitals may merge later through ordinary tiles). The palace is just part of that city (like Darmstadtium); the city
  * becomes a capital; a COMPLETED capital is a kingdom. At the end every kingdom scores, per player
  * owning a palace in it, 3 points for every city touching a field that touches the capital
- * (only COMPLETED cities, the capital itself and the City of Carcassonne included,
- * castles not). An unfinished capital scores no kingdom. Farmers are not required.
+ * (only COMPLETED cities — the capital itself, castles and the City of Carcassonne each count as
+ * one city). An unfinished capital scores no kingdom. Farmers are not required.
  */
-export class CityPalaceCapability extends Capability<CityPalaceModel> {
-  static readonly TILE_PREFIX = "Kingdoms/CityPalace";
+export class KingdomPalaceCapability extends Capability<KingdomPalaceModel> {
+  static readonly TILE_PREFIX = "Kingdoms/KingdomPalace";
   /** Max palace tiles a player may start with. */
   static readonly MAX_TILES = 9;
   static readonly POINTS_PER_CITY = 3;
@@ -67,16 +67,16 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
   ];
 
   static tileIdForSlot(slot: number): string {
-    const color = CityPalaceCapability.SLOT_COLORS[slot] ?? CityPalaceCapability.SLOT_COLORS[0];
-    return CityPalaceCapability.TILE_PREFIX + color;
+    const color = KingdomPalaceCapability.SLOT_COLORS[slot] ?? KingdomPalaceCapability.SLOT_COLORS[0];
+    return KingdomPalaceCapability.TILE_PREFIX + color;
   }
 
-  static isCityPalace(tile: Tile): boolean {
-    return tile.getId().startsWith(CityPalaceCapability.TILE_PREFIX);
+  static isKingdomPalace(tile: Tile): boolean {
+    return tile.getId().startsWith(KingdomPalaceCapability.TILE_PREFIX);
   }
 
   override getSupplyTileIds(): readonly string[] {
-    return CityPalaceCapability.SLOT_COLORS.map((c) => CityPalaceCapability.TILE_PREFIX + c);
+    return KingdomPalaceCapability.SLOT_COLORS.map((c) => KingdomPalaceCapability.TILE_PREFIX + c);
   }
 
   override initSupplyTiles(
@@ -84,21 +84,21 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
     tiles: ReadonlyMap<string, Tile>,
     playerSlots: readonly number[],
   ): GameState {
-    const own = playerSlots.map((slot) => tiles.get(CityPalaceCapability.tileIdForSlot(slot)) ?? null);
-    return this.setModel(state, new CityPalaceModel(own, []));
+    const own = playerSlots.map((slot) => tiles.get(KingdomPalaceCapability.tileIdForSlot(slot)) ?? null);
+    return this.setModel(state, new KingdomPalaceModel(own, []));
   }
 
   override onStartGame(state: GameState): GameState {
-    // the `city-palace` element is the count of palaces per player; a boolean `true` = 1
-    const raw = state.getElements().get("city-palace").getOrNull();
+    // the `kingdom-palace` element is the count of palaces per player; a boolean `true` = 1
+    const raw = state.getElements().get("kingdom-palace").getOrNull();
     let count = typeof raw === "number" ? raw : Number(raw);
     if (!Number.isInteger(count) || count < 1) count = 1;
-    if (count > CityPalaceCapability.MAX_TILES) count = CityPalaceCapability.MAX_TILES;
+    if (count > KingdomPalaceCapability.MAX_TILES) count = KingdomPalaceCapability.MAX_TILES;
     const model = this.getModel(state);
     // a player whose colour has no palace tile (XML not loaded) gets none
     return state.mapPlayers((ps) => {
       for (let i = 0; i < ps.getPlayers().size(); i++) {
-        ps = ps.setTokenCount(i, CityPalaceCapability.CityPalaceToken.CITY_PALACE, model?.getTile(i) ? count : 0);
+        ps = ps.setTokenCount(i, KingdomPalaceCapability.KingdomPalaceToken.KINGDOM_PALACE, model?.getTile(i) ? count : 0);
       }
       return ps;
     });
@@ -109,9 +109,9 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
     const player = state.getTurnPlayer();
     if (player === null) return null;
     const idx = player.getIndex();
-    const tokens = state.getPlayers().getPlayerTokenCount(idx, CityPalaceCapability.CityPalaceToken.CITY_PALACE);
+    const tokens = state.getPlayers().getPlayerTokenCount(idx, KingdomPalaceCapability.KingdomPalaceToken.KINGDOM_PALACE);
     if (tokens <= 0) return null;
-    const model = state.getCapabilityModel<CityPalaceModel>(CityPalaceCapability as never);
+    const model = state.getCapabilityModel<KingdomPalaceModel>(KingdomPalaceCapability as never);
     return model?.getTile(idx) ?? null;
   }
 
@@ -119,7 +119,7 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
    *  holds a palace (anyone's) — two capitals may still be joined later by ordinary tiles. The
    *  normal edge rules apply too. */
   override isTilePlacementAllowed(state: GameState, tile: Tile, placement: PlacementOption): boolean {
-    if (!CityPalaceCapability.isCityPalace(tile)) return true;
+    if (!KingdomPalaceCapability.isKingdomPalace(tile)) return true;
     const player = state.getTurnPlayer();
     if (player === null) return false;
     const pos = placement.getPosition();
@@ -130,14 +130,14 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
       const f = state.getFeaturePartOf(adj, side.rev());
       if (!(f instanceof City)) continue;
       // the palace would join this city — not allowed when it is already a capital
-      if (f.hasModifier(state, City.CITY_PALACE)) return false;
+      if (f.hasModifier(state, City.KINGDOM_PALACE)) return false;
       if (f.isOccupiedBy(state, player)) ownFollower = true;
     }
     return ownFollower;
   }
 
   override onTilePlaced(state: GameState, placedTile: PlacedTile): GameState {
-    if (!CityPalaceCapability.isCityPalace(placedTile.getTile())) return state;
+    if (!KingdomPalaceCapability.isKingdomPalace(placedTile.getTile())) return state;
     const owner = state.getTurnPlayer()!.getIndex();
     return this.updateModel(state, (m) => m.addPalace({ position: placedTile.getPosition(), owner }));
   }
@@ -177,6 +177,7 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
       const capitalKey = keyOf(capital);
       const touched: Field[] = [];
       const cities = new Map<string, FeaturePointer>();
+      const castles = new Map<string, FeaturePointer>();
       let coc = false;
       for (const field of fields) {
         const adjoining = field
@@ -187,22 +188,29 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
         if (!adjoining.some((f) => keyOf(f) === capitalKey)) continue;
         touched.push(field);
         for (const f of adjoining) {
-          // only COMPLETED cities count (the capital always is, by now) — castles don't
-          if (f instanceof City && !(f instanceof Castle) && f.isCompleted(state)) {
+          // only COMPLETED cities count (the capital always is, by now); a castle (a finished
+          // city converted by its owner) counts as one city too
+          if (f instanceof Castle) {
+            const k = keyOf(f);
+            if (!castles.has(k)) castles.set(k, f.getPlaces().head());
+          } else if (f instanceof City && f.isCompleted(state)) {
             const k = keyOf(f);
             if (!cities.has(k)) cities.set(k, f.getPlaces().head());
           }
         }
         if (field.isAdjoiningCityOfCarcassonne()) coc = true;
       }
-      const count = cities.size + (coc ? 1 : 0);
+      const count = cities.size + castles.size + (coc ? 1 : 0);
       if (count === 0) continue;
 
       const items: ExprItem[] = [];
       if (cities.size > 0) {
-        items.push(new ExprItem(cities.size, "cities", cities.size * CityPalaceCapability.POINTS_PER_CITY));
+        items.push(new ExprItem(cities.size, "cities", cities.size * KingdomPalaceCapability.POINTS_PER_CITY));
       }
-      if (coc) items.push(new ExprItem("coc", CityPalaceCapability.POINTS_PER_CITY));
+      if (castles.size > 0) {
+        items.push(new ExprItem(castles.size, "castles", castles.size * KingdomPalaceCapability.POINTS_PER_CITY));
+      }
+      if (coc) items.push(new ExprItem("coc", KingdomPalaceCapability.POINTS_PER_CITY));
       const capitalPtr =
         capital
           .getPlaces()
@@ -211,7 +219,7 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
       const source = new ScoreKingdomPointer(
         capitalPtr,
         touched.map((f) => f.getPlaces().head()),
-        [...cities.values()],
+        [...cities.values(), ...castles.values()],
         coc,
       );
       state = new AddPoints(
@@ -225,14 +233,14 @@ export class CityPalaceCapability extends Capability<CityPalaceModel> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace CityPalaceCapability {
-  export class CityPalaceToken extends JavaEnum implements Token {
-    static readonly CITY_PALACE = new CityPalaceToken("CITY_PALACE", 0);
-    private static readonly VALUES: readonly CityPalaceToken[] = [CityPalaceToken.CITY_PALACE];
-    static values(): readonly CityPalaceToken[] {
-      return CityPalaceToken.VALUES;
+export namespace KingdomPalaceCapability {
+  export class KingdomPalaceToken extends JavaEnum implements Token {
+    static readonly KINGDOM_PALACE = new KingdomPalaceToken("KINGDOM_PALACE", 0);
+    private static readonly VALUES: readonly KingdomPalaceToken[] = [KingdomPalaceToken.KINGDOM_PALACE];
+    static values(): readonly KingdomPalaceToken[] {
+      return KingdomPalaceToken.VALUES;
     }
   }
 }
 
-Capability.register(CityPalaceCapability);
+Capability.register(KingdomPalaceCapability);

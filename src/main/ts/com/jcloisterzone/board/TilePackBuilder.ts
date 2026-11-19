@@ -135,7 +135,7 @@ export class TilePackBuilder {
         const tileSetId = tileSetElement.getAttribute("id");
         const setCount = this.tileSets.getOrElse(tileSetId, 0);
         if (setCount > 0 && tileSetElement.getAttribute("supply") === "true") {
-          // a supply set (e.g. Kingdoms' City Palaces) puts its tiles into players' supplies, which
+          // a supply set (e.g. Kingdoms' Kingdom Palaces) puts its tiles into players' supplies, which
           // its capability does — it contributes nothing to the draw pack
           elementStream(tileSetElement.getElementsByTagName("ref")).forEach((refElement) => {
             supplySetTiles.add(refElement.getAttribute("tile"));

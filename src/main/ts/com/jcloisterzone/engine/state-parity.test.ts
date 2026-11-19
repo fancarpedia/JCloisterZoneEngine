@@ -28,7 +28,7 @@ interface Jcz {
 }
 
 // elements whose tiles live in an XML no set refers to (MUST match ELEMENT_XMLS in jcz-wire.mjs)
-const ELEMENT_XMLS: Record<string, string> = { "city-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
+const ELEMENT_XMLS: Record<string, string> = { "kingdom-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
 
 function xmlPaths(sets: Record<string, number>, elements: Record<string, unknown> = {}): string[] | null {
   const paths: string[] = [];

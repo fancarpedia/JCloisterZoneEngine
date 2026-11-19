@@ -37,7 +37,7 @@ import { ScoreMeeplePositionsPointer } from "../board/pointer/ScoreMeeplePositio
 import { ScorePositionsFeaturePointer } from "../board/pointer/ScorePositionsFeaturePointer.js";
 import { ScoreSourceFeaturePointer } from "../board/pointer/ScoreSourceFeaturePointer.js";
 import { ScoreKingdomPointer } from "../board/pointer/ScoreKingdomPointer.js";
-import { CityPalaceCapability, type CityPalaceModel } from "../game/capability/CityPalaceCapability.js";
+import { KingdomPalaceCapability, type KingdomPalaceModel } from "../game/capability/KingdomPalaceCapability.js";
 import type { BoardPointer } from "../board/pointer/BoardPointer.js";
 import { DoubleTurnEvent } from "../event/DoubleTurnEvent.js";
 import { MeepleDeployed } from "../event/MeepleDeployed.js";
@@ -419,9 +419,9 @@ export class StateGsonBuilder {
         );
         obj.fp = this.boardPtr(m._1);
         obj.size = m._2;
-      } else if (name === "CITY_PALACE") {
+      } else if (name === "KINGDOM_PALACE") {
         // Kingdoms: which palace tile (= the player's colour) the supply holds
-        const m = state.getCapabilityModel<CityPalaceModel>(CityPalaceCapability as never);
+        const m = state.getCapabilityModel<KingdomPalaceModel>(KingdomPalaceCapability as never);
         const tile = m ? m.getTile(playerIdx) : null;
         if (tile !== null) obj.tile = tile.getId();
       }

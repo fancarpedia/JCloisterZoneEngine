@@ -59,9 +59,9 @@ function loadXmlsForSets(sets: Record<string, number>, elements: Record<string, 
   for (const key of Object.keys(sets)) {
     files.add(key.split(":")[0].split("/")[0].replace(/-/g, "_") + ".xml");
   }
-  // supply tiles (abbey, City Palaces) live in an XML that may not be among the selected sets
+  // supply tiles (abbey, Kingdom Palaces) live in an XML that may not be among the selected sets
   // (MUST match ELEMENT_XMLS in jcz-wire.mjs)
-  const ELEMENT_XMLS: Record<string, string> = { "city-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
+  const ELEMENT_XMLS: Record<string, string> = { "kingdom-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
   for (const [el, file] of Object.entries(ELEMENT_XMLS)) {
     if (elements[el] !== undefined && elements[el] !== null && elements[el] !== false) files.add(file);
   }

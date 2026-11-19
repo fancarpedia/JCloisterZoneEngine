@@ -1,6 +1,6 @@
-// Kingdoms end-to-end: two AI players play whole base games with 2 City Palaces each, through
+// Kingdoms end-to-end: two AI players play whole base games with 2 Kingdom Palaces each, through
 // final scoring. Guards the palace placement + kingdom scoring paths against crashes on real,
-// messy boards (merged capitals, many fields) that the hand-built city-palace.test.ts never sees.
+// messy boards (merged capitals, many fields) that the hand-built kingdom-palace.test.ts never sees.
 import { readFileSync } from "node:fs";
 import { DOMParser } from "@xmldom/xmldom";
 import { expect, it } from "vitest";
@@ -9,7 +9,7 @@ import { Engine } from "./Engine.js";
 setDomParserFactory(() => new DOMParser() as unknown as XmlDOMParser);
 
 for (const seed of [0.11, 0.37, 0.52, 0.73, 0.91]) {
-  it("AI self-play to final scoring with City Palaces, seed " + seed, () => {
+  it("AI self-play to final scoring with Kingdom Palaces, seed " + seed, () => {
     const e = new Engine(() => "");
     (e as unknown as { tileDefinitions: string[] }).tileDefinitions = [
       readFileSync("xmls/basic.xml", "utf8"),
@@ -24,7 +24,7 @@ for (const seed of [0.11, 0.37, 0.52, 0.73, 0.91]) {
       payload: {
         initialRandom: seed, players: 2, playerSlots: [0, 1], gameAnnotations: {},
         sets: { "basic:1": 1 },
-        elements: { "small-follower": 7, farmers: true, "city-palace": 2 },
+        elements: { "small-follower": 7, farmers: true, "kingdom-palace": 2 },
         rules: {},
         start: [{ tile: "BA/RCr", x: 0, y: 0, rotation: 0 }],
       },

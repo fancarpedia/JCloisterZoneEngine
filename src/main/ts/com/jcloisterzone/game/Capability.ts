@@ -54,7 +54,7 @@ export abstract class Capability<T> {
   }
 
   /** Tile ids this capability needs built from the loaded tile-definition XML although no
-   *  tile-set draws them — supply-only tiles (Kingdoms' City Palaces). */
+   *  tile-set draws them — supply-only tiles (Kingdoms' Kingdom Palaces). */
   getSupplyTileIds(): readonly string[] {
     return [];
   }

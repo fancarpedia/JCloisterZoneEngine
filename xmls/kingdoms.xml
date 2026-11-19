@@ -2,12 +2,12 @@
 <!--
   Kingdoms — fan expansion by Luke Tubbs (Astargoth) and Giles Smith (Carcassonne Central).
 
-  One City Palace tile per player colour. The palaces are never drawn: the `kingdoms` tile-set
-  is a supply set, CityPalaceCapability builds them as supply tiles and gives each player the palace of
+  One Kingdom Palace tile per player colour. The palaces are never drawn: the `kingdoms` tile-set
+  is a supply set, KingdomPalaceCapability builds them as supply tiles and gives each player the palace of
   their own colour (by slot). A palace is just part of the city (like Darmstadtium).
 -->
 <defs>
-  <!-- Selecting Kingdoms in the setup's Tiles tab (fan expansions) turns on the `city-palace`
+  <!-- Selecting Kingdoms in the setup's Tiles tab (fan expansions) turns on the `kingdom-palace`
        element (one palace per player by default; the count is set in the Figures tab). Its
        tile-set is a supply set: the palaces go to the players, never into the draw pile. -->
   <expansion id="KINGDOMS">
@@ -15,42 +15,42 @@
     <sets>
       <ref tile-set="kingdoms" />
     </sets>
-    <implies element="city-palace" />
+    <implies element="kingdom-palace" />
     <icon>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 22V10h2V7h2v3h2V5H7V3h2v1h2V2h2v2h2V3h2v2h-1v5h2V7h2v3h2v12h-8v-5a2 2 0 0 0-4 0v5Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 555 575"><g fill-rule="evenodd"><path d="M236.8 128.5 L271.9 60 L273 13.3 C273.1 10.7 275.1 9.2 277.4 9.2 C280.3 9.2 282 11.4 282 14.1 V16.9 C299.6 12.2 312.3 22 324.8 26.4 C331.5 28.7 338.8 27.8 345.3 27 C336.8 41.9 307.4 49.6 285.6 51.1 Q281.6 51.4 282 55.2 Q281.9 57.7 283.4 61 L317.3 128.6 Z"/><path d="M214.1 140.1 H230.6 L233.9 141.1 L235.2 162 H248 L249.1 141.1 L268 140.1 V160.9 L269.4 162 H285 V140.1 H305 V161 L306 162 H319 L320 161 V140.1 H339.9 V188.6 L326.9 203.6 L327.2 216.4 L339 354 V361.7 H215 V354 L226.8 216.4 L227.1 203.6 L214.1 188.6 Z M264.9 292 V260 C264.9 253.2 270.2 248 277 248 C283.8 248 289.1 253.2 289.1 260 V292 Z"/><path d="M17 569 V365.4 L5.1 351.9 V323.1 L29.1 323.8 L29.6 343.4 Q29.7 345 31.4 345 H46.9 L47.2 331.6 Q47.2 325.2 50.9 321.3 L51.2 251.2 L52 243.6 Q52.5 241.5 55.4 241.3 Q59.5 242.1 60 245.6 V246.9 Q61.5 248.5 65 249 H100.3 L92.6 259.5 Q91.5 260.9 92.6 262.2 L100.4 273.1 L60.1 274.1 V322.9 H67.9 L68.1 345 H85.9 L86.1 323.1 H110.9 V352.4 L98 365.3 V569 Z M46 429 V396 C46 389.2 51.3 384 58.1 384 C64.9 384 70 389.2 70 396 V429 Z"/><path d="M114.1 569 V374.1 H131 V395 H149 V374.1 H170 V395 H188 L189.1 374.1 H209 V395 H223 L228 393.4 V374.1 H248 V395 H265.7 L267 394 V374.1 H287 V395 H304.8 L306.2 374.1 H326 V395 H343.9 L345.6 374.1 H365 V395 H383 L383.4 375.6 L387.6 374.1 H404 V395 H421.7 L423 394 V374.1 H439.9 V569 H320.1 V523.2 C320.1 499.4 300.8 480.1 277 480.1 C253.2 480.1 233.9 499.4 233.9 523.2 V569 Z M150.1 422.1 H170.8 L169.9 443 H150.1 Z M208.1 422.1 H228.9 V443 H208.1 Z M267.1 422.1 H286.9 V443 H267.1 Z M325.1 422.1 H345.9 V441.8 L344.8 443 H325.1 Z M383.1 422.1 H403.9 V442 L402.9 443 H384.7 L383.1 441.8 Z"/><path d="M456 569 V365.5 L443.1 352.3 V323.1 H467.9 L468.1 345 H485.9 L486.1 326.5 Q486.2 324.2 488.9 321.2 L489.2 252.6 L490 244 Q490.4 242.1 493.3 241.3 Q497.5 242.1 498 245.6 V246.9 Q499.1 248.4 501.1 248.9 L538.3 249.1 L531.4 259.7 Q530.3 261.1 531.4 262.5 L539.5 273.8 L498.1 274.1 V322.1 L499.3 323 H506.9 L507.1 345 H524.9 L525.1 323.1 H548.9 V352.4 L537 364.3 V569 Z M484 430 V395.6 C484 389.2 489.2 384 496 384 C502.8 384 508 389.2 508 395.6 V430 Z"/></g></svg>
     </icon>
   </expansion>
 
   <tiles>
-    <tile id="Kingdoms/CityPalaceRed"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceBlue"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceYellow"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceGreen"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceOrange"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalacePurple"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalacePink"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceWhite"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceBlack"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceGray"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceBeige"><city city-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/CityPalaceBrown"><city city-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceRed"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBlue"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceYellow"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceGreen"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceOrange"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalacePurple"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalacePink"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceWhite"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBlack"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceGray"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBeige"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBrown"><city kingdom-palace="true">N W S E</city></tile>
   </tiles>
   <sets>
     <!-- supply="true": these tiles go into players' supplies (each player the palace of their
          colour), never into the draw pile. The setup's Tiles view lists them read-only. -->
-    <tile-set id="kingdoms" supply="true" element="city-palace">
-      <ref count="1" tile="Kingdoms/CityPalaceRed" />
-      <ref count="1" tile="Kingdoms/CityPalaceBlue" />
-      <ref count="1" tile="Kingdoms/CityPalaceYellow" />
-      <ref count="1" tile="Kingdoms/CityPalaceGreen" />
-      <ref count="1" tile="Kingdoms/CityPalaceOrange" />
-      <ref count="1" tile="Kingdoms/CityPalacePurple" />
-      <ref count="1" tile="Kingdoms/CityPalacePink" />
-      <ref count="1" tile="Kingdoms/CityPalaceWhite" />
-      <ref count="1" tile="Kingdoms/CityPalaceBlack" />
-      <ref count="1" tile="Kingdoms/CityPalaceGray" />
-      <ref count="1" tile="Kingdoms/CityPalaceBeige" />
-      <ref count="1" tile="Kingdoms/CityPalaceBrown" />
+    <tile-set id="kingdoms" supply="true" element="kingdom-palace">
+      <ref count="1" tile="Kingdoms/KingdomPalaceRed" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceBlue" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceYellow" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceGreen" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceOrange" />
+      <ref count="1" tile="Kingdoms/KingdomPalacePurple" />
+      <ref count="1" tile="Kingdoms/KingdomPalacePink" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceWhite" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceBlack" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceGray" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceBeige" />
+      <ref count="1" tile="Kingdoms/KingdomPalaceBrown" />
     </tile-set>
   </sets>
 </defs>

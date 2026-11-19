@@ -41,7 +41,7 @@ import { WagonPhase } from "./phase/WagonPhase.js";
 import type { StepResult } from "./phase/StepResult.js";
 import { TilePhase } from "./phase/TilePhase.js";
 import { AbbeyCapability } from "./capability/AbbeyCapability.js";
-import { CityPalaceCapability } from "./capability/CityPalaceCapability.js";
+import { KingdomPalaceCapability } from "./capability/KingdomPalaceCapability.js";
 import { CastleCapability } from "./capability/CastleCapability.js";
 import { CornCircleCapability } from "./capability/CornCircleCapability.js";
 import { GoldminesCapability } from "./capability/GoldminesCapability.js";
@@ -179,8 +179,8 @@ export class GameStatePhaseReducer {
     }
     const tilePhase = new TilePhase(rng, next);
     next = tilePhase;
-    if (setup.contains(AbbeyCapability as never) || setup.contains(CityPalaceCapability as never)) {
-      // if abbey (or a City Palace) is passed, a commit follows (to advance RNG salt) before the tile draw
+    if (setup.contains(AbbeyCapability as never) || setup.contains(KingdomPalaceCapability as never)) {
+      // if abbey (or a Kingdom Palace) is passed, a commit follows (to advance RNG salt) before the tile draw
       next = new CommitAbbeyPassPhase(rng, next);
     }
     // Always present: lets the player place a tile from supply (abbey/bazaar) before drawing.
