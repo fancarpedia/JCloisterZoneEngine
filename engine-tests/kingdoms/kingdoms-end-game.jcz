@@ -12,7 +12,7 @@
     "elements": {
       "small-follower": 7,
       "farmers": true,
-      "city-palace": 1
+      "kingdom-palace": 1
     },
     "rules": {},
     "timer": null,
@@ -157,7 +157,7 @@
     {
       "type": "PLACE_TILE",
       "payload": {
-        "tileId": "Kingdoms/CityPalaceBlue",
+        "tileId": "Kingdoms/KingdomPalaceBlue",
         "rotation": "R0",
         "position": [
           1,
@@ -178,7 +178,7 @@
     {
       "type": "PLACE_TILE",
       "payload": {
-        "tileId": "Kingdoms/CityPalaceYellow",
+        "tileId": "Kingdoms/KingdomPalaceYellow",
         "rotation": "R0",
         "position": [
           -2,
