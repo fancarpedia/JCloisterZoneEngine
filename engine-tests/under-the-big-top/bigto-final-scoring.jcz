@@ -1,0 +1,98 @@
+{
+  "appVersion": "7.1.0",
+  "gameId": "1",
+  "name": "",
+  "initialRandom": 0.45728007771879,
+  "created": "2026-11-19T20:27:45.765Z",
+  "clock": 336009,
+  "setup": {
+    "sets": {
+      "basic:1": 1,
+      "under-the-big-top-c1": 1
+    },
+    "elements": {
+      "small-follower": 7,
+      "farmers": true,
+      "ringmaster": 1,
+      "big-top": 1,
+      "acrobats": true
+    },
+    "rules": {},
+    "timer": null,
+    "start": [
+      {
+        "tile": "BA/RCr",
+        "x": 0,
+        "y": 0,
+        "rotation": 0
+      }
+    ],
+    "ai": false,
+    "options": {
+      "randomizeSeating": true
+    }
+  },
+  "players": [
+    {
+      "name": "Betty",
+      "slot": 2,
+      "ai": false
+    }
+  ],
+  "chat": [],
+  "replay": [
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "ubtc1/crfr.top",
+        "rotation": "R180",
+        "position": [
+          0,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 6225
+    },
+    {
+      "type": "DEPLOY_MEEPLE",
+      "payload": {
+        "pointer": {
+          "position": [
+            0,
+            -1
+          ],
+          "location": "W",
+          "feature": "Road"
+        },
+        "meepleId": "0.small.1"
+      },
+      "player": 0,
+      "clock": 7392
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.6983324446241989
+      },
+      "player": 0,
+      "clock": 9085
+    }
+  ],
+  "gameAnnotations": {
+    "drawOrder": [
+      "ubtc1/crfr.top"
+    ],
+    "endTurn": 1
+  },
+  "test": {
+    "description": "Bigto Final Scoring",
+    "assertions": [
+      "Betty scored road for 1 point at [0,-1].",
+      "Betty scored bigtop for 5 points.",
+      "Betty has 6 points.",
+      "Phase is GameOverPhase",
+      "Undo is not allowed"
+    ]
+  }
+}
