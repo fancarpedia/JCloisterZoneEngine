@@ -98,6 +98,18 @@ export class RiverCapability extends Capability<void> {
     return tile.hasModifier(DragonCapability.VOLCANO);
   }
 
+  /** The river is still being laid: river tiles (river / river-fork / river-lake… groups) remain to
+   *  be drawn. Tiles from the players' supplies (abbey, Kingdom Palace) wait until it is finished. */
+  static isRiverInProgress(state: GameState): boolean {
+    if (!state.hasCapability(RiverCapability as never)) return false;
+    const pack = state.getTilePack();
+    if (!pack) return false;
+    for (const t of pack.getGroups()) {
+      if (t._1.startsWith("river") && t._2.size() > 0) return true;
+    }
+    return false;
+  }
+
   override isTilePlacementAllowed(state: GameState, tile: Tile, placement: PlacementOption): boolean {
     const pos = placement.getPosition();
     const rot = placement.getRotation();

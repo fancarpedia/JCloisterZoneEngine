@@ -36,6 +36,15 @@ export class GameStateBuilder {
     this.tileOverrides = tileOverrides;
   }
 
+  /** Each player's slot (= colour) by player index, from GAME_SETUP `playerSlots`. Absent
+   *  (older clients / replays) ⇒ slot = player index. */
+  setPlayerSlots(playerSlots: readonly number[] | null): void {
+    this.playerSlots = playerSlots;
+  }
+
+  private playerSlots: readonly number[] | null = null;
+  private supplyTiles: ReadonlyMap<string, import("../../board/Tile.js").Tile> = new Map();
+
   /** `definitions` = tile-definition XML *contents* (one per loaded set file). */
   constructor(
     private readonly definitions: string[],
@@ -83,6 +92,15 @@ export class GameStateBuilder {
       const rot = Rotation.valueOf("R" + pt.getRotation());
       this.state = this.state.setTilePack(draw._2);
       this.state = new PlaceTile(draw._1, new Position(pt.getX(), pt.getY()), rot).apply(this.state);
+    }
+
+    const slots: number[] = [];
+    for (let i = 0; i < this.playersCount; i++) {
+      const s = this.playerSlots?.[i];
+      slots.push(typeof s === "number" && Number.isInteger(s) && s >= 0 ? s : i);
+    }
+    for (const cap of this.state.getCapabilities().toSeq()) {
+      this.state = cap.initSupplyTiles(this.state, this.supplyTiles, slots);
     }
 
     const randomGenerator = new RandomGenerator(this.initialRandom);
@@ -135,6 +153,7 @@ export class GameStateBuilder {
     tilePackBuilder.setTileSets(this.setup.getTileSets());
     tilePackBuilder.setTileOverrides(this.tileOverrides);
     this.state = this.state.setTilePack(tilePackBuilder.createTilePack(this.definitions));
+    this.supplyTiles = tilePackBuilder.getSupplyTiles();
   }
 
   private createCapabilityInstance(clazz: ClassToken<Capability<unknown>>): Capability<unknown> {

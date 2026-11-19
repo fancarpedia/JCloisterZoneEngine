@@ -4,8 +4,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-/** Absolute paths of the set XMLs a game needs, or null if any is missing. */
-export function resolveXmlPaths(sets, xmlsDir) {
+/** Elements whose tiles live in an XML no set refers to (supply-only tiles). */
+const ELEMENT_XMLS = { "kingdom-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
+
+/** Absolute paths of the set XMLs a game needs, or null if any is missing. `elements` adds the
+ *  XMLs of supply-only tiles (Kingdoms' City Palaces are never in a tile-set). */
+export function resolveXmlPaths(sets, xmlsDir, elements = {}) {
   const paths = [];
   for (const key of Object.keys(sets)) {
     // set id is "<expansion>[/variant]:<edition>" → XML file is "<expansion>.xml".
@@ -15,6 +19,12 @@ export function resolveXmlPaths(sets, xmlsDir) {
     if (!existsSync(p)) p = resolve(join(xmlsDir, base + ".xml"));
     if (!existsSync(p)) return null;
     if (!paths.includes(p)) paths.push(p);
+  }
+  for (const [el, file] of Object.entries(ELEMENT_XMLS)) {
+    if (elements && elements[el] !== undefined && elements[el] !== null && elements[el] !== false) {
+      const p = resolve(join(xmlsDir, file));
+      if (!paths.includes(p)) paths.push(p);
+    }
   }
   return paths;
 }
@@ -103,6 +113,8 @@ export function buildWireLines(jcz, xmlPaths) {
     elements,
     rules: expandRules(jcz.setup.sets, jcz.setup.rules, elements),
     players: jcz.players.length,
+    // each player's slot (= colour); Kingdoms gives everyone the City Palace of their colour
+    playerSlots: jcz.players.map((p) => p.slot),
     initialRandom: jcz.initialRandom,
     gameAnnotations: wireGameAnnotations(jcz.gameAnnotations),
   };

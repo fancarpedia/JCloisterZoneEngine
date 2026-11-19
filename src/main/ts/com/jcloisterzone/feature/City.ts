@@ -57,6 +57,9 @@ export class City
     GamblersLuckShield,
   );
   static readonly ELIMINATED_PENNANTS = new BooleanAnyModifier("city[eliminated-pennants]", null);
+  /** Kingdoms: the city holds a Kingdom Palace (marker only — the palace is just part of the city;
+   *  its owner is kept by KingdomPalaceCapability). */
+  static readonly KINGDOM_PALACE = new BooleanAnyModifier("city[kingdom-palace]", null);
 
   /** HS.CC!.v abstraction: multiple cities can connect to the same edge. */
   private readonly multiEdges: Set<Tuple2<ShortEdge, FeaturePointer>>;

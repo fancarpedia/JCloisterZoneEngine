@@ -21,6 +21,7 @@ import type { Feature } from "../feature/Feature.js";
 import { Field } from "../feature/Field.js";
 import { GamblersLuckShield } from "../feature/GamblersLuckShield.js";
 import { Marketplace } from "../feature/Marketplace.js";
+import { AbbeyEdge } from "../feature/AbbeyEdge.js";
 import { Monastery } from "../feature/Monastery.js";
 import { type NeighbouringFeature, isInstanceOfNeighbouringFeature } from "../feature/NeighbouringFeature.js";
 import { River } from "../feature/River.js";
@@ -56,6 +57,7 @@ export class TileBuilder {
     City.PRINCESS,
     City.BESIEGED,
     City.DARMSTADTIUM,
+    City.KINGDOM_PALACE,
     City.POINTS_MODIFIER,
     City.GAMBLERS_LUCK_SHIELDS as unknown as AnyMod,
   ];
@@ -157,6 +159,14 @@ export class TileBuilder {
           break;
         case "fishhut":
           this.initFeature(el, new FishHut(contentAsLocations(el).head()));
+          break;
+        case "abbey-edge":
+          // the abbey tile: every listed side is its own edge that matches any neighbour
+          // (added as-is, like the former hardcoded tile — no capability hooks for these edges)
+          contentAsLocations(el).forEach((loc) => {
+            const fp = new FP(Position.ZERO, AbbeyEdge, loc);
+            this.features = this.features.put(fp, new AbbeyEdge(List.of(fp)));
+          });
           break;
       }
     }

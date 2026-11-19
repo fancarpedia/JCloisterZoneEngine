@@ -1,0 +1,448 @@
+{
+  "appVersion": "7.1.0",
+  "gameId": "1",
+  "name": "",
+  "initialRandom": 0.42700637524342,
+  "created": "2026-11-19T14:42:16.366Z",
+  "clock": 97346,
+  "setup": {
+    "sets": {
+      "basic:1": 1,
+      "kingdoms": 1
+    },
+    "elements": {
+      "small-follower": 7,
+      "farmers": true,
+      "kingdom-palace": 1
+    },
+    "rules": {},
+    "timer": null,
+    "start": [
+      {
+        "tile": "BA/RCr",
+        "x": 0,
+        "y": 0,
+        "rotation": 0
+      }
+    ],
+    "ai": false,
+    "options": {
+      "randomizeSeating": true
+    },
+    "addons": {
+      "kingdoms": 1
+    },
+    "supply": {
+      "kingdom-palace": {
+        "count": 1,
+        "tiles": [
+          "Kingdoms/KingdomPalaceRed",
+          "Kingdoms/KingdomPalaceBlue",
+          "Kingdoms/KingdomPalaceYellow",
+          "Kingdoms/KingdomPalaceGreen",
+          "Kingdoms/KingdomPalaceOrange",
+          "Kingdoms/KingdomPalacePurple",
+          "Kingdoms/KingdomPalacePink",
+          "Kingdoms/KingdomPalaceWhite",
+          "Kingdoms/KingdomPalaceBlack",
+          "Kingdoms/KingdomPalaceGray",
+          "Kingdoms/KingdomPalaceBeige",
+          "Kingdoms/KingdomPalaceBrown"
+        ]
+      }
+    }
+  },
+  "players": [
+    {
+      "name": "Betty",
+      "slot": 2,
+      "ai": false
+    }
+  ],
+  "chat": [],
+  "replay": [
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/CccR+",
+        "rotation": "R90",
+        "position": [
+          0,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 2844
+    },
+    {
+      "type": "DEPLOY_MEEPLE",
+      "payload": {
+        "pointer": {
+          "position": [
+            0,
+            -1
+          ],
+          "location": "_W",
+          "feature": "City"
+        },
+        "meepleId": "0.small.1"
+      },
+      "player": 0,
+      "clock": 3493
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.5455701474778215
+      },
+      "player": 0,
+      "clock": 3746
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "Kingdoms/KingdomPalaceYellow",
+        "rotation": "R0",
+        "position": [
+          1,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 5074
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9902303111693963
+      },
+      "player": 0,
+      "clock": 5255
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/CC.2",
+        "rotation": "R0",
+        "position": [
+          2,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 6799
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 6930
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.10954845003297015
+      },
+      "player": 0,
+      "clock": 6990
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/Cc.1",
+        "rotation": "R270",
+        "position": [
+          2,
+          -2
+        ]
+      },
+      "player": 0,
+      "clock": 9580
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 9791
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.7979739689258737
+      },
+      "player": 0,
+      "clock": 9844
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/CC.2",
+        "rotation": "R180",
+        "position": [
+          1,
+          -2
+        ]
+      },
+      "player": 0,
+      "clock": 11214
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 11419
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.3031889625374176
+      },
+      "player": 0,
+      "clock": 11469
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/CFC.2",
+        "rotation": "R0",
+        "position": [
+          0,
+          -2
+        ]
+      },
+      "player": 0,
+      "clock": 12831
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 13112
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.35319115005116497
+      },
+      "player": 0,
+      "clock": 13180
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          -1,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 14652
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 14785
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.39729242371269147
+      },
+      "player": 0,
+      "clock": 14845
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          -2,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 16022
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 16204
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.6747734386822085
+      },
+      "player": 0,
+      "clock": 16265
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/C",
+        "rotation": "R0",
+        "position": [
+          -2,
+          -2
+        ]
+      },
+      "player": 0,
+      "clock": 17582
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 17805
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.39076714887785124
+      },
+      "player": 0,
+      "clock": 17876
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/C",
+        "rotation": "R180",
+        "position": [
+          -2,
+          -3
+        ]
+      },
+      "player": 0,
+      "clock": 19131
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 19491
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.19601816832833838
+      },
+      "player": 0,
+      "clock": 19575
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/C",
+        "rotation": "R180",
+        "position": [
+          -2,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 22942
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 23992
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.8386623057716817
+      },
+      "player": 0,
+      "clock": 24049
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/C",
+        "rotation": "R0",
+        "position": [
+          -2,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 25327
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 25792
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.4585574317996192
+      },
+      "player": 0,
+      "clock": 25860
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RCr",
+        "rotation": "R0",
+        "position": [
+          1,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 28317
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 28805
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.6982167981091034
+      },
+      "player": 0,
+      "clock": 28864
+    }
+  ],
+  "gameAnnotations": {
+    "drawOrder": [
+      "BA/CccR+",
+      "BA/CC.2",
+      "BA/Cc.1",
+      "BA/CC.2",
+      "BA/CFC.2",
+      "BA/RFr",
+      "BA/RFr",
+      "BA/C",
+      "BA/C",
+      "BA/C",
+      "BA/C",
+      "BA/RCr"
+    ],
+    "endTurn": 12
+  },
+  "test": {
+    "description": "Kindoms End Game Cities",
+    "assertions": [
+      "Betty scored city for 16 points at [0,-1].",
+      "Betty scored kingdom for 12 points at [1,-1].",
+      "Betty has 28 points.",
+      "Phase is GameOverPhase",
+      "Turn player is Betty",
+      "Undo is not allowed"
+    ]
+  }
+}

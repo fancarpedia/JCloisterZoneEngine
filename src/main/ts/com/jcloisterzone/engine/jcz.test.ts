@@ -54,10 +54,16 @@ interface Jcz {
   gameAnnotations?: Record<string, unknown> | null;
 }
 
-function loadXmlsForSets(sets: Record<string, number>): string[] {
+function loadXmlsForSets(sets: Record<string, number>, elements: Record<string, unknown> = {}): string[] {
   const files = new Set<string>();
   for (const key of Object.keys(sets)) {
     files.add(key.split(":")[0].split("/")[0].replace(/-/g, "_") + ".xml");
+  }
+  // supply tiles (abbey, Kingdom Palaces) live in an XML that may not be among the selected sets
+  // (MUST match ELEMENT_XMLS in jcz-wire.mjs)
+  const ELEMENT_XMLS: Record<string, string> = { "kingdom-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
+  for (const [el, file] of Object.entries(ELEMENT_XMLS)) {
+    if (elements[el] !== undefined && elements[el] !== null && elements[el] !== false) files.add(file);
   }
   return [...files].map((f) => readFileSync(join(XMLS_DIR, f), "utf8"));
 }
@@ -131,7 +137,7 @@ function buildSetupMessage(jcz: Jcz, xmlContents: string[]): GameSetupMessage {
 }
 
 function runReplay(jcz: Jcz): GameState {
-  const xmlContents = loadXmlsForSets(jcz.setup.sets);
+  const xmlContents = loadXmlsForSets(jcz.setup.sets, jcz.setup.elements ?? {});
   const setupMsg = buildSetupMessage(jcz, xmlContents);
   const setup = createSetupFromMessage(setupMsg);
 
@@ -139,6 +145,7 @@ function runReplay(jcz: Jcz): GameState {
   const builder = new GameStateBuilder(xmlContents, setup, jcz.players.length, jcz.initialRandom);
   builder.setGameAnnotations(jcz.gameAnnotations ?? null);
   builder.setTileOverrides(jcz.setup.tiles ?? null);
+  builder.setPlayerSlots(jcz.players.map((p) => p.slot));
 
   let state = builder.createInitialState();
   const firstPhase = reducer.getFirstPhase();

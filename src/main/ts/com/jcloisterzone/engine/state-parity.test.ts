@@ -27,7 +27,10 @@ interface Jcz {
   gameAnnotations?: Record<string, unknown> | null;
 }
 
-function xmlPaths(sets: Record<string, number>): string[] | null {
+// elements whose tiles live in an XML no set refers to (MUST match ELEMENT_XMLS in jcz-wire.mjs)
+const ELEMENT_XMLS: Record<string, string> = { "kingdom-palace": "kingdoms.xml", abbey: "abbey_and_mayor.xml" };
+
+function xmlPaths(sets: Record<string, number>, elements: Record<string, unknown> = {}): string[] | null {
   const paths: string[] = [];
   for (const key of Object.keys(sets)) {
     const base = key.split(":")[0].split("/")[0];
@@ -37,6 +40,12 @@ function xmlPaths(sets: Record<string, number>): string[] | null {
     if (!existsSync(p)) p = resolve(join(XMLS_DIR, base + ".xml"));
     if (!existsSync(p)) return null;
     if (!paths.includes(p)) paths.push(p);
+  }
+  for (const [el, file] of Object.entries(ELEMENT_XMLS)) {
+    if (elements[el] !== undefined && elements[el] !== null && elements[el] !== false) {
+      const p = resolve(join(XMLS_DIR, file));
+      if (!paths.includes(p)) paths.push(p);
+    }
   }
   return paths;
 }
@@ -129,6 +138,7 @@ function wireLines(jcz: Jcz, paths: string[]): string[] {
         elements,
         rules: expandRules(jcz.setup.sets, (jcz.setup as { rules?: Record<string, unknown> }).rules ?? {}, elements),
         players: jcz.players.length,
+        playerSlots: (jcz.players as Array<{ slot?: number }>).map((p) => p.slot),
         initialRandom: jcz.initialRandom,
         gameAnnotations: wireAnnotations(jcz.gameAnnotations),
       },
@@ -364,7 +374,7 @@ describe("GameState JSON parity (TS vs Java golden)", () => {
   for (const { dir, file } of golden) {
     it(`${dir}/${file}`, () => {
       const jcz = JSON.parse(readFileSync(join(TESTS_ROOT, dir, file), "utf8")) as Jcz;
-      const paths = xmlPaths(jcz.setup.sets);
+      const paths = xmlPaths(jcz.setup.sets, (jcz.setup as { elements?: Record<string, unknown> }).elements ?? {});
       expect(paths, "set XML present").not.toBeNull();
       const goldenLines = readFileSync(join(TESTS_ROOT, dir, file.replace(/\.jcz$/, ".golden.jsonl")), "utf8")
         .split("\n")
@@ -418,7 +428,7 @@ if (noGolden.length > 0) {
     for (const { dir, file } of noGolden) {
       it(`${dir}/${file}`, () => {
         const jcz = JSON.parse(readFileSync(join(TESTS_ROOT, dir, file), "utf8")) as Jcz;
-        const paths = xmlPaths(jcz.setup.sets);
+        const paths = xmlPaths(jcz.setup.sets, (jcz.setup as { elements?: Record<string, unknown> }).elements ?? {});
         expect(paths, "set XML present").not.toBeNull();
         const ts = tsStates(jcz, paths!);
         expect(ts.length, "emitted at least one state").toBeGreaterThan(0);

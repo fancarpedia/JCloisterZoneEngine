@@ -36,6 +36,8 @@ import { MeeplePointer } from "../board/pointer/MeeplePointer.js";
 import { ScoreMeeplePositionsPointer } from "../board/pointer/ScoreMeeplePositionsPointer.js";
 import { ScorePositionsFeaturePointer } from "../board/pointer/ScorePositionsFeaturePointer.js";
 import { ScoreSourceFeaturePointer } from "../board/pointer/ScoreSourceFeaturePointer.js";
+import { ScoreKingdomPointer } from "../board/pointer/ScoreKingdomPointer.js";
+import { KingdomPalaceCapability, type KingdomPalaceModel } from "../game/capability/KingdomPalaceCapability.js";
 import type { BoardPointer } from "../board/pointer/BoardPointer.js";
 import { DoubleTurnEvent } from "../event/DoubleTurnEvent.js";
 import { MeepleDeployed } from "../event/MeepleDeployed.js";
@@ -389,7 +391,7 @@ export class StateGsonBuilder {
       const player: Record<string, unknown> = {
         points: score.get(i),
         finalPoints: finalScore.get(i),
-        tokens: this.playerTokens(state, tokenArr.get(i)),
+        tokens: this.playerTokens(state, tokenArr.get(i), i),
         meeples,
       };
       if (prisoners !== null) player.captured = this.capturedFor(prisoners.get(i));
@@ -400,7 +402,7 @@ export class StateGsonBuilder {
   }
 
   /** { TOKEN_NAME: {count, [fp,size for KING/ROBBER]} } — port of serializePlayers tokens. */
-  private playerTokens(state: GameState, tokens: VMap<Token, number>): Record<string, unknown> {
+  private playerTokens(state: GameState, tokens: VMap<Token, number>, playerIdx: number): Record<string, unknown> {
     const out: Record<string, unknown> = {};
     for (const t of tokens) {
       const name = t._1.name();
@@ -417,6 +419,11 @@ export class StateGsonBuilder {
         );
         obj.fp = this.boardPtr(m._1);
         obj.size = m._2;
+      } else if (name === "KINGDOM_PALACE") {
+        // Kingdoms: which palace tile (= the player's colour) the supply holds
+        const m = state.getCapabilityModel<KingdomPalaceModel>(KingdomPalaceCapability as never);
+        const tile = m ? m.getTile(playerIdx) : null;
+        if (tile !== null) obj.tile = tile.getId();
       }
       out[name] = obj;
     }
@@ -852,6 +859,16 @@ export class StateGsonBuilder {
       return {
         featurePointer: this.fp(p.asFeaturePointer()),
         positions: p.getPositions().toArray().map((pos) => this.pos(pos)),
+      };
+    }
+    // ScoreKingdomPointer → {featurePointer, fields, cities, coc}: the capital, the fields touching
+    // it and the cities those fields touch (the counted ones), for the history highlight
+    if (p instanceof ScoreKingdomPointer) {
+      return {
+        featurePointer: this.fp(p.asFeaturePointer()),
+        fields: p.getFields().map((fp) => this.fp(fp)),
+        cities: p.getCities().map((fp) => this.fp(fp)),
+        ...(p.isCityOfCarcassonne() ? { coc: true } : {}),
       };
     }
     // ScoreSourceFeaturePointer → {featurePointer, source}: the castle plus the feature whose

@@ -7,7 +7,7 @@ import { PlaceTileMessage as PlaceTileMessageClass } from "../../io/message/Plac
 import type { RandomGenerator } from "../../random/RandomGenerator.js";
 import { SetNextPlayer } from "../../reducers/SetNextPlayer.js";
 import type { Capability } from "../Capability.js";
-import { AbbeyCapability } from "../capability/AbbeyCapability.js";
+import { AbbeyCapability, type AbbeyModel } from "../capability/AbbeyCapability.js";
 import { ActionsState } from "../state/ActionsState.js";
 import type { GameState } from "../state/GameState.js";
 import { AbstractAbbeyPhase } from "./AbstractAbbeyPhase.js";
@@ -15,7 +15,7 @@ import type { ActionPhase } from "./ActionPhase.js";
 import { Phase, type PhaseHandler } from "./Phase.js";
 import type { StepResult } from "./StepResult.js";
 
-const ABBEY_CLS = AbbeyCapability as unknown as ClassToken<Capability<number>>;
+const ABBEY_CLS = AbbeyCapability as unknown as ClassToken<Capability<AbbeyModel>>;
 
 /** After the last tile is placed, each player in turn (starting after the player
  *  who placed the last tile) may place their remaining abbey into a hole. */
@@ -33,16 +33,16 @@ export class AbbeyEndGamePhase extends AbstractAbbeyPhase {
   }
 
   enter(state: GameState): StepResult {
-    let endPlayerIdx = state.getCapabilityModel<number>(ABBEY_CLS);
-    if (endPlayerIdx === null || endPlayerIdx === undefined) {
-      endPlayerIdx = state.getTurnPlayer()!.getIndex();
-      state = state.setCapabilityModel<number>(ABBEY_CLS, endPlayerIdx);
+    const model = state.getCapabilityModel<AbbeyModel>(ABBEY_CLS);
+    if (model.endPlayer === null) {
+      const endPlayerIdx = state.getTurnPlayer()!.getIndex();
+      state = state.setCapabilityModel<AbbeyModel>(ABBEY_CLS, model.setEndPlayer(endPlayerIdx));
     }
     return this.findNextAbbeyAction(state);
   }
 
   private findNextAbbeyAction(state: GameState): StepResult {
-    const endPlayerIdx = state.getCapabilityModel<number>(ABBEY_CLS);
+    const endPlayerIdx = state.getCapabilityModel<AbbeyModel>(ABBEY_CLS).endPlayer;
     let player: Player = state.getTurnPlayer()!;
     player = player.getNextPlayer(state);
 

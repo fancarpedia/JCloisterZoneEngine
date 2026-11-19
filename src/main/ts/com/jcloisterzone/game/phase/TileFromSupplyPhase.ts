@@ -19,6 +19,8 @@ import { PlayEventMeta } from "../../event/PlayEvent.js";
 import type { Capability } from "../Capability.js";
 import { BridgeCapability } from "../capability/BridgeCapability.js";
 import { AbbeyCapability } from "../capability/AbbeyCapability.js";
+import { KingdomPalaceCapability } from "../capability/KingdomPalaceCapability.js";
+import { RiverCapability } from "../capability/RiverCapability.js";
 import { BazaarCapability } from "../capability/BazaarCapability.js";
 import type { BazaarCapabilityModel } from "../capability/BazaarCapabilityModel.js";
 import { BuilderCapability } from "../capability/BuilderCapability.js";
@@ -73,6 +75,19 @@ export class TileFromSupplyPhase extends AbstractAbbeyPhase {
       }
     }
 
+    // Kingdoms: the player's Kingdom Palace — optional like the abbey (place it, or pass and draw)
+    let palaceIncluded = false;
+    const palace = this.isPalacePlacementAllowed(state) ? KingdomPalaceCapability.getAvailableTile(state) : null;
+    if (palace !== null) {
+      const placements: Set<PlacementOption> = HashSet.ofAll(state.getTilePlacements(palace));
+      if (!placements.isEmpty()) {
+        palaceIncluded = true;
+        actions = actions.append(
+          new TilePlacementAction(palace, placements) as unknown as PlayerAction<unknown>,
+        ) as Vector<PlayerAction<unknown>>;
+      }
+    }
+
     const handTiles = state.getTilesInPlayerSupply(state.getTurnPlayer()!);
     if (handTiles.length() > 0) {
       for (const tile of handTiles) {
@@ -98,8 +113,11 @@ export class TileFromSupplyPhase extends AbstractAbbeyPhase {
         new ActionsState(
           state.getTurnPlayer()!,
           actions,
-          // Can pass (to draw) only if the abbey is the sole offered action (never in a pre-draw game)
-          !hasPreDraw && abbeyIncluded && actions.length() === 1,
+          // Can pass (to draw) only if the optional supply tiles (abbey / Kingdom Palace) are the only
+          // offered actions — never in a pre-draw game, nor with a mandatory bazaar tile
+          !hasPreDraw &&
+            (abbeyIncluded || palaceIncluded) &&
+            actions.length() === (abbeyIncluded ? 1 : 0) + (palaceIncluded ? 1 : 0),
         ),
       );
       return this.promote(state);
@@ -140,8 +158,9 @@ export class TileFromSupplyPhase extends AbstractAbbeyPhase {
     const turnIdx = state.getPlayers().getTurnPlayerIndex()!;
     const hasAbbey =
       state.getPlayers().getPlayerTokenCount(turnIdx, AbbeyCapability.AbbeyToken.ABBEY_TILE) > 0;
-    // Not checking if a hole exists (createAbbeyAction handles that)
-    return hasAbbey && (builderSecondTurnPart || !bazaarInProgress);
+    // Not checking if a hole exists (createAbbeyAction handles that). Not while the river is still
+    // being laid — a hole in the river is filled by river tiles.
+    return hasAbbey && (builderSecondTurnPart || !bazaarInProgress) && !RiverCapability.isRiverInProgress(state);
   }
 
   protected isBazaarInProgress(state: GameState): boolean {
@@ -149,7 +168,24 @@ export class TileFromSupplyPhase extends AbstractAbbeyPhase {
     return bazaarModel !== null && bazaarModel !== undefined && bazaarModel.getSupply() !== null;
   }
 
+  /** A Kingdom Palace may be placed under the same conditions as the abbey (no pending bazaar tile,
+   *  allowed in the builder's second turn part). */
+  protected isPalacePlacementAllowed(state: GameState): boolean {
+    if (!state.hasCapability(KingdomPalaceCapability as never)) return false;
+    // not while the river is still being laid
+    if (RiverCapability.isRiverInProgress(state)) return false;
+    const builderState = state.getCapabilityModel<BuilderState>(BUILDER_CLS as never);
+    return builderState === BuilderState.SECOND_TURN || !this.isBazaarInProgress(state);
+  }
+
+  private isOwnPalace(state: GameState, tileId: string): boolean {
+    if (!this.isPalacePlacementAllowed(state)) return false;
+    const tile = KingdomPalaceCapability.getAvailableTile(state);
+    return tile !== null && tile.getId() === tileId;
+  }
+
   protected isTileFromPlayerSupply(state: GameState, tileId: string): boolean {
+    if (this.isOwnPalace(state, tileId)) return true;
     const abbeyTile = tileId === AbbeyCapability.ABBEY_TILE_ID && this.isAbbeyPlacementAllowed(state);
     const supplyTiles = state.getTilesInPlayerSupply(state.getTurnPlayer()!);
     const supplyTile = !supplyTiles.isEmpty() && supplyTiles.map((t) => t.getId()).contains(tileId);
@@ -159,14 +195,25 @@ export class TileFromSupplyPhase extends AbstractAbbeyPhase {
   /** Place either the abbey tile or a tile held in the player's supply. */
   protected override applyPlaceTile(state: GameState, msg: PlaceTileMessage): GameState {
     const player: Player = state.getActivePlayer()!;
-    if (msg.getTileId() === AbbeyCapability.ABBEY_TILE_ID) {
+    if (this.isOwnPalace(state, msg.getTileId()!)) {
+      const tile = KingdomPalaceCapability.getAvailableTile(state)!;
+      const pos = msg.getPosition()!;
+      const rot = msg.getRotation()!;
+      HashSet.ofAll(state.getTilePlacements(tile))
+        .find((p) => p.getPosition().equals(pos) && p.getRotation() === rot)
+        .getOrElseThrow(() => new Error(`Invalid Kingdom Palace placement ${pos},${rot}`));
+      state = state.mapPlayers((ps) =>
+        ps.addTokenCount(player.getIndex(), KingdomPalaceCapability.KingdomPalaceToken.KINGDOM_PALACE, -1),
+      );
+      state = new PlaceTile(tile, pos, rot).apply(state);
+    } else if (msg.getTileId() === AbbeyCapability.ABBEY_TILE_ID) {
       if (!this.isAbbeyPlacementAllowed(state)) {
         throw new Error("Abbey tile is not possible to place now.");
       }
       state = state.mapPlayers((ps) =>
         ps.addTokenCount(player.getIndex(), AbbeyCapability.AbbeyToken.ABBEY_TILE, -1),
       );
-      state = new PlaceTile(AbbeyCapability.ABBEY_TILE, msg.getPosition()!, msg.getRotation()!).apply(state);
+      state = new PlaceTile(AbbeyCapability.getAbbeyTile(state), msg.getPosition()!, msg.getRotation()!).apply(state);
     } else {
       const supplyTiles = state.getTilesInPlayerSupply(state.getTurnPlayer()!);
       if (!supplyTiles.isEmpty()) {
