@@ -1,0 +1,897 @@
+{
+  "appVersion": "7.1.0",
+  "gameId": "1",
+  "name": "",
+  "initialRandom": 0.073837971814833,
+  "created": "2026-11-17T18:13:10.027Z",
+  "clock": 285705,
+  "setup": {
+    "sets": {
+      "basic:1": 1,
+      "river/1:1": 1,
+      "fishermen": 1,
+      "fishhuts/river": 1
+    },
+    "elements": {
+      "small-follower": 7,
+      "farmers": true,
+      "abbey": 1
+    },
+    "rules": {},
+    "timer": null,
+    "start": [
+      {
+        "tile": "RI/s",
+        "x": 0,
+        "y": 0,
+        "rotation": 0
+      }
+    ],
+    "ai": false,
+    "options": {
+      "randomizeSeating": true
+    },
+    "addons": {
+      "fishermen": 1,
+      "fishhuts": 0
+    },
+    "supply": {
+      "abbey": {
+        "count": 1,
+        "tiles": [
+          "AM/A"
+        ]
+      }
+    }
+  },
+  "players": [
+    {
+      "name": "John",
+      "slot": 1,
+      "ai": false
+    },
+    {
+      "name": "Betty",
+      "slot": 2,
+      "ai": false
+    }
+  ],
+  "chat": [],
+  "replay": [
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/i.siif",
+        "rotation": "R90",
+        "position": [
+          1,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 2612
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 2987
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.18437334903719527
+      },
+      "player": 0,
+      "clock": 3017
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/ciic",
+        "rotation": "R180",
+        "position": [
+          2,
+          0
+        ]
+      },
+      "player": 1,
+      "clock": 5234
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 5441
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.22647140744443583
+      },
+      "player": 1,
+      "clock": 5474
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/fi.si.sf",
+        "rotation": "R0",
+        "position": [
+          2,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 8747
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 8925
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.37094179604712024
+      },
+      "player": 0,
+      "clock": 8964
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/icif",
+        "rotation": "R0",
+        "position": [
+          1,
+          1
+        ]
+      },
+      "player": 1,
+      "clock": 11068
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 11229
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.1346208975345925
+      },
+      "player": 1,
+      "clock": 11267
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "RI.1/LIRI",
+        "rotation": "R0",
+        "position": [
+          3,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 13802
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 14049
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9976478442538752
+      },
+      "player": 0,
+      "clock": 14085
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishhuts/fishhuts-IIFI",
+        "rotation": "R0",
+        "position": [
+          1,
+          2
+        ]
+      },
+      "player": 1,
+      "clock": 16520
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 16772
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.8582882293771432
+      },
+      "player": 1,
+      "clock": 16814
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/iici",
+        "rotation": "R180",
+        "position": [
+          0,
+          2
+        ]
+      },
+      "player": 0,
+      "clock": 20166
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 20716
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9150258819176936
+      },
+      "player": 0,
+      "clock": 20754
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/iiii",
+        "rotation": "R0",
+        "position": [
+          4,
+          -1
+        ]
+      },
+      "player": 1,
+      "clock": 23850
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 24045
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.6427911169094923
+      },
+      "player": 1,
+      "clock": 24088
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/ri.sfi.s",
+        "rotation": "R90",
+        "position": [
+          4,
+          -2
+        ]
+      },
+      "player": 0,
+      "clock": 25949
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 26170
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.3348010202566167
+      },
+      "player": 0,
+      "clock": 26208
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/fiir",
+        "rotation": "R90",
+        "position": [
+          2,
+          2
+        ]
+      },
+      "player": 1,
+      "clock": 39360
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 40819
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.4388867506938459
+      },
+      "player": 1,
+      "clock": 40868
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/iiff",
+        "rotation": "R90",
+        "position": [
+          4,
+          -3
+        ]
+      },
+      "player": 0,
+      "clock": 46631
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 46956
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.4036847103404276
+      },
+      "player": 0,
+      "clock": 47002
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/ifif2",
+        "rotation": "R90",
+        "position": [
+          5,
+          -1
+        ]
+      },
+      "player": 1,
+      "clock": 49501
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 49870
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.14442327997853202
+      },
+      "player": 1,
+      "clock": 49919
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "RI.1/II",
+        "rotation": "R90",
+        "position": [
+          6,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 54347
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 54990
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.33049302330729224
+      },
+      "player": 0,
+      "clock": 55036
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/fiif",
+        "rotation": "R270",
+        "position": [
+          2,
+          3
+        ]
+      },
+      "player": 1,
+      "clock": 58038
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 58281
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.47664830064244956
+      },
+      "player": 1,
+      "clock": 58324
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/iri4",
+        "rotation": "R90",
+        "position": [
+          5,
+          -3
+        ]
+      },
+      "player": 0,
+      "clock": 61333
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 61694
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.5890478718043528
+      },
+      "player": 0,
+      "clock": 61731
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/ri.sci.s",
+        "rotation": "R0",
+        "position": [
+          3,
+          3
+        ]
+      },
+      "player": 1,
+      "clock": 65670
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 65939
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.7235746121609465
+      },
+      "player": 1,
+      "clock": 65974
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishhuts/fishhuts-FIRI",
+        "rotation": "R90",
+        "position": [
+          0,
+          3
+        ]
+      },
+      "player": 0,
+      "clock": 68565
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 68699
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.09598083146660627
+      },
+      "player": 0,
+      "clock": 68746
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "RI.1/IFI",
+        "rotation": "R90",
+        "position": [
+          0,
+          4
+        ]
+      },
+      "player": 1,
+      "clock": 70457
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 70707
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.531266554506154
+      },
+      "player": 1,
+      "clock": 70742
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/irir",
+        "rotation": "R90",
+        "position": [
+          4,
+          3
+        ]
+      },
+      "player": 0,
+      "clock": 72605
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 72810
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.2494996680177281
+      },
+      "player": 0,
+      "clock": 72846
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/fi.si.sr",
+        "rotation": "R180",
+        "position": [
+          6,
+          -3
+        ]
+      },
+      "player": 1,
+      "clock": 79461
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 84380
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.25769065006528546
+      },
+      "player": 1,
+      "clock": 84456
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/fi.sri.e",
+        "rotation": "R0",
+        "position": [
+          5,
+          3
+        ]
+      },
+      "player": 0,
+      "clock": 86481
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 89316
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.43208958414946197
+      },
+      "player": 0,
+      "clock": 89357
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/iirc",
+        "rotation": "R180",
+        "position": [
+          6,
+          3
+        ]
+      },
+      "player": 1,
+      "clock": 91824
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 92150
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.08226307625056388
+      },
+      "player": 1,
+      "clock": 92189
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "RI.1/CcII",
+        "rotation": "R270",
+        "position": [
+          6,
+          4
+        ]
+      },
+      "player": 0,
+      "clock": 94261
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 94558
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.5973058322432012
+      },
+      "player": 0,
+      "clock": 94597
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/riic",
+        "rotation": "R90",
+        "position": [
+          7,
+          4
+        ]
+      },
+      "player": 1,
+      "clock": 98555
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 98827
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9252040031949077
+      },
+      "player": 1,
+      "clock": 98871
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/iifi",
+        "rotation": "R90",
+        "position": [
+          7,
+          5
+        ]
+      },
+      "player": 0,
+      "clock": 105084
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 105315
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.7548412446653663
+      },
+      "player": 0,
+      "clock": 105354
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishhuts/fishhuts-IFIF",
+        "rotation": "R0",
+        "position": [
+          7,
+          6
+        ]
+      },
+      "player": 1,
+      "clock": 107005
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 107163
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9428288587102801
+      },
+      "player": 1,
+      "clock": 107203
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/iiii5",
+        "rotation": "R0",
+        "position": [
+          7,
+          7
+        ]
+      },
+      "player": 0,
+      "clock": 111508
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 111693
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.2607392749100641
+      },
+      "player": 0,
+      "clock": 111740
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishermen/ciir",
+        "rotation": "R180",
+        "position": [
+          0,
+          5
+        ]
+      },
+      "player": 1,
+      "clock": 114847
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 1,
+      "clock": 115042
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.8400639518350661
+      },
+      "player": 1,
+      "clock": 115081
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "fishhuts/fishhuts-IIFF",
+        "rotation": "R90",
+        "position": [
+          6,
+          -2
+        ]
+      },
+      "player": 0,
+      "clock": 118715
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 122186
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9340856522014763
+      },
+      "player": 0,
+      "clock": 122231
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "AM/A",
+        "rotation": "R0",
+        "position": [
+          5,
+          -2
+        ]
+      },
+      "player": 1,
+      "clock": 247784
+    },
+    {
+      "type": "DEPLOY_MEEPLE",
+      "payload": {
+        "pointer": {
+          "position": [
+            5,
+            -2
+          ],
+          "location": "I",
+          "feature": "Monastery"
+        },
+        "meepleId": "1.small.1"
+      },
+      "player": 1,
+      "clock": 248777
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.12450340070040124
+      },
+      "player": 1,
+      "clock": 249292
+    }
+  ],
+  "test": {
+    "description": "Fishermen No Fishermen Gap For Abbey",
+    "assertions": [
+      "Betty scored monastery for 9 points at [5,-2].",
+      "John has 0 points.",
+      "Betty has 9 points.",
+      "Phase is TilePhase",
+      "Turn player is John",
+      "Active player is John",
+      "Player can't pass",
+      "Available actions: TilePlacement,RI.1/II",
+      "TilePlacement RI.1/II options: [6,-4] - [270]; [-1,5] - [270]",
+      "Undo is not allowed"
+    ]
+  }
+}
