@@ -60,6 +60,16 @@ export class TilePackBuilder {
     this.tileOverrides = tileOverrides;
   }
 
+  /** Is a game element (e.g. `kingdom-palace`) switched on in the setup? */
+  private isElementOn(element: string): boolean {
+    if (element === "") return false;
+    const value = this.state.getElements().get(element).getOrNull();
+    if (value === null || value === undefined || value === false) return false;
+    if (typeof value === "number") return value > 0;
+    if (typeof value === "string") return value !== "" && value !== "0" && value !== "false";
+    return true;
+  }
+
   private isTunnelActive(tileId: string): boolean {
     if (!this.state.getCapabilities().contains(TunnelCapability)) {
       return false;
@@ -134,9 +144,11 @@ export class TilePackBuilder {
       elementStream(element.getElementsByTagName("tile-set")).forEach((tileSetElement) => {
         const tileSetId = tileSetElement.getAttribute("id");
         const setCount = this.tileSets.getOrElse(tileSetId, 0);
-        if (setCount > 0 && tileSetElement.getAttribute("supply") === "true") {
+        if (tileSetElement.getAttribute("supply") === "true") {
           // a supply set (e.g. Kingdoms' Kingdom Palaces) puts its tiles into players' supplies, which
-          // its capability does — it contributes nothing to the draw pack
+          // its capability does — it contributes nothing to the draw pack. Built when the set is
+          // selected OR its element is on (the client shows supply tiles by element, too).
+          if (setCount <= 0 && !this.isElementOn(tileSetElement.getAttribute("element"))) return;
           elementStream(tileSetElement.getElementsByTagName("ref")).forEach((refElement) => {
             supplySetTiles.add(refElement.getAttribute("tile"));
           });

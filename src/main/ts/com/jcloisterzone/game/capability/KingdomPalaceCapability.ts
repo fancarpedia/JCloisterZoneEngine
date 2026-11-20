@@ -4,6 +4,8 @@ import { Location } from "../../board/Location.js";
 import type { PlacementOption } from "../../board/PlacementOption.js";
 import type { Position } from "../../board/Position.js";
 import type { Tile } from "../../board/Tile.js";
+import { TileModifier } from "../../board/TileModifier.js";
+import type { XmlElement } from "../../XmlUtils.js";
 import type { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
 import { ScoreKingdomPointer } from "../../board/pointer/ScoreKingdomPointer.js";
 import { ExprItem } from "../../event/ExprItem.js";
@@ -18,6 +20,18 @@ import { Capability } from "../Capability.js";
 import type { Token } from "../Token.js";
 import type { GameState } from "../state/GameState.js";
 import type { PlacedTile } from "../state/PlacedTile.js";
+
+/** Marks a Kingdom Palace tile and the player colour it belongs to — read from the tile's XML
+ *  attribute `kingdom-palace="<colour>"` (like `wind-rose="NWSE"`), so any add-on can define palace
+ *  tiles under any id without engine changes. */
+export class KingdomPalaceModifier extends TileModifier {
+  constructor(private readonly color: string) {
+    super("KingdomPalace:" + color);
+  }
+  getColor(): string {
+    return this.color;
+  }
+}
 
 /** A placed Kingdom Palace: where, and whose. */
 export interface PlacedKingdomPalace {
@@ -54,37 +68,55 @@ export class KingdomPalaceModel {
  * one city). An unfinished capital scores no kingdom. Farmers are not required.
  */
 export class KingdomPalaceCapability extends Capability<KingdomPalaceModel> {
-  static readonly TILE_PREFIX = "Kingdoms/KingdomPalace";
   /** Max palace tiles a player may start with. */
   static readonly MAX_TILES = 9;
   static readonly POINTS_PER_CITY = 3;
 
-  /** Slot (= the client's player colour, see player-colors.scss) → palace colour. */
+  /** Slot (= the client's player colour, see player-colors.scss) → the colour a palace tile names
+   *  in its `kingdom-palace` attribute. */
   static readonly SLOT_COLORS: readonly string[] = [
-    "Red", "Blue", "Yellow", "Green", "Orange", "Purple", "Pink", "White", "Black",
-    // art exists for these too; no client slot uses them yet
-    "Gray", "Beige", "Brown",
+    "red", "blue", "yellow", "green", "orange", "purple", "pink", "white", "black",
+    // no client slot uses these yet
+    "gray", "beige", "brown",
   ];
 
-  static tileIdForSlot(slot: number): string {
-    const color = KingdomPalaceCapability.SLOT_COLORS[slot] ?? KingdomPalaceCapability.SLOT_COLORS[0];
-    return KingdomPalaceCapability.TILE_PREFIX + color;
+  static getPalaceColor(tile: Tile): string | null {
+    return tile
+      .getTileModifiers()
+      .find((m) => m instanceof KingdomPalaceModifier)
+      .map((m) => (m as KingdomPalaceModifier).getColor())
+      .getOrNull();
   }
 
   static isKingdomPalace(tile: Tile): boolean {
-    return tile.getId().startsWith(KingdomPalaceCapability.TILE_PREFIX);
+    return KingdomPalaceCapability.getPalaceColor(tile) !== null;
   }
 
-  override getSupplyTileIds(): readonly string[] {
-    return KingdomPalaceCapability.SLOT_COLORS.map((c) => KingdomPalaceCapability.TILE_PREFIX + c);
+  /** `kingdom-palace="<colour>"` on a tile makes it a Kingdom Palace of that player colour. */
+  override initTile(state: GameState, tile: Tile, el: XmlElement): Tile {
+    if (el.hasAttribute("kingdom-palace")) {
+      const color = el.getAttribute("kingdom-palace").trim().toLowerCase();
+      if (color !== "") tile = tile.addTileModifier(new KingdomPalaceModifier(color));
+    }
+    return tile;
   }
 
+  /** The palaces come from the supply tile-set (`<tile-set supply="true" element="kingdom-palace">`);
+   *  each player gets the one whose colour is their slot's colour. */
   override initSupplyTiles(
     state: GameState,
     tiles: ReadonlyMap<string, Tile>,
     playerSlots: readonly number[],
   ): GameState {
-    const own = playerSlots.map((slot) => tiles.get(KingdomPalaceCapability.tileIdForSlot(slot)) ?? null);
+    const byColor = new Map<string, Tile>();
+    for (const tile of tiles.values()) {
+      const color = KingdomPalaceCapability.getPalaceColor(tile);
+      if (color !== null && !byColor.has(color)) byColor.set(color, tile);
+    }
+    const own = playerSlots.map((slot) => {
+      const color = KingdomPalaceCapability.SLOT_COLORS[slot] ?? KingdomPalaceCapability.SLOT_COLORS[0]!;
+      return byColor.get(color) ?? null;
+    });
     return this.setModel(state, new KingdomPalaceModel(own, []));
   }
 

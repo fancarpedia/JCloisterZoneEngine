@@ -4,7 +4,8 @@
 
   One Kingdom Palace tile per player colour. The palaces are never drawn: the `kingdoms` tile-set
   is a supply set, KingdomPalaceCapability builds them as supply tiles and gives each player the palace of
-  their own colour (by slot). A palace is just part of the city (like Darmstadtium).
+  their own colour (by slot). A tile is a palace by its attribute kingdom-palace="<colour>" (never by its
+  id), so any add-on can define palaces. A palace is just part of the city (like Darmstadtium).
 -->
 <defs>
   <!-- Selecting Kingdoms in the setup's Tiles tab (fan expansions) turns on the `kingdom-palace`
@@ -22,18 +23,18 @@
   </expansion>
 
   <tiles>
-    <tile id="Kingdoms/KingdomPalaceRed"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceBlue"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceYellow"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceGreen"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceOrange"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalacePurple"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalacePink"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceWhite"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceBlack"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceGray"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceBeige"><city kingdom-palace="true">N W S E</city></tile>
-    <tile id="Kingdoms/KingdomPalaceBrown"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceRed" kingdom-palace="red"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBlue" kingdom-palace="blue"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceYellow" kingdom-palace="yellow"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceGreen" kingdom-palace="green"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceOrange" kingdom-palace="orange"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalacePurple" kingdom-palace="purple"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalacePink" kingdom-palace="pink"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceWhite" kingdom-palace="white"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBlack" kingdom-palace="black"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceGray" kingdom-palace="gray"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBeige" kingdom-palace="beige"><city kingdom-palace="true">N W S E</city></tile>
+    <tile id="Kingdoms/KingdomPalaceBrown" kingdom-palace="brown"><city kingdom-palace="true">N W S E</city></tile>
   </tiles>
   <sets>
     <!-- supply="true": these tiles go into players' supplies (each player the palace of their
