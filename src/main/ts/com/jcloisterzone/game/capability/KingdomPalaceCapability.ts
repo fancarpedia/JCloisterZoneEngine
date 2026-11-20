@@ -17,6 +17,7 @@ import type { Feature } from "../../feature/Feature.js";
 import { Field } from "../../feature/Field.js";
 import { AddPoints } from "../../reducers/AddPoints.js";
 import { Capability } from "../Capability.js";
+import { PlayerColors } from "../PlayerColors.js";
 import type { Token } from "../Token.js";
 import type { GameState } from "../state/GameState.js";
 import type { PlacedTile } from "../state/PlacedTile.js";
@@ -72,14 +73,6 @@ export class KingdomPalaceCapability extends Capability<KingdomPalaceModel> {
   static readonly MAX_TILES = 9;
   static readonly POINTS_PER_CITY = 3;
 
-  /** Slot (= the client's player colour, see player-colors.scss) → the colour a palace tile names
-   *  in its `kingdom-palace` attribute. */
-  static readonly SLOT_COLORS: readonly string[] = [
-    "red", "blue", "yellow", "green", "orange", "purple", "pink", "white", "black",
-    // no client slot uses these yet
-    "gray", "beige", "brown",
-  ];
-
   static getPalaceColor(tile: Tile): string | null {
     return tile
       .getTileModifiers()
@@ -113,10 +106,8 @@ export class KingdomPalaceCapability extends Capability<KingdomPalaceModel> {
       const color = KingdomPalaceCapability.getPalaceColor(tile);
       if (color !== null && !byColor.has(color)) byColor.set(color, tile);
     }
-    const own = playerSlots.map((slot) => {
-      const color = KingdomPalaceCapability.SLOT_COLORS[slot] ?? KingdomPalaceCapability.SLOT_COLORS[0]!;
-      return byColor.get(color) ?? null;
-    });
+    // the shared player colours (PlayerColors): the slot's colour picks the palace
+    const own = playerSlots.map((slot) => byColor.get(PlayerColors.colorOfSlot(slot)) ?? null);
     return this.setModel(state, new KingdomPalaceModel(own, []));
   }
 
