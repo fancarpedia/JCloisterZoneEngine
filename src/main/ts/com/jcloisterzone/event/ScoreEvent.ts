@@ -27,6 +27,12 @@ export interface MajorityShare {
 export class ReceivedPoints {
   private readonly meeples: List<ScoredMeeple>;
   private readonly majority: List<MajorityShare>;
+  /** TS-only: the feature places that were counted for the points without scoring themselves (a
+   *  watchtower's monasteries, roads, cities, coat-of-arms city segments) — the history highlights
+   *  them in a different colour. */
+  private involved: FeaturePointer[] = [];
+  /** TS-only: the followers that were counted without scoring (a meeple watchtower's neighbours). */
+  private involvedMeeples: ScoredMeeple[] = [];
 
   constructor(
     private readonly expression: PointsExpression,
@@ -59,6 +65,21 @@ export class ReceivedPoints {
    *  points — used to show the meeples' original positions for the score event. */
   getMeeples(): List<ScoredMeeple> {
     return this.meeples;
+  }
+
+  /** Records what else was counted for these points (see `involved` / `involvedMeeples`). */
+  withInvolved(places: FeaturePointer[], meeples: ScoredMeeple[] = []): ReceivedPoints {
+    this.involved = places;
+    this.involvedMeeples = meeples;
+    return this;
+  }
+
+  getInvolved(): FeaturePointer[] {
+    return this.involved;
+  }
+
+  getInvolvedMeeples(): ScoredMeeple[] {
+    return this.involvedMeeples;
   }
 
   /** The feature's majority race (winners = owners, losers = other meeple holders) —

@@ -1,13 +1,13 @@
 import { HashSet, type Set } from "../../../../io/vavr/Set.js";
 import { List } from "../../../../io/vavr/SeqTypes.js";
-import type { Tuple2 } from "../../../../io/vavr/Tuple.js";
+import { Tuple2 } from "../../../../io/vavr/Tuple.js";
 import { Position } from "../../board/Position.js";
 import { TileModifier } from "../../board/TileModifier.js";
 import type { FeaturePointer } from "../../board/pointer/FeaturePointer.js";
 import { ScoreMeeplePositionsPointer } from "../../board/pointer/ScoreMeeplePositionsPointer.js";
 import { ExprItem } from "../../event/ExprItem.js";
 import { PointsExpression } from "../../event/PointsExpression.js";
-import { ReceivedPoints } from "../../event/ScoreEvent.js";
+import { ReceivedPoints, type ScoredMeeple } from "../../event/ScoreEvent.js";
 import { City } from "../../feature/City.js";
 import type { Completable } from "../../feature/Completable.js";
 import type { Feature } from "../../feature/Feature.js";
@@ -81,6 +81,9 @@ export class WatchtowerCapability extends Capability<void> {
       const watchtower = watchtowers.get(key)!;
       let count = 0;
       let exprName: string | null = null;
+      // what was counted — highlighted in the history (TS-only)
+      const involved: FeaturePointer[] = [];
+      const involvedMeeples: ScoredMeeple[] = [];
 
       const pts: PlacedTile[] = this.getNeigbouring(state, pos);
       let positions: Set<Position> = HashSet.empty<Position>();
@@ -100,7 +103,9 @@ export class WatchtowerCapability extends Capability<void> {
                 if (city !== null) {
                   // City still exists (not converted to Castle)
                   if (!city.hasModifier(state, City.ELIMINATED_PENNANTS)) {
-                    count += (f as City).getModifier(state, City.PENNANTS, 0);
+                    const pennants = (f as City).getModifier(state, City.PENNANTS, 0);
+                    count += pennants;
+                    if (pennants > 0) involved.push(fp); // the city segment with the coat of arms
                   }
                 }
               }
@@ -112,7 +117,12 @@ export class WatchtowerCapability extends Capability<void> {
         case "monastery": {
           for (const pt of pts) {
             for (const f of pt.getTile().getInitialFeatures().values()) {
-              if (f instanceof Monastery) count++;
+              if (f instanceof Monastery) {
+                count++;
+                involved.push(
+                  (f as Monastery).getPlaces().head().setPosition(pt.getPosition()).rotateCW(pt.getRotation()),
+                );
+              }
             }
           }
           exprName = "monasteries";
@@ -120,28 +130,30 @@ export class WatchtowerCapability extends Capability<void> {
         }
         case "city": {
           for (const pt of pts) {
-            const has = state
+            const cityFps = state
               .getFeatureMap()
               .get(pt.getPosition())
               .get()
               .keySet()
-              .find((fp) => fp.getFeature() === (City as never))
-              .isDefined();
-            if (has) count++;
+              .filter((fp) => fp.getFeature() === (City as never))
+              .toArray();
+            if (cityFps.length > 0) count++;
+            involved.push(...cityFps);
           }
           exprName = "cities";
           break;
         }
         case "road": {
           for (const pt of pts) {
-            const has = state
+            const roadFps = state
               .getFeatureMap()
               .get(pt.getPosition())
               .get()
               .keySet()
-              .find((fp) => fp.getFeature() === (Road as never))
-              .isDefined();
-            if (has) count++;
+              .filter((fp) => fp.getFeature() === (Road as never))
+              .toArray();
+            if (roadFps.length > 0) count++;
+            involved.push(...roadFps);
           }
           exprName = "roads";
           break;
@@ -150,7 +162,10 @@ export class WatchtowerCapability extends Capability<void> {
           for (const t of state.getDeployedMeeples()) {
             if (!(t._1 instanceof Follower)) continue;
             const mpos = t._2.getPosition();
-            if (Math.abs(pos.x - mpos.x) <= 1 && Math.abs(pos.y - mpos.y) <= 1) count++;
+            if (Math.abs(pos.x - mpos.x) <= 1 && Math.abs(pos.y - mpos.y) <= 1) {
+              count++;
+              involvedMeeples.push(new Tuple2(t._1 as Follower, t._2) as ScoredMeeple);
+            }
           }
           exprName = "meeples";
           break;
@@ -162,13 +177,14 @@ export class WatchtowerCapability extends Capability<void> {
           "watchtower",
           new ExprItem(count, exprName!, count * watchtower.points),
         );
-        const receivedPoints: ReceivedPoints[] = meeples.map(
-          (t) =>
-            new ReceivedPoints(
-              expr,
-              t._1.getPlayer(),
-              new ScoreMeeplePositionsPointer(t._1.getDeployment(state)!, t._1.getId(), positions),
-            ),
+        const receivedPoints: ReceivedPoints[] = meeples.map((t) =>
+          new ReceivedPoints(
+            expr,
+            t._1.getPlayer(),
+            new ScoreMeeplePositionsPointer(t._1.getDeployment(state)!, t._1.getId(), positions),
+            // the meeple on the watchtower that earned the bonus, where it stood
+            List.of(new Tuple2(t._1 as Follower, t._2) as ScoredMeeple),
+          ).withInvolved(involved, involvedMeeples),
         );
         state = new AddPoints(List.ofAll(receivedPoints), true).apply(state);
       }

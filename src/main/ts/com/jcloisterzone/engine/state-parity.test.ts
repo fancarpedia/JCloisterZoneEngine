@@ -202,6 +202,8 @@ function stripScoredMeeples(v: unknown): void {
       delete o.meeples;
       delete o.majority;
       delete o.hillMode;
+      delete o.involved;
+      delete o.involvedMeeples;
     }
     // TS-only enrichment on the neutral-moved event (the host meeple); Java goldens lack it
     delete o.hostMeeple;

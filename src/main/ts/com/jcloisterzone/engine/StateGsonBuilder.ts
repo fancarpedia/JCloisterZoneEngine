@@ -612,6 +612,32 @@ export class StateGsonBuilder {
               };
             });
           }
+          // TS-only: what else was counted (a watchtower's monasteries / roads / cities / coat-of-arms
+          // segments, and the followers of a meeple watchtower) — highlighted in another colour.
+          const involved = rp.getInvolved();
+          if (involved.length > 0) {
+            entry.involved = involved.map((fp) => {
+              const feat = fp.getFeature();
+              return {
+                position: this.pos(fp.getPosition()),
+                feature: feat === null ? null : simpleName(feat),
+                location: this.loc(fp.getLocation()),
+              };
+            });
+          }
+          const involvedMeeples = rp.getInvolvedMeeples();
+          if (involvedMeeples.length > 0) {
+            entry.involvedMeeples = involvedMeeples.map((t) => {
+              const feat = t._2.getFeature();
+              return {
+                type: simpleName(t._1.constructor as ClassToken),
+                player: t._1.getPlayer().getIndex(),
+                position: this.pos(t._2.getPosition()),
+                feature: feat === null ? null : simpleName(feat),
+                location: this.loc(t._2.getLocation()),
+              };
+            });
+          }
           // TS-only: the feature's majority race (winners = owners) — the "2nd expression".
           const majority = rp.getMajority();
           if (!majority.isEmpty()) {
