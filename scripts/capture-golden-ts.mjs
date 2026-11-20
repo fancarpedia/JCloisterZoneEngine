@@ -37,12 +37,27 @@ setDomParserFactory(() => new DOMParser());
 
 const filter = process.argv.slice(2).find((a) => !a.startsWith("-")) ?? null;
 
-/** Replay one .jcz through a fresh TS engine; return the emitted state lines. */
+/** Replay one .jcz through a fresh TS engine; return the emitted state lines. A refused move
+ *  aborts the capture unless the .jcz expects it with a `Rejected: <tileId> <message>` assertion
+ *  (same rule as state-parity.test.ts and the client's Test Runner). */
 function runTs(jcz, xmlPaths) {
   const engine = new Engine((p) => readFileSync(p, "utf8"));
+  const expected = (jcz.test?.assertions ?? [])
+    .map((a) => /^Rejected: (.+)$/.exec(a.trim()))
+    .filter(Boolean)
+    .map((m) => m[1]);
   const out = [];
   for (const line of buildWireLines(jcz, xmlPaths)) {
-    const r = engine.processInput(line);
+    let r;
+    try {
+      r = engine.processInput(line);
+    } catch (e) {
+      let tileId;
+      try { tileId = JSON.parse(line).payload?.tileId } catch { tileId = undefined }
+      const text = (typeof tileId === "string" ? tileId + " " : "") + (e instanceof Error ? e.message : String(e));
+      if (!expected.includes(text)) throw e;
+      continue;
+    }
     if (r !== null && r.startsWith("{")) out.push(r);
   }
   return out;

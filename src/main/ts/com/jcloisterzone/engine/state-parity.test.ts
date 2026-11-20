@@ -25,6 +25,7 @@ interface Jcz {
   players: unknown[];
   replay: Array<{ type: string; payload: Record<string, unknown> }>;
   gameAnnotations?: Record<string, unknown> | null;
+  test?: { assertions?: string[] };
 }
 
 // elements whose tiles live in an XML no set refers to (MUST match ELEMENT_XMLS in jcz-wire.mjs)
@@ -338,12 +339,43 @@ function collectDiffs(a: unknown, b: unknown, path: string, key: string | undefi
   if (a !== b) out.push(`${path}: ${JSON.stringify(a)} (java) vs ${JSON.stringify(b)} (ts)`);
 }
 
+// A move the engine refuses fails the replay — unless the fixture EXPECTS that refusal with a
+// `Rejected: <tileId> <message>` assertion (e.g. `Rejected: AM/A Invalid placement [5,-2],R0`:
+// the abbey may no longer go into a river gap). Then the refusal is the tested behaviour, and an
+// expected refusal that does NOT happen fails too. Same rule as the client's Test Runner
+// (FanCloisterZone src/renderer/utils/testing.js, RejectedAssert).
+function rejectionText(line: string, message: string): string {
+  let tileId: unknown;
+  try {
+    tileId = (JSON.parse(line) as { payload?: { tileId?: unknown } }).payload?.tileId;
+  } catch {
+    tileId = undefined;
+  }
+  return (typeof tileId === "string" ? tileId + " " : "") + message;
+}
+
 function tsStates(jcz: Jcz, paths: string[]): string[] {
   const engine = new Engine((p) => readFileSync(p, "utf8"));
+  const expected = (jcz.test?.assertions ?? [])
+    .map((a) => /^Rejected: (.+)$/.exec(a.trim()))
+    .filter((m): m is RegExpExecArray => m !== null)
+    .map((m) => m[1]!);
+  const rejected: string[] = [];
   const out: string[] = [];
   for (const line of wireLines(jcz, paths)) {
-    const r = engine.processInput(line);
+    let r: string | null;
+    try {
+      r = engine.processInput(line);
+    } catch (e) {
+      const text = rejectionText(line, e instanceof Error ? e.message : String(e));
+      if (!expected.includes(text)) throw e; // an unexpected refusal fails as before
+      rejected.push(text);
+      continue;
+    }
     if (r !== null) out.push(r);
+  }
+  for (const text of expected) {
+    expect(rejected, `expected the engine to reject: ${text}`).toContain(text);
   }
   return out;
 }

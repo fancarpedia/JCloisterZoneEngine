@@ -38,6 +38,12 @@ export class Engine {
   private game: Game | null = null;
   private reducer: GameStatePhaseReducer | null = null;
   private state: GameState | null = null;
+  /** Every game message the engine refused (an exception while applying it, or an explicit
+   *  ERROR such as an illegal ROTATE_TILE), in order. Published in the serialized state as
+   *  `rejected` once non-empty, so a replay host — the client's Test Runner above all — can tell
+   *  that recorded moves were skipped instead of reporting the truncated end state as a pass.
+   *  Absent when empty, so ordinary states (and the goldens) are unchanged. */
+  private readonly rejected: Array<{ type: string; tileId?: string; message: string }> = [];
 
   private bulk = false;
   /** Set once the game reaches GameOverPhase. Java's host loop is `while (!gameIsOver)`,
@@ -57,7 +63,28 @@ export class Engine {
     if (this.over) return null; // game is over — Java's run loop has already stopped reading
     if (line.charAt(0) === "%") return this.parseDirective(line);
     if (this.game === null) return this.handleGameSetup(line);
-    return this.handleMessage(line);
+    try {
+      return this.handleMessage(line);
+    } catch (e) {
+      // recorded for the state's `rejected` list, then rethrown as before (the CLI host logs it)
+      this.recordRejected(line, e instanceof Error ? e.message : String(e));
+      throw e;
+    }
+  }
+
+  /** `{ type, tileId?, message }` — the tile id when the refused message carried one (e.g. the
+   *  abbey `AM/A` of a refused PLACE_TILE), so a test can name exactly what it expects refused. */
+  private recordRejected(line: string, message: string): void {
+    let type = "?";
+    let tileId: string | undefined;
+    try {
+      const entry = JSON.parse(line) as { type?: unknown; payload?: { tileId?: unknown } };
+      type = String(entry.type ?? "?");
+      if (typeof entry.payload?.tileId === "string") tileId = entry.payload.tileId;
+    } catch {
+      // not JSON — keep "?"
+    }
+    this.rejected.push(tileId === undefined ? { type, message } : { type, tileId, message });
   }
 
   private parseDirective(line: string): string | null {
@@ -287,11 +314,16 @@ export class Engine {
   }
 
   private error(message: string): string | null {
+    this.rejected.push({ type: "ROTATE_TILE", message });
     return this.bulk ? null : JSON.stringify({ type: "ERROR", payload: { message } });
   }
 
   private serialize(): string {
-    return this.serializer.serializeGame(this.game!);
+    const json = this.serializer.serializeGame(this.game!);
+    if (this.rejected.length === 0) return json;
+    // append `rejected` to the top-level state object
+    const end = json.lastIndexOf("}");
+    return json.slice(0, end) + ',"rejected":' + JSON.stringify(this.rejected) + json.slice(end);
   }
 
   /** Current game (for hosts that want direct access / testing). */

@@ -1,10 +1,10 @@
 {
-  "appVersion": "7.1.0",
+  "appVersion": "7.2.0",
   "gameId": "1",
   "name": "",
   "initialRandom": 0.073837971814833,
-  "created": "2026-11-17T18:13:10.027Z",
-  "clock": 285705,
+  "created": "2026-11-17T21:32:00.869Z",
+  "clock": 12215190,
   "setup": {
     "sets": {
       "basic:1": 1,
@@ -853,45 +853,21 @@
       },
       "player": 1,
       "clock": 247784
-    },
-    {
-      "type": "DEPLOY_MEEPLE",
-      "payload": {
-        "pointer": {
-          "position": [
-            5,
-            -2
-          ],
-          "location": "I",
-          "feature": "Monastery"
-        },
-        "meepleId": "1.small.1"
-      },
-      "player": 1,
-      "clock": 248777
-    },
-    {
-      "type": "COMMIT",
-      "payload": {
-        "random": 0.12450340070040124
-      },
-      "player": 1,
-      "clock": 249292
     }
   ],
   "test": {
     "description": "Fishermen No Fishermen Gap For Abbey",
     "assertions": [
-      "Betty scored monastery for 9 points at [5,-2].",
       "John has 0 points.",
-      "Betty has 9 points.",
+      "Betty has 0 points.",
       "Phase is TilePhase",
-      "Turn player is John",
-      "Active player is John",
+      "Turn player is Betty",
+      "Active player is Betty",
       "Player can't pass",
-      "Available actions: TilePlacement,RI.1/II",
-      "TilePlacement RI.1/II options: [6,-4] - [270]; [-1,5] - [270]",
-      "Undo is not allowed"
+      "Available actions: TilePlacement,fishermen/fifi",
+      "TilePlacement fishermen/fifi options: [-1,2] - [0,180]; [6,-4] - [90,270]; [8,5] - [0,180]; [8,7] - [0,180]; [7,8] - [90,270]; [6,7] - [0,180]; [-1,5] - [0,180]; [7,-2] - [0,180]",
+      "Undo is not allowed",
+      "Rejected: AM/A Invalid placement [5,-2],R0"
     ]
   }
 }
