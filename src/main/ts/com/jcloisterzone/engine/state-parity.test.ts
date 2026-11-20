@@ -207,6 +207,8 @@ function stripScoredMeeples(v: unknown): void {
     }
     // TS-only enrichment on the neutral-moved event (the host meeple); Java goldens lack it
     delete o.hostMeeple;
+    // TS-only: the meeples a deployed one joined (crop circle)
+    delete o.alongside;
     for (const k of Object.keys(o)) stripScoredMeeples(o[k]);
   }
 }

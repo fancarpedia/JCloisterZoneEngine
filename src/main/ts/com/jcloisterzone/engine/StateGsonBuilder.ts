@@ -661,6 +661,20 @@ export class StateGsonBuilder {
         };
         if (ev.getMovedFrom() !== null) data.from = this.boardPtr(ev.getMovedFrom());
         this.putCause(data, ev.getCause());
+        // TS-only: the meeples it joined on its feature (a crop circle's extra follower)
+        const alongside = ev.getAlongside();
+        if (alongside.length > 0) {
+          data.alongside = alongside.map(([m, fp]) => {
+            const feat = fp.getFeature();
+            return {
+              type: simpleName(m.constructor as ClassToken),
+              player: m.getPlayer().getIndex(),
+              position: this.pos(fp.getPosition()),
+              feature: feat === null ? null : simpleName(feat),
+              location: this.loc(fp.getLocation()),
+            };
+          });
+        }
         turnEvents.push(data);
       } else if (ev instanceof MeepleReturned) {
         // forced returns always; a scoring return only when the game itself caused it (flock or

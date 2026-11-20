@@ -1,4 +1,5 @@
 import type { Location } from "../board/Location.js";
+import type { FeaturePointer } from "../board/pointer/FeaturePointer.js";
 import type { BoardPointer } from "../board/pointer/BoardPointer.js";
 import type { Meeple } from "../figure/Meeple.js";
 import type { PlacementCause } from "./PlacementCause.js";
@@ -14,8 +15,15 @@ export class MeepleDeployed extends PlayEvent {
     private readonly ptr: BoardPointer,
     private readonly movedFrom: BoardPointer | null = null,
     private readonly cause: PlacementCause | null = null,
+    /** TS-only: the meeples this one joined on its feature, where they stood — e.g. a crop circle
+     *  adds a follower next to the player's own: the history draws them together. */
+    private readonly alongside: ReadonlyArray<readonly [Meeple, FeaturePointer]> = [],
   ) {
     super(metadata);
+  }
+
+  getAlongside(): ReadonlyArray<readonly [Meeple, FeaturePointer]> {
+    return this.alongside;
   }
 
   getMeeple(): Meeple {

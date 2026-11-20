@@ -31,6 +31,7 @@ import { ReturnMeepleSource } from "../ReturnMeepleSource.js";
 import type { Capability } from "../Capability.js";
 import { CornCircleCapability, CornCircleModifier } from "../capability/CornCircleCapability.js";
 import { DeployMeeple } from "../../reducers/DeployMeeple.js";
+import { PlacementCause } from "../../event/PlacementCause.js";
 import { UndeployMeeple } from "../../reducers/UndeployMeeple.js";
 import { ActionsState } from "../state/ActionsState.js";
 import type { GameState } from "../state/GameState.js";
@@ -129,7 +130,22 @@ export class CornCirclePhase extends Phase {
   handleDeployMeeple(state: GameState, msg: DeployMeepleMessage): StepResult {
     const player = state.getActivePlayer()!;
     const m = player.getMeepleFromSupply(state, msg.getMeepleId()!)!;
-    state = new DeployMeeple(m, msg.getPointer()!).apply(state);
+    const fp = msg.getPointer()!;
+    // the player's followers already on that feature — the reason the crop circle lets them add one;
+    // the history draws them together with the new meeple
+    const feature = state.getStructure(fp);
+    const alongside: Array<readonly [Meeple, FeaturePointer]> = [];
+    if (feature !== null) {
+      for (const t of state.getDeployedMeeples()) {
+        if (t._1.getPlayer().getIndex() !== player.getIndex()) continue;
+        if (!(t._1 instanceof Follower)) continue;
+        if (feature.getPlaces().contains(t._2)) alongside.push([t._1, t._2] as const);
+      }
+    }
+    state = new DeployMeeple(m, fp)
+      .withCause(PlacementCause.rule("crop-circle"))
+      .withAlongside(alongside)
+      .apply(state);
     return this.promote(
       state.setPlayerActions(new ActionsState(player, new ConfirmAction() as unknown as PlayerAction<unknown>, false)),
     );

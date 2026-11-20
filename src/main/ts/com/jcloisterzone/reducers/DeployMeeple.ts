@@ -11,11 +11,19 @@ import type { PlacementCause } from "../event/PlacementCause.js";
 
 /** Deploys a meeple onto a feature pointer. */
 export class DeployMeeple extends AbstractUndeploy {
+  // the meeples this one joins on the feature, recorded on the event (TS-only, for the history)
+  private alongside: ReadonlyArray<readonly [Meeple, FeaturePointer]> = [];
+
   constructor(
     private readonly meeple: Meeple,
     private readonly fp: FeaturePointer,
   ) {
     super();
+  }
+
+  withAlongside(alongside: ReadonlyArray<readonly [Meeple, FeaturePointer]>): this {
+    this.alongside = alongside;
+    return this;
   }
 
   apply(state: GameState): GameState {
@@ -46,7 +54,7 @@ export class DeployMeeple extends AbstractUndeploy {
     const movedFrom = deployedMeeples.get(this.meeple).getOrNull();
     state = state.setDeployedMeeples(deployedMeeples.put(this.meeple, this.fp) as typeof deployedMeeples);
     state = state.appendEvent(
-      new MeepleDeployed(PlayEventMeta.createWithActivePlayer(state), this.meeple, this.fp, movedFrom, this.cause),
+      new MeepleDeployed(PlayEventMeta.createWithActivePlayer(state), this.meeple, this.fp, movedFrom, this.cause, this.alongside),
     );
 
     if (movedFrom !== null && this.meeple instanceof Follower) {
