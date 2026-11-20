@@ -6,7 +6,8 @@ import { Position } from "../../board/Position.js";
 import { ExprItem } from "../../event/ExprItem.js";
 import { PlayEventMeta } from "../../event/PlayEvent.js";
 import { PointsExpression } from "../../event/PointsExpression.js";
-import { ReceivedPoints } from "../../event/ScoreEvent.js";
+import { ReceivedPoints, type ScoredMeeple } from "../../event/ScoreEvent.js";
+import { Tuple2 } from "../../../../io/vavr/Tuple.js";
 import { TokenPlacedEvent } from "../../event/TokenPlacedEvent.js";
 import { Circus } from "../../feature/Circus.js";
 import { Follower } from "../../figure/Follower.js";
@@ -65,11 +66,17 @@ export class BigTopCapability extends Capability<number> {
     positions = positions.add(pos);
 
     let counts: VMap<Player, number> = HashMap.empty<Player, number>();
+    // each player's scored followers where they stood — carried on the points (like a scored
+    // feature's), so the history shows them for the Big Top score
+    const scoredBy = new Map<number, ScoredMeeple[]>();
     for (const t of state.getDeployedMeeples()) {
       if (!(t._1 instanceof Follower)) continue;
       if (!positions.contains(t._2.getPosition())) continue;
       const p = t._1.getPlayer();
       counts = counts.put(p, counts.get(p).getOrElse(0) + 1);
+      const list = scoredBy.get(p.getIndex()) ?? [];
+      list.push(new Tuple2(t._1 as Follower, t._2) as ScoredMeeple);
+      scoredBy.set(p.getIndex(), list);
     }
 
     const points: ReceivedPoints[] = [];
@@ -77,7 +84,12 @@ export class BigTopCapability extends Capability<number> {
       const followers = ct._2;
       const expr = new ExprItem(followers, "meeples", token.points * followers);
       points.push(
-        new ReceivedPoints(new PointsExpression("bigtop", expr), ct._1, pos as unknown as BoardPointer),
+        new ReceivedPoints(
+          new PointsExpression("bigtop", expr),
+          ct._1,
+          pos as unknown as BoardPointer,
+          List.ofAll(scoredBy.get(ct._1.getIndex()) ?? []) as List<ScoredMeeple>,
+        ),
       );
     }
     if (points.length > 0) {
