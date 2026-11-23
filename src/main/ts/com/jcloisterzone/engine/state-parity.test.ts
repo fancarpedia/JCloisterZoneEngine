@@ -66,7 +66,6 @@ const SET_ELEMENTS: Record<string, string[]> = {
   flier: ["flier"],
   "corn-circles": ["corn-circle"],
   "russian-promos": ["russian-trap"],
-  watchtowers: ["watchtower"],
 };
 function expandElements(
   sets: Record<string, number>,

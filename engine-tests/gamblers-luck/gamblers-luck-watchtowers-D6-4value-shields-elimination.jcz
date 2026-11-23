@@ -13,6 +13,7 @@
       "gamblers-luck": 1
     },
     "elements": {
+      "watchtower": true,
       "small-follower": 7,
       "farmers": true
     },

@@ -45,7 +45,6 @@ const SET_ELEMENTS = {
   flier: ["flier"],
   "corn-circles": ["corn-circle"],
   "russian-promos": ["russian-trap"],
-  watchtowers: ["watchtower"],
 };
 
 /** Inject set-implied elements: hardcoded old-expansion map + `<enforces>` declarations

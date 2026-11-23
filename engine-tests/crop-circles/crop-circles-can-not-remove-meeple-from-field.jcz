@@ -24,6 +24,7 @@
       "cult/5": 1
     },
     "elements": {
+      "watchtower": true,
       "small-follower": 7,
       "farmers": true,
       "meteorite": true,

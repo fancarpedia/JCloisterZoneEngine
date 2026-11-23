@@ -1,0 +1,375 @@
+{
+  "appVersion": "7.2.0",
+  "gameId": "af256bac1c754cc08192f4d6db046d4e",
+  "name": "",
+  "initialRandom": 0.5186239169031659,
+  "created": "2026-11-21T13:18:35.566Z",
+  "clock": 365126,
+  "setup": {
+    "sets": {
+      "basic:1": 1,
+      "princess-and-dragon:1": 1
+    },
+    "elements": {
+      "small-follower": 7,
+      "farmers": true,
+      "dragon": 1,
+      "fairy": 1,
+      "princess": true,
+      "portal": true
+    },
+    "rules": {},
+    "timer": {
+      "initial": 180,
+      "turn": 20
+    },
+    "start": [
+      {
+        "tile": "BA/RCr",
+        "x": 0,
+        "y": 0,
+        "rotation": 0
+      }
+    ],
+    "ai": false,
+    "options": {
+      "randomizeSeating": true
+    }
+  },
+  "players": [
+    {
+      "name": "Bumsakalaka",
+      "slot": 2,
+      "ai": false,
+      "clientId": "10babd2edac340fdaac4c9e3a2055b53"
+    }
+  ],
+  "chat": [],
+  "replay": [
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "DG/Rr.v",
+        "rotation": "R180",
+        "position": [
+          -1,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 1876
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.0967730036918053
+      },
+      "player": 0,
+      "clock": 2407
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          1,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 3836
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 4014
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9708959715037335
+      },
+      "player": 0,
+      "clock": 4025
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          2,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 5149
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 5319
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.8716091212900821
+      },
+      "player": 0,
+      "clock": 5321
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/RFr",
+        "rotation": "R0",
+        "position": [
+          3,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 6729
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 6958
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.9062256516537093
+      },
+      "player": 0,
+      "clock": 6961
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "DG/RFr.d",
+        "rotation": "R0",
+        "position": [
+          2,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 9418
+    },
+    {
+      "type": "DEPLOY_MEEPLE",
+      "payload": {
+        "pointer": {
+          "position": [
+            2,
+            1
+          ],
+          "location": "WE",
+          "feature": "Road"
+        },
+        "meepleId": "0.small.1"
+      },
+      "player": 0,
+      "clock": 12164
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          0,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 14464
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          1,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 15722
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          2,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 16858
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          2,
+          1
+        ]
+      },
+      "player": 0,
+      "clock": 18012
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.4116937302669543
+      },
+      "player": 0,
+      "clock": 18016
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/L",
+        "rotation": "R0",
+        "position": [
+          2,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 272276
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 272514
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.2399869803142214
+      },
+      "player": 0,
+      "clock": 272517
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "BA/Cc.1",
+        "rotation": "R90",
+        "position": [
+          3,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 273702
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 273826
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.8894576689788112
+      },
+      "player": 0,
+      "clock": 273828
+    },
+    {
+      "type": "PLACE_TILE",
+      "payload": {
+        "tileId": "DG/C.d",
+        "rotation": "R0",
+        "position": [
+          1,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 275230
+    },
+    {
+      "type": "PASS",
+      "payload": {},
+      "player": 0,
+      "clock": 276032
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          2,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 278491
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          2,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 279626
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          3,
+          -1
+        ]
+      },
+      "player": 0,
+      "clock": 280983
+    },
+    {
+      "type": "MOVE_NEUTRAL_FIGURE",
+      "payload": {
+        "figureId": "dragon.1",
+        "to": [
+          3,
+          0
+        ]
+      },
+      "player": 0,
+      "clock": 282043
+    },
+    {
+      "type": "COMMIT",
+      "payload": {
+        "random": 0.614976199205201
+      },
+      "player": 0,
+      "clock": 282046
+    }
+  ],
+  "gameAnnotations": {
+    "drawOrder": [
+      "DG/Rr.v",
+      "BA/RFr",
+      "BA/RFr",
+      "BA/RFr",
+      "DG/RFr.d"
+    ]
+  }
+}
