@@ -18,6 +18,7 @@ import { GamblersLuckCapability } from "./capability/GamblersLuckCapability.js";
 import { BazaarCapability } from "./capability/BazaarCapability.js";
 import { GoldPiecePhase } from "./phase/GoldPiecePhase.js";
 import { MageAndWitchPhase } from "./phase/MageAndWitchPhase.js";
+import { BardsLutePhase } from "./phase/BardsLutePhase.js";
 import { PhantomPhase } from "./phase/PhantomPhase.js";
 import { TunnelPhase } from "./phase/TunnelPhase.js";
 import { PlaceFerryPhase } from "./phase/PlaceFerryPhase.js";
@@ -46,6 +47,7 @@ import { CastleCapability } from "./capability/CastleCapability.js";
 import { CornCircleCapability } from "./capability/CornCircleCapability.js";
 import { GoldminesCapability } from "./capability/GoldminesCapability.js";
 import { MageAndWitchCapability } from "./capability/MageAndWitchCapability.js";
+import { BardsLuteCapability } from "./capability/BardsLuteCapability.js";
 import { PhantomCapability } from "./capability/PhantomCapability.js";
 import { TunnelCapability } from "./capability/TunnelCapability.js";
 import { FerriesCapability } from "./capability/FerriesCapability.js";
@@ -168,6 +170,10 @@ export class GameStatePhaseReducer {
     // Set Action/Phantom phases as possible rewind targets
     rewindActionContainer.setActionPhase(actionPhase);
     rewindActionContainer.setPhantomPhase(phantomPhase);
+    // Bards' note: right after the lute tile is placed, before any meeple (as in the Java branch)
+    if (setup.contains(BardsLuteCapability as never)) {
+      next = new BardsLutePhase(rng, next);
+    }
     if (setup.contains(MageAndWitchCapability as never)) {
       next = new MageAndWitchPhase(rng, next);
     }

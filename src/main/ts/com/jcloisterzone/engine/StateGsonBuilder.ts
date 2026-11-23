@@ -75,6 +75,8 @@ import { BazaarSelectBuyOrSellAction } from "../action/BazaarSelectBuyOrSellActi
 import { CornCircleSelectDeployOrRemoveAction } from "../action/CornCircleSelectDeployOrRemoveAction.js";
 import { DonkeyAction } from "../action/DonkeyAction.js";
 import { GoldPieceAction } from "../action/GoldPieceAction.js";
+import { BardsLuteAction } from "../action/BardsLuteAction.js";
+import { BardsLuteCapability } from "../game/capability/BardsLuteCapability.js";
 import { ShepherdPlacementConfirmAction } from "../action/ShepherdPlacementConfirmAction.js";
 import { TilePlacementConfirmAction } from "../action/TilePlacementConfirmAction.js";
 import { TunnelAction } from "../action/TunnelAction.js";
@@ -284,6 +286,12 @@ export class StateGsonBuilder {
         const arr = buckets.get(lb.name());
         if (arr && arr.length > 0) out[lb.name()] = arr;
       }
+    }
+    // Bards of Carcassonne — the notes on the board (feature pointers), when the capability is present
+    if (state.hasCapability(BardsLuteCapability as never)) {
+      out[BardsLuteCapability.BardsLuteToken.BARDS_NOTE.name()] = [...BardsLuteCapability.getNotes(state)].map((fp) =>
+        this.boardPtr(fp),
+      );
     }
     // Goldmines — gold token placements (emitted, possibly empty, when capability present)
     if (state.hasCapability(GOLD_CLS)) {
@@ -1104,6 +1112,13 @@ export class StateGsonBuilder {
     if (action instanceof TilePlacementConfirmAction) {
       // field-less action — Java's default Gson reflection emits an empty object.
       return {};
+    }
+    if (action instanceof BardsLuteAction) {
+      return {
+        type: "BardsLute",
+        token: action.getToken().name(),
+        options: [...action.getOptions()].map((fp) => this.boardPtr(fp)),
+      };
     }
     if (action instanceof GoldPieceAction) {
       return {

@@ -26,6 +26,7 @@ import { FeaturePointerAddModifier } from "./modifier/FeaturePointerAddModifier.
 import { IntegerAddModifier } from "./modifier/IntegerAddModifier.js";
 import { IntegerNonMergingModifier } from "./modifier/IntegerNonMergingModifier.js";
 import * as ModifierSupport from "./modifier/ModifierSupport.js";
+import { BardsLuteCapability } from "../game/capability/BardsLuteCapability.js";
 
 type ModMap = VMap<FeatureModifier<unknown>, unknown>;
 
@@ -194,6 +195,11 @@ export class City
       ) {
         return new PointsExpression("city.incomplete", new ExprItem("cathedral", 0));
       }
+      // Bards: an unfinished city with a note scores nothing at the end
+      if (!completed) {
+        const notes = BardsLuteCapability.countNotes(state, this.getPlaces());
+        if (notes > 0) return new PointsExpression("city.incomplete", new ExprItem(notes, "bardsnotes", 0));
+      }
 
       const besieged = this.hasModifier(state, City.BESIEGED);
       let pennants = this.getModifier(state, City.PENNANTS, 0);
@@ -218,6 +224,11 @@ export class City
       }
       if (completed && this.hasModifier(state, City.DARMSTADTIUM)) {
         exprItems.push(new ExprItem("darmstadtium", 3));
+      }
+      // Bards: a completed city with a note + 1 per tile (advanced: per note)
+      if (completed) {
+        const bonus = BardsLuteCapability.bonus(state, this.getPlaces(), tileCount);
+        if (bonus !== null) exprItems.push(bonus);
       }
 
       // NOTE: scoreScriptedModifiers(...) intentionally omitted (GraalVM dropped).

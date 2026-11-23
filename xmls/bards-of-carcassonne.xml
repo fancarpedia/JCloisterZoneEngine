@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defs>
+  <expansion id="BARDS-OF-CARCASSONNE">
+    <title>Bards of Carcassonne</title>
+    <sets>
+      <ref tile-set="bards-of-carcassonne" />
+    </sets>
+    <implies element="bards-lute" />
+    <impliesAllowed element="well" />
+    <icon>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28.35 28.35">
+        <path xmlns="http://www.w3.org/2000/svg" class="st0" d="M0.28,17.48l0.99-6.7h26.73c0,0,0.18,0.98-0.08,2.07c-0.63,2.64-1.36,4.06-7.61,4.06s-10.1-4.63-10.1-4.63  l-7.95-0.41l-1.08,5.71L0.28,17.48z"/>
+      </svg>
+    </icon>
+    <link url="http://www.carcassonnecentral.com/community/index.php?action=downloads;sa=view;down=193" title="Download" type="download" />
+    <link url="https://www.hans-im-glueck.de/en/guide-for-authors/" title="©"  />
+  </expansion>
+  <tiles>
+    <tile id="bards-of-carcassonne/cc.l" bards-lute="true">
+      <city>N E</city>
+      <field city="N E">SL SR WL WR</field>
+    </tile>
+    <tile id="bards-of-carcassonne/cfc.l" bards-lute="true">
+      <city>S</city>
+      <city>N</city>
+      <field city="S N">EL ER WL WR</field>
+    </tile>
+    <tile id="bards-of-carcassonne/crcr.l" bards-lute="true">
+      <city wagon-move="a b">N</city>
+      <city wagon-move="c">S</city>
+      <field city="N">EL</field>
+      <field city="N">WR</field>
+      <field city="N S">ER</field>
+      <field city="S">WL</field>
+      <road wagon-move="a c">W</road>
+      <road wagon-move="b">E</road>
+    </tile>
+    <tile id="bards-of-carcassonne/crfc.l" bards-lute="true">
+      <city>N</city>
+      <field city="N">EL WR</field>
+      <field>ER SL SR WL</field>
+      <road>W E</road>
+    </tile>
+    <tile id="bards-of-carcassonne/rc.l" bards-lute="true">
+      <city wagon-move="a">N</city>
+      <field city="N">EL ER SL SR WL</field>
+      <field city="N">WR</field>
+      <road wagon-move="a">W</road>
+    </tile>
+    <tile id="bards-of-carcassonne/rc.2.l.w" bards-lute="true">
+      <city>S</city>
+      <well road="W">I</well>
+      <field city="S">NL NR EL ER WL WR</field>
+      <road wells="1" well="I">W</road>
+    </tile>
+    <tile id="bards-of-carcassonne/rrcc.l" bards-lute="true">
+      <city>W</city>
+      <city>S</city>
+      <field city="W S">NL ER</field>
+      <field>NR EL</field>
+      <road>N E</road>
+    </tile>
+  </tiles>
+  <sets>
+    <tile-set id="bards-of-carcassonne">
+      <ref count="1" tile="bards-of-carcassonne/cc.l" />
+      <ref count="1" tile="bards-of-carcassonne/cfc.l" />
+      <ref count="1" tile="bards-of-carcassonne/crcr.l" />
+      <ref count="1" tile="bards-of-carcassonne/crfc.l" />
+      <ref count="1" tile="bards-of-carcassonne/rc.l" />
+      <ref count="1" tile="bards-of-carcassonne/rc.2.l.w" />
+      <ref count="1" tile="bards-of-carcassonne/rrcc.l" />
+    </tile-set>
+  </sets>
+</defs>

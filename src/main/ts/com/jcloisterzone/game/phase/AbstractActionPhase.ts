@@ -20,6 +20,7 @@ import { City } from "../../feature/City.js";
 import { Monastery } from "../../feature/Monastery.js";
 import { MonasteriesCapability } from "../capability/MonasteriesCapability.js";
 import { FishermenCapability } from "../capability/FishermenCapability.js";
+import { BardsLuteCapability } from "../capability/BardsLuteCapability.js";
 import { River } from "../../feature/River.js";
 import { Road } from "../../feature/Road.js";
 import { type Structure, isInstanceOfStructure } from "../../feature/Structure.js";
@@ -91,6 +92,11 @@ export abstract class AbstractActionPhase extends Phase {
       }
       // towers handled by the Tower capability separately
       places = places.filter((t) => !(t._2 instanceof Tower));
+      // Bards: no meeple on the feature that received a note THIS turn (later turns: allowed)
+      const noted = BardsLuteCapability.featuresNotedThisTurn(state);
+      if (noted.length > 0) {
+        places = places.filter((t) => !noted.some((f) => f.getPlaces().contains(t._1)));
+      }
       // a special (German) monastery may also be occupied as an abbot — modelled as
       // a virtual AS_ABBOT location on the monastery feature.
       places = places.flatMap((t) => {

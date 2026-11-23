@@ -30,6 +30,7 @@ import type { BooleanModifier } from "./modifier/BooleanModifier.js";
 import type { FeatureModifier } from "./modifier/FeatureModifier.js";
 import { IntegerAddModifier } from "./modifier/IntegerAddModifier.js";
 import * as ModifierSupport from "./modifier/ModifierSupport.js";
+import { BardsLuteCapability } from "../game/capability/BardsLuteCapability.js";
 
 type ModMap = VMap<FeatureModifier<unknown>, unknown>;
 
@@ -274,6 +275,11 @@ export class Road
     ) {
       return new PointsExpression("road.incomplete", new ExprItem("inn", 0));
     }
+    // Bards: an unfinished road with a note scores nothing at the end
+    if (!completed) {
+      const notes = BardsLuteCapability.countNotes(state, this.getPlaces());
+      if (notes > 0) return new PointsExpression("road.incomplete", new ExprItem(notes, "bardsnotes", 0));
+    }
 
     const labyrinth = this.hasModifier(state, Road.LABYRINTH);
     const tileCount = this.getTilePositions().size();
@@ -291,6 +297,11 @@ export class Road
     }
     if (wellsCount > 0) {
       exprItems.push(new ExprItem(wellsCount, "wells", (inn && completed ? 2 : 1) * wellsCount));
+    }
+    // Bards: a completed road with a note + 1 per tile (advanced: per note); wells score as usual
+    if (completed) {
+      const bonus = BardsLuteCapability.bonus(state, this.getPlaces(), tileCount);
+      if (bonus !== null) exprItems.push(bonus);
     }
     if (this.marketplaces.length() > 0) {
       const marketplaceCap = state.getCapabilities().get(MarketplaceCapability);

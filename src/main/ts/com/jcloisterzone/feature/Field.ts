@@ -26,6 +26,7 @@ import { MultisetStringIntegerAddModifier } from "./modifier/MultisetStringInteg
 import type { BooleanModifier } from "./modifier/BooleanModifier.js";
 import type { FeatureModifier } from "./modifier/FeatureModifier.js";
 import * as ModifierSupport from "./modifier/ModifierSupport.js";
+import { BardsLuteCapability } from "../game/capability/BardsLuteCapability.js";
 
 type ModMap = VMap<FeatureModifier<unknown>, unknown>;
 
@@ -229,6 +230,12 @@ export class Field extends ScoreableTileFeature implements MultiTileFeature, Mod
       if (pigHerds > 0) {
         exprItems.push(new ExprItem("pigHerds", scoredObjects)); // do not stack
       }
+    }
+    // Bards: a field with a note + 1 per completed city and per castle (advanced: per note);
+    // besieged cities count as completed cities (Cathars), the Count's city does not
+    if (cityCount + castleCount > 0) {
+      const bonus = BardsLuteCapability.bonus(state, this.getPlaces(), cityCount + castleCount);
+      if (bonus !== null) exprItems.push(bonus);
     }
 
     // NOTE: scoreScriptedModifiers(...) intentionally omitted (GraalVM dropped).

@@ -30,6 +30,7 @@ import { CastleCapability } from "../game/capability/CastleCapability.js";
 import { GoldminesCapability } from "../game/capability/GoldminesCapability.js";
 import { TunnelCapability } from "../game/capability/TunnelCapability.js";
 import { FerriesCapability } from "../game/capability/FerriesCapability.js";
+import { BardsLuteCapability } from "../game/capability/BardsLuteCapability.js";
 import { LittleBuildingsCapability } from "../game/capability/LittleBuildingsCapability.js";
 import { TowerCapability } from "../game/capability/TowerCapability.js";
 import type { Token } from "../game/Token.js";
@@ -82,6 +83,9 @@ function resolveToken(name: string): Token {
   }
   if (name === "FERRY") {
     return FerriesCapability.FerryToken.FERRY;
+  }
+  if (name === "BARDS_NOTE") {
+    return BardsLuteCapability.BardsLuteToken.BARDS_NOTE;
   }
   throw new Error("Unknown token " + name);
 }

@@ -28,6 +28,8 @@ export class Rule extends JavaEnum {
   static readonly ROBBERS_SON_ACTION = new Rule("ROBBERS_SON_ACTION", 21, "robbers-son-action", "string", ["may", "must"]);
   static readonly METEORITE_IMPACT = new Rule("METEORITE_IMPACT", 22, "meteorite-impact", "string", ["standard", "extended", "combination"]);
   static readonly BLACK_FAIRY_PLACEMENT = new Rule("BLACK_FAIRY_PLACEMENT", 23, "black-fairy-placement", "string", ["next-follower", "on-tile"]);
+  // Bards of Carcassonne, advanced variant: each note adds its bonus (notes stack); basic: one bonus
+  static readonly BARDS_NOTES_STACK = new Rule("BARDS_NOTES_STACK", 24, "bards-notes-stack", "boolean", null);
 
   private readonly key: string | null;
   private readonly type: RuleType;
@@ -46,7 +48,7 @@ export class Rule extends JavaEnum {
     Rule.TUNNELIZE_OTHER_EXPANSIONS, Rule.MORE_TUNNEL_TOKENS, Rule.FESTIVAL_RETURN, Rule.KEEP_MONASTERIES,
     Rule.LABYRINTH_VARIANT, Rule.LITTLE_BUILDINGS_SCORING, Rule.KING_AND_ROBBER_SCORING, Rule.TINY_CITY_SCORING,
     Rule.COC_FINAL_SCORING, Rule.COUNT_MOVE, Rule.INN_AND_CATHEDRAL_FINAL_SCORING, Rule.VINEYARDS_FOR_GARDEN,
-    Rule.ROBBERS_SON_ACTION, Rule.METEORITE_IMPACT, Rule.BLACK_FAIRY_PLACEMENT,
+    Rule.ROBBERS_SON_ACTION, Rule.METEORITE_IMPACT, Rule.BLACK_FAIRY_PLACEMENT, Rule.BARDS_NOTES_STACK,
   ];
 
   static values(): readonly Rule[] {
