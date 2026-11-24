@@ -1,6 +1,6 @@
 {
   "gameId": "1",
-  "appVersion": "7.2.0-alpha.4",
+  "appVersion": "7.3.0-alpha.1",
   "initialRandom": 0.0,
   "test": {
     "description": "Multi-edge / Abbey merge test",
